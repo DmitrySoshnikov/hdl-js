@@ -7,3 +7,13 @@ const shell = require('shelljs');
 
 // Rebuild parser.
 shell.exec(`node node_modules/syntax-cli/bin/syntax -g src/parser/hdl.g -o src/parser/generated/hld-parser.js -m lalr1 --loc`);
+
+// Setup pre-commit hook.
+if (!shell.test('-f', '.git/hooks/pre-commit')) {
+  shell.ln('-s', '../../scripts/git-pre-commit', '.git/hooks/pre-commit');
+}
+
+// Setup pre-push hook.
+if (!shell.test('-f', '.git/hooks/pre-push')) {
+  shell.ln('-s', '../../scripts/git-pre-push', '.git/hooks/pre-push');
+}
