@@ -1,5 +1,7 @@
 # hdl-js
 
+[![Build Status](https://travis-ci.org/DmitrySoshnikov/hdl-js.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/hdl-js) [![npm version](https://badge.fury.io/js/hdl-js.svg)](https://badge.fury.io/js/hdl-js)
+
 Hardware definition language (HDL) parser, and Hardware simulator.
 
 ### Table of Contents
@@ -153,6 +155,6 @@ const hdlFile = fs.readFileSync('./examples/And.hdl', 'utf-8');
 console.log(hdl.parse(hdlFile)); // HDL AST
 ```
 
-#Emulator
+# Emulator
 
 TODO; WIP.
