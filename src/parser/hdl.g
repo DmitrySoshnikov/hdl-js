@@ -3,7 +3,7 @@
  *
  * To rebuild run:
  *
- *   npm run rebuild
+ *   npm run build
  */
 
 %lex
