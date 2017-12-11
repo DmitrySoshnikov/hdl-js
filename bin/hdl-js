@@ -43,7 +43,7 @@ function main() {
   if (parse) {
     const parsed = hdl.parse(hdlFile);
     console.info(
-      '\n', colors.bold('Parsed:'),
+      '\n', colors.bold('Parsed:'), '\n\n',
       JSON.stringify(parsed, null, 2), '\n'
     );
     return;

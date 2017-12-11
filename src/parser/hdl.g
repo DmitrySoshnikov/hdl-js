@@ -1,9 +1,9 @@
 /**
  * HDL (Hardware-definition langauge) syntactic grammar.
  *
- * How to run:
+ * To rebuild run:
  *
- * ./bin/syntax -g examples/hdl.g -m lalr1 -f examples/and.hdl
+ *   npm run rebuild
  */
 
 %lex
