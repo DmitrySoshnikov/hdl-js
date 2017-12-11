@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const colors = require('colors');
+const fs = require('fs');
+const hdl = require('..');
+
+function enforceUnique(v) {
+  return Array.isArray(v) ? v[v.length - 1] : v;
+}
+
+const options = require('yargs')
+  .usage('Usage: $0 [options]')
+  .options({
+    file: {
+      alias: 'f',
+      describe: 'An HDL file containing chip specification',
+      demandOption: true,
+      requiresArg: true,
+      coerce: enforceUnique,
+    },
+    parse: {
+      alias: 'p',
+      describe: 'Parse the HDL file, and print AST',
+    },
+  })
+  .alias('help', 'h')
+  .alias('version', 'v')
+  .argv;
+
+function main() {
+  const {
+    file,
+    parse,
+  } = options;
+
+  const hdlFile = fs.readFileSync(file, 'utf-8');
+
+  // ------------------------------------------------------
+  // Parser.
+
+  if (parse) {
+    const parsed = hdl.parse(hdlFile);
+    console.info(
+      '\n', colors.bold('Parsed:'),
+      JSON.stringify(parsed, null, 2), '\n'
+    );
+    return;
+  }
+}
+
+if (require.main === module) {
+  main();
+}
