@@ -6,7 +6,7 @@
 const shell = require('shelljs');
 
 // Rebuild parser.
-shell.exec(`node node_modules/syntax-cli/bin/syntax -g src/parser/hdl.g -o src/parser/generated/hld-parser.js -m lalr1 --loc`);
+shell.exec(`node node_modules/syntax-cli/bin/syntax -g src/parser/hdl.g -o src/parser/generated/hdl-parser.js -m lalr1 --loc`);
 
 // Setup pre-commit hook.
 if (!shell.test('-f', '.git/hooks/pre-commit')) {
