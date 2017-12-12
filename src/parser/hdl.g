@@ -15,10 +15,10 @@
 
 \s+                 /* skip whitespace */
 
-CHIP                return 'CHIP'
-IN                  return 'IN'
-OUT                 return 'OUT'
-PARTS               return 'PARTS'
+(?:CHIP|chip)       return 'CHIP'
+(?:IN|in)           return 'IN'
+(?:OUT|out)         return 'OUT'
+(?:PARTS|parts)     return 'PARTS'
 
 \w+                 return 'ID'
 
@@ -41,6 +41,12 @@ let outputs = [];
  */
 let parts = [];
 
+yyparse.onParseBegin = (_string) => {
+  inputs.length = 0;
+  outputs.length = 0;
+  parts.length = 0;
+};
+
 %}
 
 %%
@@ -58,7 +64,8 @@ Chip
   ;
 
 Sections
-  : Section Section Section
+  : Section
+  | Sections Section
   ;
 
 Section
@@ -128,7 +135,7 @@ ArgsList
   ;
 
 Arg
-  : ID '=' ID {
+  : Name '=' Name {
       $$ = {
         type: 'Argument',
         name: $1,
