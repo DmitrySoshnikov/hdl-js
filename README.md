@@ -89,11 +89,20 @@ The parsed AST is:
   type: 'Chip',
   name: 'And',
   inputs: [
-    'a',
-    'b',
+    {
+      type: 'Name',
+      value: 'a'
+    },
+    {
+      type: 'Name',
+      value: 'b'
+    }
   ],
   outputs: [
-    'out',
+    {
+      type: 'Name',
+      value: 'out'
+    }
   ],
   parts: [
     {
@@ -102,20 +111,38 @@ The parsed AST is:
       arguments: [
         {
           type: 'Argument',
-          name: 'a',
-          value: 'a',
+          name: {
+            type: 'Name',
+            value: 'a'
+          },
+          value: {
+            type: 'Name',
+            value: 'a'
+          }
         },
         {
           type: 'Argument',
-          name: 'b',
-          value: 'b',
+          name: {
+            type: 'Name',
+            value: 'b'
+          },
+          value: {
+            type: 'Name',
+            value: 'b'
+          }
         },
         {
           type: 'Argument',
-          name: 'out',
-          value: 'n',
-        },
-      ],
+          name: {
+            type: 'Name',
+            value: 'out'
+          },
+          value: {
+            type: 'Name',
+            value: 'n'
+          }
+        }
+      ]
     },
     {
       type: 'ChipCall',
@@ -123,22 +150,40 @@ The parsed AST is:
       arguments: [
         {
           type: 'Argument',
-          name: 'a',
-          value: 'n',
+          name: {
+            type: 'Name',
+            value: 'a'
+          },
+          value: {
+            type: 'Name',
+            value: 'n'
+          }
         },
         {
           type: 'Argument',
-          name: 'b',
-          value: 'n',
+          name: {
+            type: 'Name',
+            value: 'b'
+          },
+          value: {
+            type: 'Name',
+            value: 'n'
+          }
         },
         {
           type: 'Argument',
-          name: 'out',
-          value: 'out',
-        },
-      ],
-    },
-  ],
+          name: {
+            type: 'Name',
+            value: 'out'
+          },
+          value: {
+            type: 'Name',
+            value: 'out'
+          }
+        }
+      ]
+    }
+  ]
 }
 ```
 
