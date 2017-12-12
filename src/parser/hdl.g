@@ -10,17 +10,18 @@
 
 %%
 
-\/\/.*              /* skip comments */
-\/\*(.|\s)*?\*\/    /* skip comments */
+\/\/.*                  /* skip comments */
+\/\*(.|\s)*?\*\/        /* skip comments */
 
-\s+                 /* skip whitespace */
+\s+                     /* skip whitespace */
 
-(?:CHIP|chip)       return 'CHIP'
-(?:IN|in)           return 'IN'
-(?:OUT|out)         return 'OUT'
-(?:PARTS|parts)     return 'PARTS'
+\b(?:CHIP|chip)\b       return 'CHIP'
+\b(?:IN|in)\b           return 'IN'
+\b(?:OUT|out)\b         return 'OUT'
+\b(?:PARTS|parts)\b     return 'PARTS'
 
-\w+                 return 'ID'
+\d+                     return 'NUMBER'
+[a-zA-Z_$]\w*           return 'ID'
 
 /lex
 
@@ -47,12 +48,32 @@ yyparse.onParseBegin = (_string) => {
   parts.length = 0;
 };
 
+/**
+ * Converts subscript to `size` for input/ouput:
+ * `a[16]`: {value: 'a', size: 16}
+ *
+ * And to `index` for references:
+ * `a[15]`: {value: 'a', index: 15}
+ */
+function subscriptToProp(value, prop) {
+  if (value.subscript) {
+    value[prop] = value.subscript.value;
+    delete value.subscript;
+  }
+  return value;
+}
+
+function subscriptListToProp(values, prop) {
+  values.forEach(value => subscriptToProp(value, prop));
+  return values;
+}
+
 %}
 
 %%
 
 Chip
-  : CHIP Name '{' Sections '}' {
+  : CHIP Identifer '{' Sections '}' {
       $$ = {
         type: 'Chip',
         name: $2,
@@ -76,13 +97,13 @@ Section
 
 Inputs
   : IN Names ';' {
-      inputs.push(...$2);
+      inputs.push(...subscriptListToProp($2, 'size'));
     }
   ;
 
 Outputs
   : OUT Names ';' {
-      outputs.push(...$2);
+      outputs.push(...subscriptListToProp($2, 'size'));
     }
   ;
 
@@ -101,6 +122,33 @@ Names
   ;
 
 Name
+  : Identifer OptSub {
+      $$ = {
+        type: 'Name',
+        value: $1,
+      };
+
+      if ($2) {
+        $$.subscript = $2;
+      }
+    }
+  ;
+
+OptSub
+  : Subscript
+  | /* empty */
+  ;
+
+Subscript
+  : '[' NUMBER ']' {
+      $$ = {
+        kind: 'number',
+        value: Number($2),
+      }
+    }
+  ;
+
+Identifer
   : ID
   | CHIP
   | IN
@@ -117,7 +165,7 @@ ChipCalls
   ;
 
 ChipCall
-  : ID '(' ArgsList ')' ';' {
+  : Identifer '(' ArgsList ')' ';' {
       $$ = {
         type: 'ChipCall',
         name: $1,
@@ -138,8 +186,8 @@ Arg
   : Name '=' Name {
       $$ = {
         type: 'Argument',
-        name: $1,
-        value: $3,
+        name: subscriptToProp($1, 'index'),
+        value: subscriptToProp($3, 'index'),
       }
     }
   ;

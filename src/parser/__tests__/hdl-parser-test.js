@@ -3,121 +3,92 @@
  * Copyright (c) 2017-present Dmitry Soshnikov <dmitry.soshnikov@gmail.com>
  */
 
-const fs = require('fs');
 const parser = require('..');
 
 describe('hdl-parser', () => {
 
   it('basic-file', () => {
 
-    const exampleHDL = fs.readFileSync(
-      __dirname + '/../../../examples/And.hdl',
-      'utf-8'
-    );
-
-    expect(parser.parse(exampleHDL)).toEqual({
-      type: 'Chip',
-      name: 'And',
-      inputs: [
-        'a',
-        'b',
-      ],
-      outputs: [
-        'out',
-      ],
-      parts: [
-        {
-          type: 'ChipCall',
-          name: 'Nand',
-          arguments: [
-            {
-              type: 'Argument',
-              name: 'a',
-              value: 'a',
-            },
-            {
-              type: 'Argument',
-              name: 'b',
-              value: 'b',
-            },
-            {
-              type: 'Argument',
-              name: 'out',
-              value: 'n',
-            },
-          ],
-        },
-        {
-          type: 'ChipCall',
-          name: 'Nand',
-          arguments: [
-            {
-              type: 'Argument',
-              name: 'a',
-              value: 'n',
-            },
-            {
-              type: 'Argument',
-              name: 'b',
-              value: 'n',
-            },
-            {
-              type: 'Argument',
-              name: 'out',
-              value: 'out',
-            },
-          ],
-        },
-      ],
-    });
-  });
-
-
-  it('lower-case', () => {
-
     const exampleHDL = `
-      chip Sum {
-        in x, y;
-        out out;
-        parts:
-          Add(x=x, y=y, out=out);
+      CHIP And {
+        IN a, b[4];
+        OUT out[8], out2;
+
+        PARTS:
+
+        Nand(a=a, b=b[1], out[3]=n);
       }
     `;
 
     expect(parser.parse(exampleHDL)).toEqual({
       type: 'Chip',
-      name: 'Sum',
+      name: 'And',
       inputs: [
-        'x',
-        'y',
+        {
+          type: 'Name',
+          value: 'a',
+        },
+        {
+          type: 'Name',
+          value: 'b',
+          size: 4,
+        },
       ],
       outputs: [
-        'out',
+        {
+          type: 'Name',
+          value: 'out',
+          size: 8,
+        },
+        {
+          type: 'Name',
+          value: 'out2',
+        }
       ],
       parts: [
         {
           type: 'ChipCall',
-          name: 'Add',
+          name: 'Nand',
           arguments: [
             {
               type: 'Argument',
-              name: 'x',
-              value: 'x',
+              name: {
+                type: 'Name',
+                value: 'a',
+              },
+              value: {
+                type: 'Name',
+                value: 'a',
+              },
             },
             {
               type: 'Argument',
-              name: 'y',
-              value: 'y',
+              name: {
+                type: 'Name',
+                value: 'b',
+              },
+              value: {
+                type: 'Name',
+                value: 'b',
+                index: 1,
+              },
             },
             {
               type: 'Argument',
-              name: 'out',
-              value: 'out',
+              name: {
+                type: 'Name',
+                value: 'out',
+                index: 3,
+              },
+              value: {
+                type: 'Name',
+                value: 'n',
+              },
             },
           ],
         },
       ],
     });
-
   });
+
 });
