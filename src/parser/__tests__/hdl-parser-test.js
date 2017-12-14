@@ -7,22 +7,23 @@ const parser = require('..');
 
 describe('hdl-parser', () => {
 
-  it('basic-file', () => {
+  it('basic chip', () => {
 
     const exampleHDL = `
-      CHIP And {
+      CHIP Custom {
         IN a, b[4];
         OUT out[8], out2;
 
         PARTS:
 
         Nand(a=a, b=b[1], out[3]=n);
+        Nand(a[0..7]=a[1], b=b[8..15], out[3]=n);
       }
     `;
 
     expect(parser.parse(exampleHDL)).toEqual({
       type: 'Chip',
-      name: 'And',
+      name: 'Custom',
       inputs: [
         {
           type: 'Name',
@@ -71,6 +72,55 @@ describe('hdl-parser', () => {
                 type: 'Name',
                 value: 'b',
                 index: 1,
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'out',
+                index: 3,
+              },
+              value: {
+                type: 'Name',
+                value: 'n',
+              },
+            },
+          ],
+        },
+        {
+          type: 'ChipCall',
+          name: 'Nand',
+          arguments: [
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'a',
+                range: {
+                  from: 0,
+                  to: 7,
+                },
+              },
+              value: {
+                type: 'Name',
+                value: 'a',
+                index: 1,
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'b',
+              },
+              value: {
+                type: 'Name',
+                value: 'b',
+                range: {
+                  from: 8,
+                  to: 15,
+                },
               },
             },
             {

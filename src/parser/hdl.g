@@ -66,14 +66,23 @@ yyparse.onParseBegin = (_string) => {
  * Converts subscript to `size` for input/ouput:
  * `a[16]`: {value: 'a', size: 16}
  *
- * And to `index` for references:
+ * And to `index` or `range` for references:
  * `a[15]`: {value: 'a', index: 15}
+ * `a[0..7]`: {value: 'a', range: {from: 0, to: 7}}
  */
 function subscriptToProp(value, prop) {
-  if (value.subscript) {
-    value[prop] = value.subscript.value;
+  const {subscript} = value;
+
+  if (subscript) {
+    if (subscript.kind === 'number') {
+      value[prop] = subscript.value;
+    } else if (subscript.kind === 'range') {
+      delete subscript.kind;
+      value.range = subscript;
+    }
     delete value.subscript;
   }
+
   return value;
 }
 
@@ -148,7 +157,7 @@ Names
     { $$ = [$1]; }
 
   | Names ',' Name
-    { $1.push($3); $$ = $1; }
+    { $1.push($3); $$ = $1 }
   ;
 
 Name
@@ -170,11 +179,25 @@ OptSub
   ;
 
 Subscript
-  : '[' NUMBER ']' {
+  : '[' SubscriptValue ']' {
+      $$ = $2;
+    }
+  ;
+
+SubscriptValue
+  : NUMBER {
       $$ = {
         kind: 'number',
-        value: Number($2),
-      }
+        value: Number($1),
+      };
+    }
+
+  | NUMBER '.' '.' NUMBER {
+      $$ = {
+        kind: 'range',
+        from: Number($1),
+        to: Number($4),
+      };
     }
   ;
 
