@@ -82,7 +82,13 @@ CHIP And {
 }
 ```
 
-The parsed AST is:
+Running the:
+
+```
+./bin/hdl-js -f examples/And.hdl -p
+```
+
+We get the parsed AST is:
 
 ```js
 {
@@ -183,7 +189,9 @@ The parsed AST is:
         }
       ]
     }
-  ]
+  ],
+  builtins: [],
+  clocked: [],
 }
 ```
 

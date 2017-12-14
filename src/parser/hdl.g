@@ -10,18 +10,20 @@
 
 %%
 
-\/\/.*                  /* skip comments */
-\/\*(.|\s)*?\*\/        /* skip comments */
+\/\/.*                      /* skip comments */
+\/\*(.|\s)*?\*\/            /* skip comments */
 
-\s+                     /* skip whitespace */
+\s+                         /* skip whitespace */
 
-\b(?:CHIP|chip)\b       return 'CHIP'
-\b(?:IN|in)\b           return 'IN'
-\b(?:OUT|out)\b         return 'OUT'
-\b(?:PARTS|parts)\b     return 'PARTS'
+\b(?:CHIP|chip)\b           return 'CHIP'
+\b(?:IN|in)\b               return 'IN'
+\b(?:OUT|out)\b             return 'OUT'
+\b(?:PARTS|parts)\b         return 'PARTS'
+\b(?:BUILTIN|builtin)\b     return 'BUILTIN'
+\b(?:CLOCKED|clocked)\b     return 'CLOCKED'
 
-\d+                     return 'NUMBER'
-[a-zA-Z_$]\w*           return 'ID'
+\d+                         return 'NUMBER'
+[a-zA-Z_$]\w*               return 'ID'
 
 /lex
 
@@ -42,10 +44,22 @@ let outputs = [];
  */
 let parts = [];
 
+/**
+ * Builtin parts.
+ */
+let builtins = [];
+
+/**
+ * Clocked parts.
+ */
+let clocked = [];
+
 yyparse.onParseBegin = (_string) => {
   inputs.length = 0;
   outputs.length = 0;
   parts.length = 0;
+  builtins.length = 0;
+  clocked.length = 0;
 };
 
 /**
@@ -80,6 +94,8 @@ Chip
         inputs,
         outputs,
         parts,
+        builtins,
+        clocked,
       };
     }
   ;
@@ -93,6 +109,8 @@ Section
   : Inputs
   | Outputs
   | Parts
+  | Builtin
+  | Clocked
   ;
 
 Inputs
@@ -110,6 +128,18 @@ Outputs
 Parts
   : PARTS ':' ChipCalls {
       parts.push(...$3);
+    }
+  ;
+
+Builtin
+  : BUILTIN Name ';' {
+      builtins.push($2);
+    }
+  ;
+
+Clocked
+  : CLOCKED Names ';' {
+      clocked.push(...$2);
     }
   ;
 
@@ -154,6 +184,8 @@ Identifer
   | IN
   | OUT
   | PARTS
+  | BUILTIN
+  | CLOCKED
   ;
 
 ChipCalls

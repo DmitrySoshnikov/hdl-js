@@ -88,6 +88,66 @@ describe('hdl-parser', () => {
           ],
         },
       ],
+      builtins: [],
+      clocked: [],
+    });
+  });
+
+  it('builtins', () => {
+    const exampleHDL = `
+      CHIP RAM64 {
+
+        IN in[16], load, address[6];
+        OUT out[16];
+
+        BUILTIN RAM64;
+        CLOCKED in, load;
+      }
+    `;
+
+    expect(parser.parse(exampleHDL)).toEqual({
+      type: 'Chip',
+      name: 'RAM64',
+      inputs: [
+        {
+          type: 'Name',
+          value: 'in',
+          size: 16
+        },
+        {
+          type: 'Name',
+          value: 'load'
+        },
+        {
+          type: 'Name',
+          value: 'address',
+          size: 6
+        }
+      ],
+      outputs: [
+        {
+          type: 'Name',
+          value: 'out',
+          size: 16
+        }
+      ],
+      parts: [],
+      builtins: [
+        {
+          type: 'Name',
+          value: 'RAM64'
+        }
+      ],
+      clocked: [
+        {
+          type: 'Name',
+          value: 'in'
+        },
+        {
+          type: 'Name',
+          value: 'load'
+        }
+      ]
     });
   });
 
