@@ -5,13 +5,13 @@
 
 'use strict';
 
-const And = require('../And');
+const Or = require('../Or');
 const Pin = require('../../Pin');
 const GateTestUtil = require('../gate-test-util');
 
-describe('And', () => {
+describe('Or', () => {
 
-  it('And interface', () => {
+  it('Or interface', () => {
     // Inputs.
     const a = new Pin({name: 'a'});
     const b = new Pin({name: 'b'});
@@ -19,23 +19,23 @@ describe('And', () => {
     // Output.
     const out = new Pin({name: 'out'});
 
-    const and = new And({
+    const or = new Or({
       inputPins: [a, b],
       outputPins: [out],
     });
 
-    expect(and.getName()).toBe('And');
-    expect(and.getInputPins()).toEqual([a, b]);
-    expect(and.getOutputPins()).toEqual([out]);
+    expect(or.getName()).toBe('Or');
+    expect(or.getInputPins()).toEqual([a, b]);
+    expect(or.getOutputPins()).toEqual([out]);
 
     const truthTable = [
       {a: 0, b: 0, out: 0},
-      {a: 0, b: 1, out: 0},
-      {a: 1, b: 0, out: 0},
+      {a: 0, b: 1, out: 1},
+      {a: 1, b: 0, out: 1},
       {a: 1, b: 1, out: 1},
     ];
 
-    expect(() => GateTestUtil.testTruthTable(truthTable, and))
+    expect(() => GateTestUtil.testTruthTable(truthTable, or))
       .not.toThrow();
   });
 
