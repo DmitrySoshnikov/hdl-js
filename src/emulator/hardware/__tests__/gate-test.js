@@ -3,6 +3,8 @@
  * Copyright (c) 2017-present Dmitry Soshnikov <dmitry.soshnikov@gmail.com>
  */
 
+'use strict';
+
 const Gate = require('../Gate');
 const Pin = require('../Pin');
 
@@ -30,6 +32,11 @@ describe('Gate', () => {
     expect(() => gate.eval()).toThrow(
       'Abstract method `Gate#eval` should be implemented in a concrete class.'
     );
+  });
+
+  it('infer name from constructor', () => {
+    class And extends Gate {}
+    expect((new And()).getName()).toBe('And');
   });
 
 });

@@ -14,10 +14,15 @@ class Gate {
    * Creates a gate instance with the given name.
    */
   constructor({
-    name,
+    name = null,
     inputPins = [],
     outputPins = [],
-  }) {
+  } = {}) {
+    // Infer name from the class if not passed explicitly.
+    if (!name) {
+      name = this.constructor.name;
+    }
+
     this._name = name;
     this._inputPins = inputPins;
     this._outputPins = outputPins;

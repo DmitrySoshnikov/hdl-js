@@ -3,6 +3,8 @@
  * Copyright (c) 2017-present Dmitry Soshnikov <dmitry.soshnikov@gmail.com>
  */
 
+'use strict';
+
 const Gate = require('./Gate');
 
 /**
@@ -14,12 +16,12 @@ class CompositeGate extends Gate {
    * Creates a gate instance with the given name.
    */
   constructor({
-    name,
+    name = null,
     inputPins = [],
     outputPins = [],
     internalPins = [],
     parts = [],
-  }) {
+  } = {}) {
     super({
       name,
       inputPins,
