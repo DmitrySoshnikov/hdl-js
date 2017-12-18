@@ -1,9 +1,13 @@
 /**
  * HDL (Hardware-definition langauge) syntactic grammar.
  *
- * To rebuild run:
+ * To rebuild the parser run:
  *
  *   npm run build
+ *
+ * This generates the parser module in:
+ *
+ *   ./src/parser/generated/hdl-parser.js
  */
 
 %lex

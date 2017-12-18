@@ -62,6 +62,8 @@ Options:
   --parse, -p    Parse the HDL file, and print AST
 ```
 
+> NOTE: the HDL format is based on the chips format from the [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
+
 For the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
 ```
