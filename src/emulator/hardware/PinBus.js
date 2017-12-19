@@ -15,6 +15,11 @@ const Pin = require('./Pin');
 class PinBus extends Pin {
   constructor({name, size, value = null}) {
     super({name, value});
+
+    if (!size) {
+      throw new TypeError(`PinBus "${name}": "size" argument is required.`);
+    }
+
     this._size = size;
   }
 

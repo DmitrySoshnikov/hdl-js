@@ -13,11 +13,11 @@ describe('And', () => {
 
   it('And interface', () => {
     // Inputs.
-    const a16 = new PinBus({name: 'a'});
-    const b16 = new PinBus({name: 'b'});
+    const a16 = new PinBus({name: 'a', size: 16});
+    const b16 = new PinBus({name: 'b', size: 16});
 
     // Output.
-    const out16 = new PinBus({name: 'out'});
+    const out16 = new PinBus({name: 'out', size: 16});
 
     const and16 = new And16({
       inputPins: [a16, b16],
