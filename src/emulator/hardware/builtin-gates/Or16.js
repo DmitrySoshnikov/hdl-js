@@ -8,19 +8,19 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
- * A bitwise 16-bit And gate.
+ * A bitwise 16-bit Or gate.
  */
-class And16 extends BuiltInGate {
+class Or16 extends BuiltInGate {
   /**
    * IN a[16], b[16];
    * OUT out[16];
    *
-   * for i = 0..15: out[i] = (a[i] & b[i])
+   * for i = 0..15: out[i] = (a[i] | b[i])
    *
    * Abstract:
    *
-   *   And(a=a[0], b=b[0], out=out[0]);
-   *   And(a=a[1], b=b[1], out=out[1]);
+   *   Or(a=a[0], b=b[0], out=out[0]);
+   *   Or(a=a[1], b=b[1], out=out[1]);
    *   ...
    *
    * Technically use JS bitwise operations at needed index.
@@ -31,9 +31,9 @@ class And16 extends BuiltInGate {
     const a = this.getInputPins()[0].getValue();
     const b = this.getInputPins()[1].getValue();
 
-    // In JS implemenation doesn't differ from the simple `And` gate.
-    this.getOutputPins()[0].setValue(a & b);
+    // In JS implemenation doesn't differ from the simple `Or` gate.
+    this.getOutputPins()[0].setValue(a | b);
   }
 }
 
-module.exports = And16;
+module.exports = Or16;

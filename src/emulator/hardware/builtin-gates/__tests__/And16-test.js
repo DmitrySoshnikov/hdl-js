@@ -9,9 +9,9 @@ const And16 = require('../And16');
 const PinBus = require('../../PinBus');
 const GateTestUtil = require('../gate-test-util');
 
-describe('And', () => {
+describe('And16', () => {
 
-  it('And interface', () => {
+  it('And16 interface', () => {
     // Inputs.
     const a16 = new PinBus({name: 'a', size: 16});
     const b16 = new PinBus({name: 'b', size: 16});
