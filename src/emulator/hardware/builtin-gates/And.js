@@ -8,6 +8,16 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
+ * Canonical truth table for the `And` gate.
+ */
+const TRUTH_TABLE = [
+  {a: 0, b: 0, out: 0},
+  {a: 0, b: 1, out: 0},
+  {a: 1, b: 0, out: 0},
+  {a: 1, b: 1, out: 1},
+];
+
+/**
  * A bitwise 1-bit And gate.
  */
 class And extends BuiltInGate {
@@ -21,5 +31,14 @@ class And extends BuiltInGate {
     this.getOutputPins()[0].setValue(a & b);
   }
 }
+
+/**
+ * Specification of the `And` gate.
+ */
+And.Spec = {
+  inputPins: ['a', 'b'],
+  outputPins: ['out'],
+  truthTable: TRUTH_TABLE,
+};
 
 module.exports = And;

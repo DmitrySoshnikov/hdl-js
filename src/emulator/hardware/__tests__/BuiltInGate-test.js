@@ -18,7 +18,15 @@ describe('BuiltInGate', () => {
     // Output.
     const out = new Pin({name: 'out', value: 0});
 
-    const gate = new BuiltInGate({
+    class MyBuiltInGate extends BuiltInGate {}
+
+    MyBuiltInGate.Spec = {
+      inputPins: ['a', 'b'],
+      outputPins: ['out'],
+      truthTable: [],
+    };
+
+    const gate = new MyBuiltInGate({
       name: 'And',
       inputPins: [a, b],
       outputPins: [out],

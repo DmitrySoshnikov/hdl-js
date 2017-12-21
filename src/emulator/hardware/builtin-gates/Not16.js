@@ -8,6 +8,17 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
+ * Canonical truth table for the `Not16` gate.
+ */
+const TRUTH_TABLE = [
+  {in: 0b0000000000000000, out: ~0b0000000000000000},
+  {in: 0b1111111111111111, out: ~0b1111111111111111},
+  {in: 0b1010101010101010, out: ~0b1010101010101010},
+  {in: 0b0011110011000011, out: ~0b0011110011000011},
+  {in: 0b0001001000110100, out: ~0b0001001000110100},
+];
+
+/**
  * A bitwise 16-bit Not gate.
  */
 class Not16 extends BuiltInGate {
@@ -34,5 +45,14 @@ class Not16 extends BuiltInGate {
     this.getOutputPins()[0].setValue(~a);
   }
 }
+
+/**
+ * Specification of the `And` gate.
+ */
+Not16.Spec = {
+  inputPins: ['in'],
+  outputPins: ['out'],
+  truthTable: TRUTH_TABLE,
+};
 
 module.exports = Not16;

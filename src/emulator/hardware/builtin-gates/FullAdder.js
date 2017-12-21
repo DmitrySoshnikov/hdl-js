@@ -8,6 +8,20 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
+ * Canonical truth table for the `FullAdder` gate.
+ */
+const TRUTH_TABLE = [
+  {a: 0, b: 0, c: 0, sum: 0, carry: 0},
+  {a: 0, b: 0, c: 1, sum: 1, carry: 0},
+  {a: 0, b: 1, c: 0, sum: 1, carry: 0},
+  {a: 0, b: 1, c: 1, sum: 0, carry: 1},
+  {a: 1, b: 0, c: 0, sum: 1, carry: 0},
+  {a: 1, b: 0, c: 1, sum: 0, carry: 1},
+  {a: 1, b: 1, c: 0, sum: 0, carry: 1},
+  {a: 1, b: 1, c: 1, sum: 1, carry: 1},
+];
+
+/**
  * A FullAdder.
  * `sum` returns the LSB of the sum of the three bits a, b and c.
  * `carry` returns the carry bit.
@@ -29,5 +43,15 @@ class FullAdder extends BuiltInGate {
     this.getOutputPins()[1].setValue(Math.trunc(t / 2)); // carry
   }
 }
+
+/**
+ * Specification of the `FullAdder` gate.
+ */
+FullAdder.Spec = {
+  inputPins: ['a', 'b', 'c'],
+  outputPins: ['sum', 'carry'],
+  truthTable: TRUTH_TABLE,
+};
+
 
 module.exports = FullAdder;

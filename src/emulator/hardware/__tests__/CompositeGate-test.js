@@ -5,7 +5,7 @@
 
 'use strict';
 
-const BuiltInGate = require('../BuiltInGate');
+const Gate = require('../Gate');
 const CompositeGate = require('../CompositeGate');
 const Pin = require('../Pin');
 
@@ -37,7 +37,7 @@ describe('CompositeGate', () => {
     const carry = new Pin({name: 'carry'});
 
     // Xor part.
-    const xor = new BuiltInGate({
+    const xor = new Gate({
       name: 'Xor',
       inputPins: [a, b],
       outputPins: [sum],
@@ -51,7 +51,7 @@ describe('CompositeGate', () => {
     };
 
     // And part.
-    const and = new BuiltInGate({
+    const and = new Gate({
       name: 'And',
       inputPins: [a, b],
       outputPins: [carry],

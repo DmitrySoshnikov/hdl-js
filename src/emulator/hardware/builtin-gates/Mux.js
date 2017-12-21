@@ -8,6 +8,20 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
+ * Canonical truth table for the `Mux` gate.
+ */
+const TRUTH_TABLE = [
+  {a: 0, b: 0, sel: 0, out: 0},
+  {a: 0, b: 0, sel: 1, out: 0},
+  {a: 0, b: 1, sel: 0, out: 0},
+  {a: 0, b: 1, sel: 1, out: 1},
+  {a: 1, b: 0, sel: 0, out: 1},
+  {a: 1, b: 0, sel: 1, out: 0},
+  {a: 1, b: 1, sel: 0, out: 1},
+  {a: 1, b: 1, sel: 1, out: 1},
+];
+
+/**
  * 1-bit 2-way multiplexor.
  * if sel=1 out=b else out=a.
  */
@@ -21,5 +35,14 @@ class Mux extends BuiltInGate {
     this.getOutputPins()[0].setValue(sel === 0 ? a : b);
   }
 }
+
+/**
+ * Specification of the `Mux` gate.
+ */
+Mux.Spec = {
+  inputPins: ['a', 'b', 'sel'],
+  outputPins: ['out'],
+  truthTable: TRUTH_TABLE,
+};
 
 module.exports = Mux;

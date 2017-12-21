@@ -5,6 +5,9 @@
 
 'use strict';
 
+const Pin = require('../Pin');
+const PinBus = require('../PinBus');
+
 /**
  * Evaluates the gate logic on the truth table input.
  *
@@ -57,6 +60,36 @@ function testTruthTable(table, gate) {
   });
 }
 
+/**
+ * Automatically tests a gate based on it spec.
+ */
+function autoTestGate(GateClass) {
+  const spec = GateClass.Spec;
+
+  const createPins = pinNames => {
+    return pinNames.map(pinName => {
+      const {name, size} = PinBus.extractNameParts(pinName);
+      return size
+        ? new PinBus({name, size})
+        : new Pin({name});
+    });
+  };
+
+  const inputPins = createPins(spec.inputPins);
+  const outputPins = createPins(spec.outputPins);
+
+  const gate = new GateClass({
+    inputPins,
+    outputPins,
+  });
+
+  expect(gate.getName()).toBe(GateClass.name);
+  expect(gate.getInputPins()).toEqual(inputPins);
+  expect(gate.getOutputPins()).toEqual(outputPins);
+
+  testTruthTable(spec.truthTable, gate);
+}
+
 function checkPin(pin, row, index, kind) {
   if (!row.hasOwnProperty(pin.getName())) {
     throw new Error(
@@ -67,5 +100,6 @@ function checkPin(pin, row, index, kind) {
 }
 
 module.exports = {
+  autoTestGate,
   testTruthTable,
 };

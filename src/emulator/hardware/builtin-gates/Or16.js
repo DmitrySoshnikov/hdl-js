@@ -8,6 +8,20 @@
 const BuiltInGate = require('../BuiltInGate');
 
 /**
+ * Canonical truth table for the `Or16` gate.
+ *
+ * Note: for PinBus instances use a subset of the testing table.
+ */
+const TRUTH_TABLE = [
+  {a: 0b0000000000000000, b: 0b0000000000000000, out: 0b0000000000000000},
+  {a: 0b0000000000000000, b: 0b1111111111111111, out: 0b1111111111111111},
+  {a: 0b1111111111111111, b: 0b1111111111111111, out: 0b1111111111111111},
+  {a: 0b1010101010101010, b: 0b0101010101010101, out: 0b1111111111111111},
+  {a: 0b0011110011000011, b: 0b0000111111110000, out: 0b0011111111110011},
+  {a: 0b0001001000110100, b: 0b1001100001110110, out: 0b1001101001110110},
+];
+
+/**
  * A bitwise 16-bit Or gate.
  */
 class Or16 extends BuiltInGate {
@@ -35,5 +49,14 @@ class Or16 extends BuiltInGate {
     this.getOutputPins()[0].setValue(a | b);
   }
 }
+
+/**
+ * Specification of the `Or16` gate.
+ */
+Or16.Spec = {
+  inputPins: ['a', 'b'],
+  outputPins: ['out'],
+  truthTable: TRUTH_TABLE,
+};
 
 module.exports = Or16;
