@@ -58,10 +58,13 @@ hdl-js --help
 Usage: hdl-js [options]
 
 Options:
-  --help, -h     Show help                                       [boolean]
-  --version, -v  Show version number                             [boolean]
-  --file, -f     An HDL file containing chip specification       [required]
-  --parse, -p    Parse the HDL file, and print AST
+  --help, -h      Show help                                    [boolean]
+  --version, -v   Show version number                          [boolean]
+  --file, -f      An HDL file containing chip specification
+  --parse, -p     Parse the HDL file, and print AST
+  --list, -l      List supported built-in gates
+  --gate, -g      Name of a built-in gate
+  --describe, -d  Prints gate's specification
 ```
 
 > NOTE: the HDL format is based on the chips format from the [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
