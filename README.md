@@ -287,6 +287,8 @@ console.log(And.Spec);
 Output:
 
 {
+  description: 'Implements bitwise 1-bit And & operation.',
+
   inputPins: ['a', 'b'],
 
   outputPins: ['out'],
