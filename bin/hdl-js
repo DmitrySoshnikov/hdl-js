@@ -5,6 +5,7 @@
 const colors = require('colors');
 const fs = require('fs');
 const hdl = require('..');
+const path = require('path');
 
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
@@ -16,7 +17,6 @@ const options = require('yargs')
     file: {
       alias: 'f',
       describe: 'An HDL file containing chip specification',
-      demandOption: true,
       requiresArg: true,
       coerce: enforceUnique,
     },
@@ -24,28 +24,136 @@ const options = require('yargs')
       alias: 'p',
       describe: 'Parse the HDL file, and print AST',
     },
+    list: {
+      alias: 'l',
+      describe: 'List supported built-in gates',
+    },
+    gate: {
+      alias: 'g',
+      describe: 'Name of a built-in gate',
+      requiresArg: true,
+      coerce: enforceUnique,
+    },
+    describe: {
+      alias: 'd',
+      describe: 'Prints gate\'s specification',
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
   .argv;
 
+/**
+ * Directory with all built-in gates.
+ */
+const BUILTINS_DIR = __dirname + '/../src/emulator/hardware/builtin-gates';
+
+/**
+ * Lists built-in gates.
+ */
+function listBuiltInGates() {
+  const builtinGates = fs.readdirSync(BUILTINS_DIR)
+    .filter(file => /^[A-Z]/.test(file))
+    .map(file => '  - ' + path.basename(file, '.js'));
+
+  console.info('');
+  console.info(colors.bold('Built-in gates:'));
+  console.info('');
+  console.info(builtinGates.join('\n'), '\n');
+}
+
 function main() {
   const {
     file,
+    gate,
     parse,
+    list,
+    describe,
   } = options;
 
-  const hdlFile = fs.readFileSync(file, 'utf-8');
+  if (gate && !describe) {
+    console.info(
+      `\nHint: pass ${colors.bold('--describe')} option to see ` +
+      `${colors.bold('"' + gate + '"')} gate specification.\n`
+    );
+  }
+
+  // HDL file to be parsed.
+  let hdlFile;
+
+  // ------------------------------------------------------
+  // Custom HDL file.
+
+  if (file) {
+    hdlFile = fs.readFileSync(file, 'utf-8');
+  }
+
+  // ------------------------------------------------------
+  // List built-in gates.
+
+  if (list) {
+    listBuiltInGates();
+  }
+
+  // ------------------------------------------------------
+  // Describes a gate (built-in or composite).
+
+  if (gate && describe) {
+    // Handle only built-in gates.
+    // TODO: support user-defined composite gates from HDL.
+
+    let GateClass = null;
+
+    try {
+      GateClass = require(BUILTINS_DIR + '/' + gate);
+    } catch (_e) {
+      console.error(colors.red(`\nUnknown gate: "${gate}".`));
+      listBuiltInGates();
+      process.exit(1);
+    }
+
+    const spec = GateClass.Spec;
+
+    console.info('');
+    console.info(colors.bold(`"${GateClass.name}"`) + ' gate:');
+
+    const toFullName = (name) => {
+      return name = typeof name === 'string'
+        ? `  - ${name}`
+        : `  - ${name.name}[${name.size}]`;
+    };
+
+    // Input pins:
+
+    const inputPins = spec.inputPins
+      .map(input => toFullName(input))
+      .join('\n');
+
+    console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
+
+    // Output pins:
+
+    const outputPins = spec.outputPins
+      .map(output => toFullName(output))
+      .join('\n');
+
+    console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
+    console.info('');
+
+    // Truth table:
+    console.info(colors.bold('Truth table:'), '\n');
+    GateClass.printTruthTable();
+  }
 
   // ------------------------------------------------------
   // Parser.
 
-  if (parse) {
+  if (parse && hdlFile) {
     const parsed = hdl.parse(hdlFile);
-    console.info(
-      '\n', colors.bold('Parsed:'), '\n\n',
-      JSON.stringify(parsed, null, 2), '\n'
-    );
+    console.info('');
+    console.info(colors.bold('Parsed:'));
+    console.info('');
+    console.info(JSON.stringify(parsed, null, 2), '\n');
     return;
   }
 }

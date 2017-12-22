@@ -6,7 +6,7 @@
 'use strict';
 
 const Mux = require('../Mux');
-const GateTestUtil = require('../gate-test-util');
+const GateTestUtil = require('../../gate-test-util');
 
 describe('Mux', () => {
   it('Mux interface', () => {

@@ -6,7 +6,7 @@
 'use strict';
 
 const Not = require('../Not');
-const GateTestUtil = require('../gate-test-util');
+const GateTestUtil = require('../../gate-test-util');
 
 describe('Not', () => {
   it('Not interface', () => {

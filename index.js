@@ -6,6 +6,7 @@
 'use strict';
 
 const parser = require('./src/parser');
+const emulator = require('./src/emulator/hardware');
 
 /**
  * An API object for HDL processing.
@@ -15,6 +16,11 @@ const hdl = {
    * Parser module exposed.
    */
   parser,
+
+  /**
+   * Emulator module exposed.
+   */
+  emulator,
 
   /**
    * Parses an HDL string, producing an AST.

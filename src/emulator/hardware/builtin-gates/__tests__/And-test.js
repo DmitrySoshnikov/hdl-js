@@ -6,7 +6,7 @@
 'use strict';
 
 const And = require('../And');
-const GateTestUtil = require('../gate-test-util');
+const GateTestUtil = require('../../gate-test-util');
 
 describe('And', () => {
   it('And interface', () => {

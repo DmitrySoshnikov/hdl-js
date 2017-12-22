@@ -5,8 +5,8 @@
 
 'use strict';
 
-const Pin = require('../Pin');
-const PinBus = require('../PinBus');
+const Pin = require('./Pin');
+const PinBus = require('./PinBus');
 
 /**
  * Evaluates the gate logic on the truth table input.

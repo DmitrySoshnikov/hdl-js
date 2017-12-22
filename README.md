@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/DmitrySoshnikov/hdl-js.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/hdl-js) [![npm version](https://badge.fury.io/js/hdl-js.svg)](https://badge.fury.io/js/hdl-js)
 
-Hardware definition language (HDL) parser, and Hardware simulator.
+Hardware description language (HDL) parser, and Hardware simulator.
 
 ### Table of Contents
 
@@ -11,6 +11,8 @@ Hardware definition language (HDL) parser, and Hardware simulator.
 - [Usage as a CLI](#usage-as-a-cli)
 - [Usage from Node](#usage-from-node)
 - [Emulator](#emulator)
+  - [Built-in gates](#built-in-gates)
+  - [Composite gates](#composite-gates)
 
 ### Installation
 
@@ -212,4 +214,124 @@ console.log(hdl.parse(hdlFile)); // HDL AST
 
 # Emulator
 
-TODO; WIP.
+[Hardware emulator](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware) module simulates and tests logic gates and chips implemented in the HDL, and also provides canonical implementation of the [built-in chips](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware/builtin-gates).
+
+### Built-in gates
+
+The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of _compound gates_.
+
+```
+./bin/hdl-js --list
+
+Built-in gates:
+
+- And
+- And16
+- Or
+- ...
+```
+
+To see the specification of a particular gate, we can use `--describe` (`-d`) option, passing the name of a needed `--gate` (`-g`):
+
+```
+./bin/hdl-js --gate And --describe
+```
+
+Result:
+
+```
+"And" gate:
+
+Inputs:
+
+  - a
+  - b
+
+Outputs:
+
+  - out
+
+Truth table:
+
+┌───┬───┬─────┐
+│ a │ b │ out │
+├───┼───┼─────┤
+│ 0 │ 0 │  0  │
+├───┼───┼─────┤
+│ 0 │ 1 │  0  │
+├───┼───┼─────┤
+│ 1 │ 0 │  0  │
+├───┼───┼─────┤
+│ 1 │ 1 │  1  │
+└───┴───┴─────┘
+```
+
+From Node the specification of a built-in gate is exposed via `Spec` option on the gate class:
+
+```js
+const hdl = require('hdl-js');
+
+const {And} = hdl.emulator.BuiltInGates;
+
+console.log(And.Spec);
+
+/*
+
+Output:
+
+{
+  inputPins: ['a', 'b'],
+
+  outputPins: ['out'],
+
+  truthTable: [
+    {a: 0, b: 0, out: 0},
+    {a: 0, b: 1, out: 0},
+    {a: 1, b: 0, out: 0},
+    {a: 1, b: 1, out: 1},
+  ]
+}
+
+*/
+```
+
+It is possible to manually test and evaluate the outputs of a gate based on its inputs:
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  emulator: {
+
+    /**
+     * `Pin` class is used to define inputs, and outputs.
+     */
+    Pin,
+
+    BuiltInGates: {
+      And,
+    }
+  }
+} = hdl;
+
+const and = new And({
+  inputPins: [
+    new Pin({name: 'a', value: 1}),
+    new Pin({name: 'b', value: 1}),
+  ],
+
+  outputPins: [
+    new Pin({name: 'out'}),
+  ],
+});
+
+// Run the logic.
+and.eval();
+
+// Check "out" pin value:
+console.log(and.getOutputPins()[0].getValue()); // 1
+```
+
+### Composite gates
+
+TODO; WIP

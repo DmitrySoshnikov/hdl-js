@@ -7,6 +7,7 @@
 
 const Gate = require('./Gate');
 const PinBus = require('./PinBus');
+const TablePrinter = require('../../table-printer');
 
 /**
  * Base class for all builtin gates.
@@ -64,6 +65,62 @@ class BuiltInGate extends Gate {
         );
       }
     });
+  }
+
+  /**
+   * Prints truth table.
+   */
+  static printTruthTable() {
+    const {
+      inputPins,
+      outputPins,
+      truthTable,
+    } = this.Spec;
+
+    const toHeaderColumn = (name) => {
+      const content = name = typeof name === 'string'
+        ? name
+        : `${name.name}[${name.size}]`;
+
+      return {content, hAlign: 'center'};
+    };
+
+    const allPins = [...inputPins, ...outputPins];
+
+    const inputPinNames = inputPins.map(input => toHeaderColumn(input));
+    const outputPinNames = outputPins.map(output => toHeaderColumn(output));
+
+    const printer = new TablePrinter({
+      head: [...inputPinNames, ...outputPinNames],
+    });
+
+    truthTable.forEach(row => {
+      const tableRow = Object.keys(row).map(key => {
+        const binary = (row[key] >>> 0).toString(2);
+
+        const pin = allPins.find(name => {
+          return typeof name === 'string'
+            ? name === key
+            : name.name === key;
+        });
+
+        let content = binary.padStart(pin.size || 0, '0');
+
+        // 16-bit max in this machine.
+        if (content.length > 16) {
+          content = content.slice(16);
+        }
+
+        return {
+          content,
+          hAlign: 'center',
+        };
+      });
+      printer.push(tableRow);
+    });
+
+    console.info(printer.toString());
+    console.info('');
   }
 
   /**

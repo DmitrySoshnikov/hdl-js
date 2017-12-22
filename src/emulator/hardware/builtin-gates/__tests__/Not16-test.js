@@ -7,7 +7,7 @@
 
 const Not16 = require('../Not16');
 const PinBus = require('../../PinBus');
-const GateTestUtil = require('../gate-test-util');
+const GateTestUtil = require('../../gate-test-util');
 
 describe('Not16', () => {
 

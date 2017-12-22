@@ -5,9 +5,12 @@
 
 'use strict';
 
-const Gate = require('./Gate');
 const BuiltInGate = require('./BuiltInGate');
+const BuiltInGates = require('./builtin-gates');
 const CompositeGate = require('./CompositeGate');
+const Gate = require('./Gate');
+const Pin = require('./Pin');
+const PinBus = require('./PinBus');
 
 /**
  * Simulates hardware chips (gates) evaluation.
@@ -19,6 +22,16 @@ const HardwareEmulator = {
   Gate,
 
   /**
+   * Expose `Pin` class.
+   */
+  Pin,
+
+  /**
+   * Expose `PinBus` class.
+   */
+  PinBus,
+
+  /**
    * Expose `BuiltInGate` class.
    */
   BuiltInGate,
@@ -27,6 +40,11 @@ const HardwareEmulator = {
    * Expose `CompositeGate` class.
    */
   CompositeGate,
+
+  /**
+   * Expose a map of all built-in gates.
+   */
+  BuiltInGates,
 };
 
 module.exports = HardwareEmulator;

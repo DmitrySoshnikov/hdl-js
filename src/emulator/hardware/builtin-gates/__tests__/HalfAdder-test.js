@@ -6,7 +6,7 @@
 'use strict';
 
 const HalfAdder = require('../HalfAdder');
-const GateTestUtil = require('../gate-test-util');
+const GateTestUtil = require('../../gate-test-util');
 
 describe('HalfAdder', () => {
   it('HalfAdder interface', () => {
