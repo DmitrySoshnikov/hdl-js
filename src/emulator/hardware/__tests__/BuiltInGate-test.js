@@ -21,6 +21,7 @@ describe('BuiltInGate', () => {
     class MyBuiltInGate extends BuiltInGate {}
 
     MyBuiltInGate.Spec = {
+      description: 'MyBuiltInGate',
       inputPins: ['a', 'b'],
       outputPins: ['out'],
       truthTable: [],

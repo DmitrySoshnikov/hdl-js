@@ -47,15 +47,19 @@ class Not16 extends BuiltInGate {
 }
 
 /**
- * Specification of the `And` gate.
+ * Specification of the `Not16` gate.
  */
 Not16.Spec = {
+  description: 'Implements bitwise 16-bit Not ~ operation.',
+
   inputPins: [
     {name: 'in', size: 16},
   ],
+
   outputPins: [
     {name: 'out', size: 16},
   ],
+
   truthTable: TRUTH_TABLE,
 };
 

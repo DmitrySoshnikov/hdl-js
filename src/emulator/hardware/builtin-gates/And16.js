@@ -54,13 +54,17 @@ class And16 extends BuiltInGate {
  * Specification of the `And16` gate.
  */
 And16.Spec = {
+  description: 'Implements bitwise 16-bit And & operation.',
+
   inputPins: [
     {name: 'a', size: 16},
     {name: 'b', size: 16},
   ],
+
   outputPins: [
     {name: 'out', size: 16},
   ],
+
   truthTable: TRUTH_TABLE,
 };
 

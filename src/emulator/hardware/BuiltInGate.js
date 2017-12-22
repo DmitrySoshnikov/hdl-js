@@ -37,14 +37,7 @@ class BuiltInGate extends Gate {
    * Validates pin numbers.
    */
   _validatePins(pins, kind) {
-    const spec = this.constructor.Spec;
-
-    if (!spec) {
-      throw new Error(
-        `"${this.getName()}" gate: BuiltIn gates ` +
-        `should impelment "Spec" property`
-      );
-    }
+    const spec = BuiltInGate._validateSpec(this.constructor.Spec);
 
     if (pins.length !== spec[kind].length) {
       throw new Error(
@@ -67,6 +60,29 @@ class BuiltInGate extends Gate {
     });
   }
 
+  static _validateSpec(spec, gateName) {
+    if (!spec) {
+      throw new Error(
+        `"${gateName}" gate: BuiltIn gates ` +
+        `should impelment "Spec" property.`
+      );
+    }
+
+    if (
+      !spec.description ||
+      !spec.inputPins ||
+      !spec.outputPins ||
+      !spec.truthTable
+    ) {
+      throw new Error(
+        `"${gateName}" gate: "Spec" should impelment` +
+        `all properties: description, inputPins, outputPins, truthTable.`
+      );
+    }
+
+    return spec;
+  }
+
   /**
    * Prints truth table.
    */
@@ -75,7 +91,7 @@ class BuiltInGate extends Gate {
       inputPins,
       outputPins,
       truthTable,
-    } = this.Spec;
+    } = BuiltInGate._validateSpec(this.Spec);
 
     const toHeaderColumn = (name) => {
       const content = name = typeof name === 'string'

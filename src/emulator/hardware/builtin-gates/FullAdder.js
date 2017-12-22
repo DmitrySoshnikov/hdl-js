@@ -23,8 +23,9 @@ const TRUTH_TABLE = [
 
 /**
  * A FullAdder.
- * `sum` returns the LSB of the sum of the three bits a, b and c.
- * `carry` returns the carry bit.
+ *
+ * The `sum` returns the LSB of the sum of the three bits a, b and c.
+ * The `carry` returns the carry bit.
  */
 class FullAdder extends BuiltInGate {
   /**
@@ -48,8 +49,18 @@ class FullAdder extends BuiltInGate {
  * Specification of the `FullAdder` gate.
  */
 FullAdder.Spec = {
+  description: [
+    'Implements 3-bits adder (full-adder) gate.',
+    '',
+    'The `sum` returns LSB (the least significant bit) of the sum',
+    'of the three bits `a`, `b` and `c`.',
+    '',
+    'The `carry` returns the carry bit.',
+  ].join('\n'),
+
   inputPins: ['a', 'b', 'c'],
   outputPins: ['sum', 'carry'],
+
   truthTable: TRUTH_TABLE,
 };
 

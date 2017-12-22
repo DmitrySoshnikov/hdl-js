@@ -36,11 +36,19 @@ class Nand extends BuiltInGate {
 }
 
 /**
- * Specification of the `And` gate.
+ * Specification of the `Nand` gate.
  */
 Nand.Spec = {
+  description: [
+    'Implements bitwise 1-bit Nand (negative-And) gate.',
+    '',
+    'The "Nand" gate similarly to the "Nor" gate is the basic',
+    'building block for all other gates.'
+  ].join('\n'),
+
   inputPins: ['a', 'b'],
   outputPins: ['out'],
+
   truthTable: TRUTH_TABLE,
 };
 

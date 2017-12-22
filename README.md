@@ -242,6 +242,10 @@ Result:
 ```
 "And" gate:
 
+Description:
+
+  Implements bitwise 1-bit And & operation.
+
 Inputs:
 
   - a

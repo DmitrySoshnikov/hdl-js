@@ -36,6 +36,7 @@ class And extends BuiltInGate {
  * Specification of the `And` gate.
  */
 And.Spec = {
+  description: 'Implements bitwise 1-bit And & operation.',
   inputPins: ['a', 'b'],
   outputPins: ['out'],
   truthTable: TRUTH_TABLE,

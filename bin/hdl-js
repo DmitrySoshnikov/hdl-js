@@ -123,6 +123,14 @@ function main() {
         : `  - ${name.name}[${name.size}]`;
     };
 
+    // Description:
+
+    const description = spec.description.split('\n')
+      .map(line => '  ' + line)
+      .join('\n')
+
+    console.info('\n' + colors.bold('Description:\n\n') + description);
+
     // Input pins:
 
     const inputPins = spec.inputPins

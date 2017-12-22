@@ -40,8 +40,16 @@ class Mux extends BuiltInGate {
  * Specification of the `Mux` gate.
  */
 Mux.Spec = {
+  description: [
+    'Implements 1-bit 2-way multiplexor (Mux) gate.',
+    '',
+    'out = a, when sel = 0',
+    'out = b, when sel = 1',
+  ].join('\n'),
+
   inputPins: ['a', 'b', 'sel'],
   outputPins: ['out'],
+
   truthTable: TRUTH_TABLE,
 };
 

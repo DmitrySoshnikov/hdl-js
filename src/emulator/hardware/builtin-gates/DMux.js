@@ -11,15 +11,15 @@ const BuiltInGate = require('../BuiltInGate');
  * Canonical truth table for the `DMux` gate.
  */
 const TRUTH_TABLE = [
-  {a: 0, sel: 0, out1: 0, out2: 0},
-  {a: 0, sel: 1, out1: 0, out2: 0},
-  {a: 1, sel: 0, out1: 1, out2: 0},
-  {a: 1, sel: 1, out1: 0, out2: 1},
+  {in: 0, sel: 0, out1: 0, out2: 0},
+  {in: 0, sel: 1, out1: 0, out2: 0},
+  {in: 1, sel: 0, out1: 1, out2: 0},
+  {in: 1, sel: 1, out1: 0, out2: 1},
 ];
 
 /**
  * 1 bit demultiplexer.
- * if sel=0 {out1=a; out2=0} else {out1=0; out2=a}
+ * if sel=0 {out1=in; out2=0} else {out1=0; out2=in}
  */
 class DMux extends BuiltInGate {
   eval() {
@@ -35,8 +35,16 @@ class DMux extends BuiltInGate {
  * Specification of the `DMux` gate.
  */
 DMux.Spec = {
-  inputPins: ['a', 'sel'],
+  description: [
+    'Implements 1-bit demultiplexer (DMux) gate.',
+    '',
+    '{out1 = in, out2 = 0 }, when sel = 0',
+    '{out1 = 0,  out2 = in}, when sel = 1',
+  ].join('\n'),
+
+  inputPins: ['in', 'sel'],
   outputPins: ['out1', 'out2'],
+
   truthTable: TRUTH_TABLE,
 };
 

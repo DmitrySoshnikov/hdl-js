@@ -40,8 +40,18 @@ class HalfAdder extends BuiltInGate {
  * Specification of the `HalfAdder` gate.
  */
 HalfAdder.Spec = {
+  description: [
+    'Implements 2-bits adder (half-adder) gate.',
+    '',
+    'The `sum` returns LSB (the least significant bit) of the sum',
+    'of the two bits `a`, and `b`.',
+    '',
+    'The `carry` returns the carry bit.',
+  ].join('\n'),
+
   inputPins: ['a', 'b'],
   outputPins: ['sum', 'carry'],
+
   truthTable: TRUTH_TABLE,
 };
 
