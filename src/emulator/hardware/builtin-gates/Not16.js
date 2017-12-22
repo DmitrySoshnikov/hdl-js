@@ -50,8 +50,12 @@ class Not16 extends BuiltInGate {
  * Specification of the `And` gate.
  */
 Not16.Spec = {
-  inputPins: ['in'],
-  outputPins: ['out'],
+  inputPins: [
+    {name: 'in', size: 16},
+  ],
+  outputPins: [
+    {name: 'out', size: 16},
+  ],
   truthTable: TRUTH_TABLE,
 };
 

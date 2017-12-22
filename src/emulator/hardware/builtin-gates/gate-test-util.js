@@ -68,7 +68,12 @@ function autoTestGate(GateClass) {
 
   const createPins = pinNames => {
     return pinNames.map(pinName => {
-      const {name, size} = PinBus.extractNameParts(pinName);
+      let name, size = null;
+      if (typeof pinName === 'string') {
+        name = pinName;
+      } else {
+        ({name, size} = pinName);
+      }
       return size
         ? new PinBus({name, size})
         : new Pin({name});

@@ -77,12 +77,4 @@ describe('PinBus', () => {
     expect(() => a16.getSlice(-1, 15)).toThrow();
   });
 
-  it('extract name parts', () => {
-    expect(PinBus.extractNameParts('a[16]'))
-      .toEqual({name: 'a', size: 16});
-
-    expect(PinBus.extractNameParts('a'))
-      .toEqual({name: 'a', size: null});
-  });
-
 });

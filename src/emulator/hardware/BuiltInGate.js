@@ -54,7 +54,9 @@ class BuiltInGate extends Gate {
 
     // Check that for sized-pins, a `PinBus` is passed.
     spec[kind].forEach((pinName, index) => {
-      const {size} = PinBus.extractNameParts(pinName);
+      const size = typeof pinName === 'string'
+        ? null
+        : pinName.size;
       if (size && !(pins[index] instanceof PinBus)) {
         throw new TypeError(
           `"${this._name}" gate: expect gate #${index} from ${kind} to be ` +

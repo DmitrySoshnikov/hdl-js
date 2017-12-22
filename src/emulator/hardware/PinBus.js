@@ -74,21 +74,6 @@ class PinBus extends Pin {
       );
     }
   }
-
-  /**
-   * Extracts name parts (name, and size):
-   *
-   * a[16] -> {name: 'a', size: 16}   -> PinBus
-   * a     -> {name: 'a', size: null} -> Pin
-   */
-  static extractNameParts(name) {
-    const nameRe = /(\w+)(?:\[\s*(\d+)\s*\])?/;
-    const parts = nameRe.exec(name);
-    return {
-      name: parts[1],
-      size: parts[2] ? Number(parts[2]) : null,
-    };
-  }
 }
 
 module.exports = PinBus;

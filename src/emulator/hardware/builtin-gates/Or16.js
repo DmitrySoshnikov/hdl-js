@@ -54,8 +54,13 @@ class Or16 extends BuiltInGate {
  * Specification of the `Or16` gate.
  */
 Or16.Spec = {
-  inputPins: ['a', 'b'],
-  outputPins: ['out'],
+  inputPins: [
+    {name: 'a', size: 16},
+    {name: 'b', size: 16},
+  ],
+  outputPins: [
+    {name: 'out', size: 16},
+  ],
   truthTable: TRUTH_TABLE,
 };
 
