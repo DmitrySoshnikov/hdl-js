@@ -111,9 +111,8 @@ class Gate {
   execOnData(table) {
     const result = [];
 
-    // Map from row index to conflicting
-    // output values.
-    const conflicts = new Map();
+    // Entries with conflicting data: {row, pins}.
+    const conflicts = [];
 
     table.forEach((row, index) => {
       // Evaluate the row.
@@ -136,7 +135,7 @@ class Gate {
       }
 
       if (Object.keys(conflictsForRow).length > 0) {
-        conflicts.set(index, conflictsForRow);
+        conflicts.push({row: index, pins: conflictsForRow});
       }
 
       result.push(outputRow);

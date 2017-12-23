@@ -339,6 +339,69 @@ and.eval();
 
 // Check "out" pin value:
 console.log(and.getOutputPins()[0].getValue()); // 1
+
+// Test the gate on set of inputs, get the results
+// for the outputs.
+
+const inputData = [
+  {a: 1, b: 0},
+  {a: 1, b: 1},
+];
+
+let resultTable = and.execOnData(inputData).result;
+
+console.log(resultTable);
+
+/*
+
+Output for `resultTable`:
+
+[
+  {a: 1, b: 0, out: 0},
+  {a: 1, b: 1, out: 1},
+]
+
+*/
+
+// If the output pins are passed, the validation
+// results with conflicts is returned:
+
+const data = [
+  {a: 1, b: 0, out: 1}, // invalid output
+  {a: 1, b: 1, out: 1}, // valid
+];
+
+let {
+  result,
+  conflicts,
+} = and.execOnData(data);
+
+// Result is a correct truth table:
+console.log(result);
+
+/*
+
+Output for `result`:
+
+[
+  {a: 1, b: 0, out: 0},
+  {a: 1, b: 1, out: 1},
+]
+
+*/
+
+// Conflicts contain conflicting entries: {row, pins}.
+console.log(conflicts);
+
+/*
+
+Conflicts output:
+
+[
+  {row: 0, pins: {out: 0}},
+]
+
+*/
 ```
 
 ### Composite gates

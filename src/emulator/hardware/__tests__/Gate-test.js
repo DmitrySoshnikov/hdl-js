@@ -65,29 +65,29 @@ describe('Gate', () => {
     let {result, conflicts} = and.execOnData(data);
 
     expect(result).toEqual(data);
-    expect(conflicts.size).toBe(0);
+    expect(conflicts.length).toBe(0);
 
     // Partial data
     data = [{a: 1, b: 1, out: 1}];
     ({result, conflicts} = and.execOnData(data));
 
     expect(result).toEqual(data);
-    expect(conflicts.size).toBe(0);
+    expect(conflicts.length).toBe(0);
 
     // Invalid data.
     data = [{a: 1, b: 1, out: 0}];
     ({result, conflicts} = and.execOnData(data));
 
     expect(result).not.toEqual(data);
-    expect(conflicts.size).toBe(1);
-    expect(conflicts.get(0)).toEqual({out: 1});
+    expect(conflicts.length).toBe(1);
+    expect(conflicts[0]).toEqual({row: 0, pins: {out: 1}});
 
     // Sets the outputs, no conflicts.
     data = [{a: 1, b: 1}];
     ({result, conflicts} = and.execOnData(data));
 
     expect(result).toEqual([{a: 1, b: 1, out: 1}]);
-    expect(conflicts.size).toBe(0);
+    expect(conflicts.length).toBe(0);
   });
 
 });
