@@ -339,6 +339,12 @@ and.eval();
 
 // Check "out" pin value:
 console.log(and.getOutputPins()[0].getValue()); // 1
+```
+
+It is possible to execute and test gate logic on the set of data:
+
+```js
+// const and = new And({ ... });
 
 // Test the gate on set of inputs, get the results
 // for the outputs.
@@ -348,13 +354,13 @@ const inputData = [
   {a: 1, b: 1},
 ];
 
-let resultTable = and.execOnData(inputData).result;
+const {result} = and.execOnData(inputData);
 
-console.log(resultTable);
+console.log(result);
 
 /*
 
-Output for `resultTable`:
+Output for `result`:
 
 [
   {a: 1, b: 0, out: 0},
@@ -362,9 +368,15 @@ Output for `resultTable`:
 ]
 
 */
+```
 
-// If the output pins are passed, the validation
-// results with conflicts is returned:
+In addition, if _output pins_ are passed, the `execOnData` will validates them, and report conflicting pins, if the expected values differ from the actual ones:
+
+
+```js
+// const and = new And({ ... });
+
+// Pass the output pins as well:
 
 const data = [
   {a: 1, b: 0, out: 1}, // invalid output

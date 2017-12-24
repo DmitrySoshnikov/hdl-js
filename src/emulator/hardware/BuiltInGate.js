@@ -6,6 +6,7 @@
 'use strict';
 
 const Gate = require('./Gate');
+const Pin = require('./Pin');
 const PinBus = require('./PinBus');
 const TablePrinter = require('../../table-printer');
 
@@ -23,6 +24,27 @@ class BuiltInGate extends Gate {
   } = {}) {
     super({name, inputPins, outputPins});
     this._validate();
+  }
+
+  /**
+   * Creates an default instance of this gate from the spec.
+   */
+  static defaultFromSpec() {
+    const {
+      inputPins,
+      outputPins,
+    } = BuiltInGate._validateSpec(this.Spec);
+
+    const toPin = name => {
+      return typeof name === 'string'
+        ? new Pin({name})
+        : new PinBus({name: name.name, size: name.size});
+    };
+
+    return new this({
+      inputPins: inputPins.map(toPin),
+      outputPins: outputPins.map(toPin),
+    });
   }
 
   /**
@@ -86,12 +108,15 @@ class BuiltInGate extends Gate {
   /**
    * Prints truth table.
    */
-  static printTruthTable() {
+  static printTruthTable({table = null}) {
+    const spec = BuiltInGate._validateSpec(this.Spec);
+
     const {
       inputPins,
       outputPins,
-      truthTable,
-    } = BuiltInGate._validateSpec(this.Spec);
+    } = spec;
+
+    const truthTable = table || spec.truthTable;
 
     const toHeaderColumn = (name) => {
       const content = name = typeof name === 'string'

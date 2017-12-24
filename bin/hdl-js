@@ -38,6 +38,13 @@ const options = require('yargs')
       alias: 'd',
       describe: 'Prints gate\'s specification',
     },
+    '--exec-on-data': {
+      alias: 'e',
+      describe: 'Evaluates gate\'s logic on passed data; ' +
+        'validates outputs if passed',
+      requiresArg: true,
+      coerce: enforceUnique,
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
@@ -62,6 +69,19 @@ function listBuiltInGates() {
   console.info(builtinGates.join('\n'), '\n');
 }
 
+/**
+ * Loads built-in gate class.
+ */
+function loadBuiltInGate(name) {
+  try {
+    return require(BUILTINS_DIR + '/' + name);
+  } catch (_e) {
+    console.error(colors.red(`\nUnknown gate: "${name}".`));
+    listBuiltInGates();
+    process.exit(1);
+  }
+}
+
 function main() {
   const {
     file,
@@ -69,12 +89,20 @@ function main() {
     parse,
     list,
     describe,
+    execOnData,
   } = options;
 
-  if (gate && !describe) {
+  if (gate && !describe && !execOnData) {
     console.info(
       `\nHint: pass ${colors.bold('--describe')} option to see ` +
       `${colors.bold('"' + gate + '"')} gate specification.\n`
+    );
+  }
+
+  if (describe && !gate && !file) {
+    console.info(
+      `\nHint: pass ${colors.bold('--gate')} or ${colors.bold('--file')} ` +
+      `option to see the specification of a built-in or custom gate.\n`
     );
   }
 
@@ -102,16 +130,7 @@ function main() {
     // Handle only built-in gates.
     // TODO: support user-defined composite gates from HDL.
 
-    let GateClass = null;
-
-    try {
-      GateClass = require(BUILTINS_DIR + '/' + gate);
-    } catch (_e) {
-      console.error(colors.red(`\nUnknown gate: "${gate}".`));
-      listBuiltInGates();
-      process.exit(1);
-    }
-
+    const GateClass = loadBuiltInGate(gate);
     const spec = GateClass.Spec;
 
     console.info('');
@@ -151,6 +170,48 @@ function main() {
     // Truth table:
     console.info(colors.bold('Truth table:'), '\n');
     GateClass.printTruthTable();
+  }
+
+  // ------------------------------------------------------
+  // Exec on data.
+
+  if (execOnData) {
+    if (!gate && !file) {
+      console.info(
+        `\nHint: pass ${colors.bold('--gate')} or ${colors.bold('--file')} ` +
+        `option to execute gate logic on the passed data.\n`
+      );
+      return;
+    }
+    const GateClass = loadBuiltInGate(gate);
+    const gateInstance = GateClass.defaultFromSpec();
+    const data = JSON.parse(execOnData);
+
+    const {result, conflicts} = gateInstance.execOnData(data);
+
+    if (conflicts.length) {
+      console.info(
+        colors.bold(`\nFound ${conflicts.length} conflicts in:`), '\n'
+      );
+
+      conflicts.forEach(conflict => {
+        const {row, pins} = conflict;
+        const pinNames = Object.keys(pins);
+
+        console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`, '\n');
+
+        pinNames.forEach(pin => {
+          result[row][pin] = colors.red(pin);
+        })
+      });
+
+    } else {
+      // No conflicts.
+      console.info(colors.bold('\nTruth table for data:'), '\n');
+    }
+
+    // Always print correct table eventually.
+    GateClass.printTruthTable({table: result});
   }
 
   // ------------------------------------------------------
