@@ -38,7 +38,7 @@ const options = require('yargs')
       alias: 'd',
       describe: 'Prints gate\'s specification',
     },
-    '--exec-on-data': {
+    'exec-on-data': {
       alias: 'e',
       describe: 'Evaluates gate\'s logic on passed data; ' +
         'validates outputs if passed',

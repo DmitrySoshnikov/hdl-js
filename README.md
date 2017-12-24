@@ -65,6 +65,8 @@ Options:
   --list, -l      List supported built-in gates
   --gate, -g      Name of a built-in gate
   --describe, -d  Prints gate's specification
+  --exec-on-data, -e  Evaluates gate's logic on passed data; validates outputs
+                      if passed
 ```
 
 > NOTE: the HDL format is based on the chips format from the [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
