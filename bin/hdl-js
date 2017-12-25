@@ -188,21 +188,22 @@ function main() {
     const data = JSON.parse(execOnData);
 
     const {result, conflicts} = gateInstance.execOnData(data);
+    const conflictingRows = {};
 
     if (conflicts.length) {
       console.info(
-        colors.bold(`\nFound ${conflicts.length} conflicts in:`), '\n'
+        colors.red(colors.bold(
+          `\nFound ${conflicts.length} conflicts in:\n`
+        ))
       );
 
       conflicts.forEach(conflict => {
         const {row, pins} = conflict;
         const pinNames = Object.keys(pins);
 
-        console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`, '\n');
+        conflictingRows[row] = pins;
 
-        pinNames.forEach(pin => {
-          result[row][pin] = colors.red(pin);
-        })
+        console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`, '\n');
       });
 
     } else {
@@ -210,8 +211,20 @@ function main() {
       console.info(colors.bold('\nTruth table for data:'), '\n');
     }
 
-    // Always print correct table eventually.
-    GateClass.printTruthTable({table: result});
+    // Always print correct table eventually,
+    // showing conflicting values in red.
+    GateClass.printTruthTable({
+      table: result,
+      transformValue(value, row, column) {
+        if (
+          conflictingRows[row] &&
+          conflictingRows[row].hasOwnProperty(column)
+        ) {
+          return colors.red(data[row][column]) + ' / ' + colors.green(value);
+        }
+        return value;
+      }
+    });
   }
 
   // ------------------------------------------------------

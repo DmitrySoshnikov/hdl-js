@@ -93,7 +93,7 @@ class BuiltInGate extends Gate {
   /**
    * Prints truth table.
    */
-  static printTruthTable({table = null, transformValue = null}) {
+  static printTruthTable({table = null, transformValue = null} = {}) {
     super.printTruthTable({
       table: table || BuiltInGate.validateSpec(this.Spec).truthTable,
       transformValue,
