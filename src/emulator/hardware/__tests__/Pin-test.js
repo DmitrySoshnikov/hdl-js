@@ -19,4 +19,10 @@ describe('Pin', () => {
     expect(a.getValue()).toBe(false);
   });
 
+  it('to full name', () => {
+    expect(Pin.toFullName('a')).toBe('a');
+    expect(Pin.toFullName({name: 'a'})).toBe('a');
+    expect(Pin.toFullName({name: 'a', size: 16})).toBe('a[16]');
+  });
+
 });

@@ -8,7 +8,6 @@
 const Gate = require('./Gate');
 const Pin = require('./Pin');
 const PinBus = require('./PinBus');
-const TablePrinter = require('../../table-printer');
 
 /**
  * Base class for all builtin gates.
@@ -33,7 +32,7 @@ class BuiltInGate extends Gate {
     const {
       inputPins,
       outputPins,
-    } = BuiltInGate._validateSpec(this.Spec);
+    } = BuiltInGate.validateSpec(this.Spec);
 
     const toPin = name => {
       return typeof name === 'string'
@@ -59,7 +58,7 @@ class BuiltInGate extends Gate {
    * Validates pin numbers.
    */
   _validatePins(pins, kind) {
-    const spec = BuiltInGate._validateSpec(this.constructor.Spec);
+    const spec = BuiltInGate.validateSpec(this.constructor.Spec);
 
     if (pins.length !== spec[kind].length) {
       throw new Error(
@@ -82,86 +81,23 @@ class BuiltInGate extends Gate {
     });
   }
 
-  static _validateSpec(spec, gateName) {
-    if (!spec) {
-      throw new Error(
-        `"${gateName}" gate: BuiltIn gates ` +
-        `should impelment "Spec" property.`
-      );
-    }
-
-    if (
-      !spec.description ||
-      !spec.inputPins ||
-      !spec.outputPins ||
-      !spec.truthTable
-    ) {
-      throw new Error(
-        `"${gateName}" gate: "Spec" should impelment` +
-        `all properties: description, inputPins, outputPins, truthTable.`
-      );
-    }
-
-    return spec;
+  static validateSpec(spec) {
+    return super.validateSpec(spec, [
+      'description',
+      'inputPins',
+      'outputPins',
+      'truthTable',
+    ]);
   }
 
   /**
    * Prints truth table.
    */
-  static printTruthTable({table = null}) {
-    const spec = BuiltInGate._validateSpec(this.Spec);
-
-    const {
-      inputPins,
-      outputPins,
-    } = spec;
-
-    const truthTable = table || spec.truthTable;
-
-    const toHeaderColumn = (name) => {
-      const content = name = typeof name === 'string'
-        ? name
-        : `${name.name}[${name.size}]`;
-
-      return {content, hAlign: 'center'};
-    };
-
-    const allPins = [...inputPins, ...outputPins];
-
-    const inputPinNames = inputPins.map(input => toHeaderColumn(input));
-    const outputPinNames = outputPins.map(output => toHeaderColumn(output));
-
-    const printer = new TablePrinter({
-      head: [...inputPinNames, ...outputPinNames],
+  static printTruthTable({table = null, transformValue = null}) {
+    super.printTruthTable({
+      table: table || BuiltInGate.validateSpec(this.Spec).truthTable,
+      transformValue,
     });
-
-    truthTable.forEach(row => {
-      const tableRow = Object.keys(row).map(key => {
-        const binary = (row[key] >>> 0).toString(2);
-
-        const pin = allPins.find(name => {
-          return typeof name === 'string'
-            ? name === key
-            : name.name === key;
-        });
-
-        let content = binary.padStart(pin.size || 0, '0');
-
-        // 16-bit max in this machine.
-        if (content.length > 16) {
-          content = content.slice(16);
-        }
-
-        return {
-          content,
-          hAlign: 'center',
-        };
-      });
-      printer.push(tableRow);
-    });
-
-    console.info(printer.toString());
-    console.info('');
   }
 
   /**

@@ -5,9 +5,14 @@
 
 'use strict';
 
-const parser = require('../../parser');
 const fs = require('fs');
+const parser = require('../../parser');
+const Pin = require('./Pin');
+const TablePrinter = require('../../table-printer');
 
+/**
+ * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
+ */
 class Gate {
 
   /**
@@ -142,6 +147,89 @@ class Gate {
     });
 
     return {result, conflicts};
+  }
+
+  /**
+   * Prints truth table of this gate.
+   *
+   * If `transformValue` function is passed, it's called with
+   * the current row, column, and value.
+   */
+  static printTruthTable({table, transformValue = null}) {
+    const spec = this.validateSpec(this.Spec, [
+      'inputPins',
+      'outputPins',
+    ]);
+
+    const {
+      inputPins,
+      outputPins,
+    } = spec;
+
+    const toHeaderColumn = (name) => {
+      return {
+        content: Pin.toFullName(name),
+        hAlign: 'center',
+      };
+    };
+
+    const allPins = [...inputPins, ...outputPins];
+
+    const printer = new TablePrinter({
+      head: [
+        ...inputPins.map(toHeaderColumn),
+        ...outputPins.map(toHeaderColumn),
+      ],
+    });
+
+    table.forEach((row, index) => {
+      const tableRow = Object.keys(row).map(key => {
+        const binary = (row[key] >>> 0).toString(2);
+
+        const pin = allPins.find(name => {
+          return typeof name === 'string'
+            ? name === key
+            : name.name === key;
+        });
+
+        let content = binary.padStart(pin.size || 0, '0');
+
+        // 16-bit max in this machine.
+        if (content.length > 16) {
+          content = content.slice(16);
+        }
+
+        if (transformValue) {
+          content = transformValue(content, index, key);
+        }
+
+        return {
+          content,
+          hAlign: 'center',
+        };
+      });
+      printer.push(tableRow);
+    });
+
+    console.info(printer.toString());
+    console.info('');
+  }
+
+  static validateSpec(spec, specProps) {
+    if (!spec) {
+      throw new Error(`All gates should implement "Spec" property.`);
+    }
+
+    specProps.forEach(prop => {
+      if (!spec.hasOwnProperty(prop)) {
+        throw new Error(
+          `"${this.name}" gate: "Spec" should impelment` +
+          `all properties: ${specProps.join(', ')}.`
+        );
+      }
+    });
+
+    return spec;
   }
 
   /**

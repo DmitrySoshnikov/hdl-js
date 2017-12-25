@@ -34,6 +34,28 @@ class Pin {
   setValue(value) {
     return this._value = value;
   }
+
+  /**
+   * Builds a full name of a pin or pin bus:
+   *
+   * 'a' -> 'a'
+   * {name: 'a'} -> 'a'
+   * {name: 'a', size: 16} -> 'a[16]'
+   */
+  static toFullName(name) {
+    // Simple string name from Spec.
+    if (typeof name === 'string') {
+      return name;
+    }
+
+    // PinBus.
+    if (name.name && name.size) {
+      return `${name.name}[${name.size}]`;
+    }
+
+    // Simple name from AST.
+    return name.name;
+  }
 }
 
 module.exports = Pin;
