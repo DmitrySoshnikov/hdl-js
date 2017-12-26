@@ -418,7 +418,9 @@ Conflicts output:
 */
 ```
 
-From the CLI it's control with the same `--exec-on-data` (`-e`) option. In the example below we validate the gate logic, passing (incorrect in this case) expected `out` value. The tool tells us, that the correct value for `Or` gate in this case should be `1`, not `0`:
+From the CLI it's controlled via the `--exec-on-data` (`-e`) option.
+
+In the example below we validate the gate logic, passing (incorrect in this case) expected value for the `out` pin of the `Or` gate:
 
 ```
 ./bin/hdl-js -g Or -e '[{"a": 1, "b": 1, "out": 0}]'
