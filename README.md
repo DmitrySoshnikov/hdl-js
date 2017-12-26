@@ -97,7 +97,7 @@ Running the:
 ./bin/hdl-js -f examples/And.hdl -p
 ```
 
-We get the parsed AST is:
+We get the parsed AST:
 
 ```js
 {
@@ -416,6 +416,22 @@ Conflicts output:
 ]
 
 */
+```
+
+From the CLI it's control with the same `--exec-on-data` (`-e`) option. In the example below we validate the gate logic, passing (incorrect in this case) expected `out` value. The tool tells us, that the correct value for `Or` gate in this case should be `1`, not `0`:
+
+```
+./bin/hdl-js -g Or -e '[{"a": 1, "b": 1, "out": 0}]'
+
+Found 1 conflicts in:
+
+  - row: 0, pins: out
+
+┌───┬───┬───────┐
+│ a │ b │  out  │
+├───┼───┼───────┤
+│ 1 │ 1 │ 0 / 1 │
+└───┴───┴───────┘
 ```
 
 ### Composite gates
