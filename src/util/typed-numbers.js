@@ -5,8 +5,6 @@
 
 'use strict';
 
-const storage = new Int16Array([0]);
-
 /**
  * Converts a number to signed 16-bit integer.
  */
@@ -15,8 +13,7 @@ function int16(v) {
     v = Number.parseInt(v, 2);
   }
 
-  storage[0] = v;
-  return storage[0];
+  return (v << 16) >> 16;
 }
 
 /**

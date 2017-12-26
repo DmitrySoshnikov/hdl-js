@@ -7,6 +7,8 @@
 
 const Pin = require('./Pin');
 
+const {int16} = require('../../util/typed-numbers');
+
 /**
  * Represents a pin bus (set of pins) in a gate.
  *
@@ -14,7 +16,7 @@ const Pin = require('./Pin');
  */
 class PinBus extends Pin {
   constructor({name, size, value = null}) {
-    super({name, value: new Int16Array([value])});
+    super({name, value});
 
     // Call explicitly `setValue` to handle bit-strings.
     if (value) {
@@ -43,14 +45,14 @@ class PinBus extends Pin {
     if (typeof value === 'string') {
       value = Number.parseInt(value, 2);
     }
-    this._value[0] = value;
+    this._value = int16(value);
   }
 
   /**
    * Returns value of this pin bus.
    */
   getValue() {
-    return this._value[0];
+    return this._value;
   }
 
   /**
@@ -61,12 +63,12 @@ class PinBus extends Pin {
 
     // Set 1.
     if (value === 1) {
-      this._value[0] |= (1 << index);
+      this._value |= (1 << index);
       return;
     }
 
     // Set 0 ("clear").
-    this._value[0] &= ~(1 << index);
+    this._value &= ~(1 << index);
   }
 
   /**
@@ -74,7 +76,7 @@ class PinBus extends Pin {
    */
   getValueAt(index) {
     this._checkIndex(index);
-    return (this._value[0] >> index) & 1;
+    return (this._value >> index) & 1;
   }
 
   /**
@@ -83,7 +85,7 @@ class PinBus extends Pin {
   getSlice(from, to) {
     this._checkIndex(from);
     this._checkIndex(to);
-    return (this._value[0] >> from) & ((1 << (to + 1 - from)) - 1);
+    return (this._value >> from) & ((1 << (to + 1 - from)) - 1);
   }
 
   /**
