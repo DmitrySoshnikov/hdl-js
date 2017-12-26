@@ -7,7 +7,7 @@
 
 const Gate = require('../Gate');
 const Pin = require('../Pin');
-
+const PinBus = require('../PinBus');
 
 // Inputs.
 const a = new Pin({name: 'a', value: 1});
@@ -74,6 +74,13 @@ describe('Gate', () => {
     expect(result).toEqual(data);
     expect(conflicts.length).toBe(0);
 
+    // String data
+    data = [{a: '1', b: '1', out: 1}];
+    ({result, conflicts} = and.execOnData(data));
+
+    expect(result).toEqual(data);
+    expect(conflicts.length).toBe(0);
+
     // Invalid data.
     data = [{a: 1, b: 1, out: 0}];
     ({result, conflicts} = and.execOnData(data));
@@ -87,6 +94,40 @@ describe('Gate', () => {
     ({result, conflicts} = and.execOnData(data));
 
     expect(result).toEqual([{a: 1, b: 1, out: 1}]);
+    expect(conflicts.length).toBe(0);
+  });
+
+  it('executes on data: PinBus', () => {
+    const Not16 = require('../builtin-gates/Not16');
+
+    const _in = new PinBus({name: 'in', size: 16});
+    const _out = new PinBus({name: 'out', size: 16});
+
+    const not16 = new Not16({
+      inputPins: [_in],
+      outputPins: [_out],
+    });
+
+    // Full data.
+    let data = Not16.Spec.truthTable;
+    let {result, conflicts} = not16.execOnData(data);
+
+    expect(result).toEqual(data);
+    expect(conflicts.length).toBe(0);
+
+    // Invalid data.
+    data = [{in: '0000000000000000', out: 0b1111111111111110}];
+    ({result, conflicts} = not16.execOnData(data));
+
+    expect(result).not.toEqual(data);
+    expect(conflicts.length).toBe(1);
+    expect(conflicts[0]).toEqual({row: 0, pins: {out: ~0b0000000000000000}});
+
+    // Sets the outputs, no conflicts.
+    data = [{in: '0000000000000000', out: ~0b0000000000000000}];
+    ({result, conflicts} = not16.execOnData(data));
+
+    expect(result).toEqual(data);
     expect(conflicts.length).toBe(0);
   });
 

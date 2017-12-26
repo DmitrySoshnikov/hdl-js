@@ -128,14 +128,35 @@ class Gate {
       const conflictsForRow = {};
 
       for (const pinName in this._namesToPinsMap) {
+        const pin = this.getPin(pinName);
+
         const expectedValue = row[pinName];
-        const actualValue = this.getPin(pinName).getValue();
+        const actualValue = pin.getValue();
 
         outputRow[pinName] = actualValue;
 
         // If the (output) pin is provided, validate it.
-        if (row.hasOwnProperty(pinName) && expectedValue !== actualValue) {
-          conflictsForRow[pinName] = actualValue;
+        if (row.hasOwnProperty(pinName)) {
+          let expectedStrnig;
+          let actualString;
+
+          if (pin.constructor === Pin) {
+            expectedStrnig = expectedValue.toString();
+            actualString = actualValue.toString();
+          } else {
+            expectedStrnig = typeof expectedValue === 'number'
+              ? (expectedValue >>> 0).toString(2).slice(16)
+              : expectedValue;
+
+            // For PinBus compare bit-strings.
+            actualString = typeof actualValue === 'number'
+              ? (actualValue >>> 0).toString(2).slice(16)
+              : actualValue;
+          }
+
+          if (expectedStrnig !== actualString) {
+            conflictsForRow[pinName] = actualValue;
+          }
         }
       }
 

@@ -185,7 +185,14 @@ function main() {
     }
     const GateClass = loadBuiltInGate(gate);
     const gateInstance = GateClass.defaultFromSpec();
-    const data = JSON.parse(execOnData);
+
+    // Treat values as binary numbers.
+    const data = JSON.parse(execOnData, (_key, value) => {
+      if (typeof value !== 'number') {
+        return value;
+      }
+      return Number.parseInt(value, 2) >>> 0;
+    });
 
     const {result, conflicts} = gateInstance.execOnData(data);
     const conflictingRows = {};
