@@ -7,6 +7,8 @@ const fs = require('fs');
 const hdl = require('..');
 const path = require('path');
 
+const {int16} = require('../src/util/typed-numbers');
+
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
 }
@@ -188,10 +190,10 @@ function main() {
 
     // Treat values as binary numbers.
     const data = JSON.parse(execOnData, (_key, value) => {
-      if (typeof value !== 'number') {
-        return value;
+      if (typeof value === 'string' || typeof value === 'number') {
+        return int16(value);
       }
-      return Number.parseInt(value, 2) >>> 0;
+      return value;
     });
 
     const {result, conflicts} = gateInstance.execOnData(data);
@@ -227,7 +229,13 @@ function main() {
           conflictingRows[row] &&
           conflictingRows[row].hasOwnProperty(column)
         ) {
-          return colors.red(data[row][column]) + ' / ' + colors.green(value);
+          let expected = (data[row][column] >>> 0).toString(2);
+
+          if (expected.length > 16) {
+            expected = expected.slice(16);
+          }
+
+          return colors.red(expected) + ' / ' + colors.green(value);
         }
         return value;
       }

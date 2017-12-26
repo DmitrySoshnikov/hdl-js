@@ -11,6 +11,11 @@
 class Pin {
   constructor({name, value = null}) {
     this._name = name;
+
+    if (typeof value === 'string') {
+      value = Number.parseInt(value, 2);
+    }
+
     this._value = value;
   }
 
@@ -32,6 +37,9 @@ class Pin {
    * Udates the value of this pin.
    */
   setValue(value) {
+    if (typeof value === 'string') {
+      value = Number.parseInt(value, 2);
+    }
     return this._value = value;
   }
 

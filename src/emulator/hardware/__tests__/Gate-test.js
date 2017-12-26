@@ -9,6 +9,8 @@ const Gate = require('../Gate');
 const Pin = require('../Pin');
 const PinBus = require('../PinBus');
 
+const {int16} = require('../../../util/typed-numbers');
+
 // Inputs.
 const a = new Pin({name: 'a', value: 1});
 const b = new Pin({name: 'b', value: 0});
@@ -78,7 +80,7 @@ describe('Gate', () => {
     data = [{a: '1', b: '1', out: 1}];
     ({result, conflicts} = and.execOnData(data));
 
-    expect(result).toEqual(data);
+    expect(result).toEqual([{a: 1, b: 1, out: 1}]);
     expect(conflicts.length).toBe(0);
 
     // Invalid data.
@@ -121,13 +123,15 @@ describe('Gate', () => {
 
     expect(result).not.toEqual(data);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0]).toEqual({row: 0, pins: {out: ~0b0000000000000000}});
+    expect(conflicts[0])
+      .toEqual({row: 0, pins: {out: int16(0b1111111111111111)}});
 
     // Sets the outputs, no conflicts.
-    data = [{in: '0000000000000000', out: ~0b0000000000000000}];
+    data = [{in: '0000000000000000', out: int16(0b1111111111111111)}];
     ({result, conflicts} = not16.execOnData(data));
 
-    expect(result).toEqual(data);
+    expect(result)
+      .toEqual([{in: 0, out: int16(0b1111111111111111)}]);
     expect(conflicts.length).toBe(0);
   });
 

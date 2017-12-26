@@ -10,6 +10,8 @@ const parser = require('../../parser');
 const Pin = require('./Pin');
 const TablePrinter = require('../../table-printer');
 
+const {int16} = require('../../util/typed-numbers');
+
 /**
  * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
  */
@@ -128,35 +130,16 @@ class Gate {
       const conflictsForRow = {};
 
       for (const pinName in this._namesToPinsMap) {
-        const pin = this.getPin(pinName);
-
-        const expectedValue = row[pinName];
-        const actualValue = pin.getValue();
+        const expectedValue = int16(row[pinName]);
+        const actualValue = this.getPin(pinName).getValue();
 
         outputRow[pinName] = actualValue;
 
+        //console.log({pinName, expectedValue, actualValue});
+
         // If the (output) pin is provided, validate it.
-        if (row.hasOwnProperty(pinName)) {
-          let expectedStrnig;
-          let actualString;
-
-          if (pin.constructor === Pin) {
-            expectedStrnig = expectedValue.toString();
-            actualString = actualValue.toString();
-          } else {
-            expectedStrnig = typeof expectedValue === 'number'
-              ? (expectedValue >>> 0).toString(2).slice(16)
-              : expectedValue;
-
-            // For PinBus compare bit-strings.
-            actualString = typeof actualValue === 'number'
-              ? (actualValue >>> 0).toString(2).slice(16)
-              : actualValue;
-          }
-
-          if (expectedStrnig !== actualString) {
-            conflictsForRow[pinName] = actualValue;
-          }
+        if (row.hasOwnProperty(pinName) && expectedValue !== actualValue) {
+          conflictsForRow[pinName] = actualValue;
         }
       }
 

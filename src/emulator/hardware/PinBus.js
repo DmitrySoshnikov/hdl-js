@@ -14,7 +14,12 @@ const Pin = require('./Pin');
  */
 class PinBus extends Pin {
   constructor({name, size, value = null}) {
-    super({name, value});
+    super({name, value: new Int16Array([value])});
+
+    // Call explicitly `setValue` to handle bit-strings.
+    if (value) {
+      this.setValue(value);
+    }
 
     if (!size) {
       throw new TypeError(`PinBus "${name}": "size" argument is required.`);
@@ -31,6 +36,24 @@ class PinBus extends Pin {
   }
 
   /**
+   * Override `setValue` to handle both, bit-strings: '0000000000000000'
+   * raw binary numbers: 0b0000000000000000.
+   */
+  setValue(value) {
+    if (typeof value === 'string') {
+      value = Number.parseInt(value, 2);
+    }
+    this._value[0] = value;
+  }
+
+  /**
+   * Returns value of this pin bus.
+   */
+  getValue() {
+    return this._value[0];
+  }
+
+  /**
    * Updates the value of a particular bit in this bus.
    */
   setValueAt(index, value) {
@@ -38,12 +61,12 @@ class PinBus extends Pin {
 
     // Set 1.
     if (value === 1) {
-      this._value |= (1 << index);
+      this._value[0] |= (1 << index);
       return;
     }
 
     // Set 0 ("clear").
-    this._value &= ~(1 << index);
+    this._value[0] &= ~(1 << index);
   }
 
   /**
@@ -51,7 +74,7 @@ class PinBus extends Pin {
    */
   getValueAt(index) {
     this._checkIndex(index);
-    return (this._value >> index) & 1;
+    return (this._value[0] >> index) & 1;
   }
 
   /**
@@ -60,7 +83,7 @@ class PinBus extends Pin {
   getSlice(from, to) {
     this._checkIndex(from);
     this._checkIndex(to);
-    return (this._value >> from) & ((1 << (to + 1 - from)) - 1);
+    return (this._value[0] >> from) & ((1 << (to + 1 - from)) - 1);
   }
 
   /**

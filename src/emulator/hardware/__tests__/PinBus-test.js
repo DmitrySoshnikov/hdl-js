@@ -77,4 +77,18 @@ describe('PinBus', () => {
     expect(() => a16.getSlice(-1, 15)).toThrow();
   });
 
+  it('set value', () => {
+    const a16 = new PinBus({
+      name: 'a',
+      size: 16,
+    });
+
+    // Number value.
+    a16.setValue(0b0101010101010101);
+    expect(a16.getValue()).toBe(0b0101010101010101);
+
+    a16.setValue('0101010101010101');
+    expect(a16.getValue()).toBe(0b0101010101010101);
+  });
+
 });
