@@ -71,6 +71,44 @@ class Gate {
   }
 
   /**
+   * Returns pin info from Spec.
+   */
+  static getPinInfo(name) {
+    if (!this._pinsInfoMap) {
+      this._pinsInfoMap = {};
+
+      const spec = this.validateSpec(this.Spec);
+
+      const {
+        inputPins,
+        outputPins,
+      } = spec;
+
+      const processPins = (pins, kind) => {
+        for (const pin of pins) {
+          const name = typeof pin === 'string' ? pin : pin.name;
+          this._pinsInfoMap[name] = {kind, name};
+
+          if (typeof pin !== 'string' && pin.hasOwnProperty('size')) {
+            this._pinsInfoMap[name].size = pin.size;
+          }
+        }
+      };
+
+      processPins(inputPins, 'input');
+      processPins(outputPins, 'output');
+    }
+
+    if (!this._pinsInfoMap.hasOwnProperty(name)) {
+      throw new Error(
+        `Pin "${name}" is not in Spec of "${this.name}" gate.`
+      );
+    }
+
+    return this._pinsInfoMap[name];
+  }
+
+  /**
    * Creates a gate from an HDL file.
    */
   static fromHDLFile(fileName) {
@@ -158,10 +196,7 @@ class Gate {
    * the current row, column, and value.
    */
   static printTruthTable({table, transformValue = null}) {
-    const spec = this.validateSpec(this.Spec, [
-      'inputPins',
-      'outputPins',
-    ]);
+    const spec = this.validateSpec(this.Spec);
 
     const {
       inputPins,
@@ -175,8 +210,6 @@ class Gate {
       };
     };
 
-    const allPins = [...inputPins, ...outputPins];
-
     const printer = new TablePrinter({
       head: [
         ...inputPins.map(toHeaderColumn),
@@ -185,16 +218,12 @@ class Gate {
     });
 
     table.forEach((row, index) => {
-      const tableRow = Object.keys(row).map(key => {
-        const binary = (row[key] >>> 0).toString(2);
+      const tableRow = Object.keys(row).map(name => {
+        const pinInfo = this.getPinInfo(name);
 
-        const pin = allPins.find(name => {
-          return typeof name === 'string'
-            ? name === key
-            : name.name === key;
-        });
-
-        let content = binary.padStart(pin.size || 0, '0');
+        let content = (row[name] >>> 0)
+          .toString(2)
+          .padStart(pinInfo.size || 0, '0');
 
         // 16-bit max in this machine.
         if (content.length > 16) {
@@ -202,7 +231,7 @@ class Gate {
         }
 
         if (transformValue) {
-          content = transformValue(content, index, key);
+          content = transformValue(content, index, name);
         }
 
         return {
@@ -217,7 +246,10 @@ class Gate {
     console.info('');
   }
 
-  static validateSpec(spec, specProps) {
+  static validateSpec(
+    spec,
+    specProps = ['inputPins', 'outputPins']
+  ) {
     if (!spec) {
       throw new Error(`All gates should implement "Spec" property.`);
     }

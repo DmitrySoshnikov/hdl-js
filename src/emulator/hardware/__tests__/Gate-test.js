@@ -135,4 +135,20 @@ describe('Gate', () => {
     expect(conflicts.length).toBe(0);
   });
 
+  it('get pin info', () => {
+    const And = require('../builtin-gates/And');
+
+    expect(And.getPinInfo('a')).toEqual({kind: 'input', name: 'a'});
+    expect(And.getPinInfo('b')).toEqual({kind: 'input', name: 'b'});
+    expect(And.getPinInfo('out')).toEqual({kind: 'output', name: 'out'});
+
+    const Not16 = require('../builtin-gates/Not16');
+
+    expect(Not16.getPinInfo('in'))
+      .toEqual({kind: 'input', name: 'in', size: 16});
+
+    expect(Not16.getPinInfo('out'))
+      .toEqual({kind: 'output', name: 'out', size: 16});
+  });
+
 });

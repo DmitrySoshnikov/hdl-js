@@ -231,6 +231,13 @@ function main() {
         ) {
           let expected = (data[row][column] >>> 0).toString(2);
 
+          const pinInfo = GateClass.getPinInfo(column);
+
+          if (pinInfo.size) {
+            expected = expected.padStart(pinInfo.size, '0');
+          }
+
+          // 16-bit max in this machine.
           if (expected.length > 16) {
             expected = expected.slice(16);
           }
