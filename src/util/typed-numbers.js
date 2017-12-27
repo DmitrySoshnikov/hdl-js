@@ -17,6 +17,18 @@ function int16(v) {
 }
 
 /**
+ * Converts all rows in a table to `int16`.
+ */
+function int16Table(table) {
+  for (const row of table) {
+    for (const pin in row) {
+      row[pin] = int16(row[pin]);
+    }
+  }
+  return table;
+}
+
+/**
  * Converts a number to unsigned 16-bit integer.
  */
 function uint16(v) {
@@ -25,5 +37,6 @@ function uint16(v) {
 
 module.exports = {
   int16,
+  int16Table,
   uint16,
 };

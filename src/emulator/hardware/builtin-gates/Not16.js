@@ -7,18 +7,18 @@
 
 const BuiltInGate = require('../BuiltInGate');
 
-const {int16} = require('../../../util/typed-numbers');
+const {int16Table} = require('../../../util/typed-numbers');
 
 /**
  * Canonical truth table for the `Not16` gate.
  */
-const TRUTH_TABLE = [
-  {in: int16(0b0000000000000000), out: int16(0b1111111111111111)},
-  {in: int16(0b1111111111111111), out: int16(0b0000000000000000)},
-  {in: int16(0b1010101010101010), out: int16(0b0101010101010101)},
-  {in: int16(0b0011110011000011), out: int16(0b1100001100111100)},
-  {in: int16(0b0001001000110100), out: int16(0b01110110111001011)},
-];
+const TRUTH_TABLE = int16Table([
+  {in: 0b0000000000000000, out: 0b1111111111111111},
+  {in: 0b1111111111111111, out: 0b0000000000000000},
+  {in: 0b1010101010101010, out: 0b0101010101010101},
+  {in: 0b0011110011000011, out: 0b1100001100111100},
+  {in: 0b0001001000110100, out: 0b1110110111001011},
+]);
 
 /**
  * A bitwise 16-bit Not gate.
