@@ -55,16 +55,13 @@ hdl-js --help
 ```
 
 ```
-Usage: hdl-js [options]
-
 Options:
-  --help, -h      Show help                                    [boolean]
-  --version, -v   Show version number                          [boolean]
-  --file, -f      An HDL file containing chip specification
-  --parse, -p     Parse the HDL file, and print AST
-  --list, -l      List supported built-in gates
-  --gate, -g      Name of a built-in gate
-  --describe, -d  Prints gate's specification
+  --help, -h          Show help                                        [boolean]
+  --version, -v       Show version number                              [boolean]
+  --gate, -g          Name of a built-in gate or path to an HDL file
+  --parse, -p         Parse the HDL file, and print AST
+  --list, -l          List supported built-in gates
+  --describe, -d      Prints gate's specification
   --exec-on-data, -e  Evaluates gate's logic on passed data; validates outputs
                       if passed
 ```
@@ -94,7 +91,7 @@ CHIP And {
 Running the:
 
 ```
-./bin/hdl-js -f examples/And.hdl -p
+./bin/hdl-js --gate examples/And.hdl --parse
 ```
 
 We get the parsed AST:
@@ -274,6 +271,8 @@ Truth table:
 │ 1 │ 1 │  1  │
 └───┴───┴─────┘
 ```
+
+> NOTE: the `--gate` option handles both, built-in gates by name, and custom gates from HDL files.
 
 From Node the specification of a built-in gate is exposed via `Spec` option on the gate class:
 

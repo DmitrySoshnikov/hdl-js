@@ -16,9 +16,9 @@ function enforceUnique(v) {
 const options = require('yargs')
   .usage('Usage: $0 [options]')
   .options({
-    file: {
-      alias: 'f',
-      describe: 'An HDL file containing chip specification',
+    gate: {
+      alias: 'g',
+      describe: 'Name of a built-in gate or path to an HDL file',
       requiresArg: true,
       coerce: enforceUnique,
     },
@@ -29,12 +29,6 @@ const options = require('yargs')
     list: {
       alias: 'l',
       describe: 'List supported built-in gates',
-    },
-    gate: {
-      alias: 'g',
-      describe: 'Name of a built-in gate',
-      requiresArg: true,
-      coerce: enforceUnique,
     },
     describe: {
       alias: 'd',
@@ -84,9 +78,55 @@ function loadBuiltInGate(name) {
   }
 }
 
+/**
+ * Prints specification and truth table of a built-in gate.
+ */
+function describeBuiltInGate(gate) {
+  const GateClass = loadBuiltInGate(gate);
+  const spec = GateClass.Spec;
+
+  console.info('');
+  console.info(colors.bold(`"${GateClass.name}"`) + ' gate:');
+
+  const toFullName = (name) => {
+    return name = typeof name === 'string'
+      ? `  - ${name}`
+      : `  - ${name.name}[${name.size}]`;
+  };
+
+  // Description:
+
+  const description = spec.description.split('\n')
+    .map(line => '  ' + line)
+    .join('\n')
+
+  console.info('\n' + colors.bold('Description:\n\n') + description);
+
+  // Input pins:
+
+  const inputPins = spec.inputPins
+    .map(input => toFullName(input))
+    .join('\n');
+
+  console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
+
+  // Output pins:
+
+  const outputPins = spec.outputPins
+    .map(output => toFullName(output))
+    .join('\n');
+
+  console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
+  console.info('');
+
+  // Truth table:
+  console.info(colors.bold('Truth table:'), '\n');
+  GateClass.printTruthTable();
+
+}
+
 function main() {
   const {
-    file,
     gate,
     parse,
     list,
@@ -101,10 +141,10 @@ function main() {
     );
   }
 
-  if (describe && !gate && !file) {
+  if (describe && !gate) {
     console.info(
-      `\nHint: pass ${colors.bold('--gate')} or ${colors.bold('--file')} ` +
-      `option to see the specification of a built-in or custom gate.\n`
+      `\nHint: pass ${colors.bold('--gate')} option to see ` +
+      `the specification of a built-in or custom gate.\n`
     );
   }
 
@@ -112,10 +152,10 @@ function main() {
   let hdlFile;
 
   // ------------------------------------------------------
-  // Custom HDL file.
+  // Handle gate (built-in or custom).
 
-  if (file) {
-    hdlFile = fs.readFileSync(file, 'utf-8');
+  if (gate && fs.existsSync(gate)) {
+    hdlFile = fs.readFileSync(gate, 'utf-8');
   }
 
   // ------------------------------------------------------
@@ -129,59 +169,26 @@ function main() {
   // Describes a gate (built-in or composite).
 
   if (gate && describe) {
-    // Handle only built-in gates.
-    // TODO: support user-defined composite gates from HDL.
+    // Custom gates from HDL files:
+    if (hdlFile) {
+      console.error(colors.red(
+        `\n--describe currently works only with built-in gates.\n`
+      ));
+      process.exit(1);
+    }
 
-    const GateClass = loadBuiltInGate(gate);
-    const spec = GateClass.Spec;
-
-    console.info('');
-    console.info(colors.bold(`"${GateClass.name}"`) + ' gate:');
-
-    const toFullName = (name) => {
-      return name = typeof name === 'string'
-        ? `  - ${name}`
-        : `  - ${name.name}[${name.size}]`;
-    };
-
-    // Description:
-
-    const description = spec.description.split('\n')
-      .map(line => '  ' + line)
-      .join('\n')
-
-    console.info('\n' + colors.bold('Description:\n\n') + description);
-
-    // Input pins:
-
-    const inputPins = spec.inputPins
-      .map(input => toFullName(input))
-      .join('\n');
-
-    console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
-
-    // Output pins:
-
-    const outputPins = spec.outputPins
-      .map(output => toFullName(output))
-      .join('\n');
-
-    console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
-    console.info('');
-
-    // Truth table:
-    console.info(colors.bold('Truth table:'), '\n');
-    GateClass.printTruthTable();
+    // Built-in gates:
+    describeBuiltInGate(gate);
   }
 
   // ------------------------------------------------------
   // Exec on data.
 
   if (execOnData) {
-    if (!gate && !file) {
+    if (!gate) {
       console.info(
-        `\nHint: pass ${colors.bold('--gate')} or ${colors.bold('--file')} ` +
-        `option to execute gate logic on the passed data.\n`
+        `\nHint: pass ${colors.bold('--gate')} option to execute ` +
+        `gate logic on the passed data.\n`
       );
       return;
     }
