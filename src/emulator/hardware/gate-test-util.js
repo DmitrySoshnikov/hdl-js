@@ -7,7 +7,6 @@
 
 const assert = require('assert');
 const Pin = require('./Pin');
-const PinBus = require('./PinBus');
 
 /**
  * Evaluates the gate logic on the truth table input.
@@ -36,15 +35,13 @@ function autoTestGate(GateClass) {
 
   const createPins = pinNames => {
     return pinNames.map(pinName => {
-      let name, size = null;
+      let name, size = 1;
       if (typeof pinName === 'string') {
         name = pinName;
       } else {
         ({name, size} = pinName);
       }
-      return size
-        ? new PinBus({name, size})
-        : new Pin({name});
+      return new Pin({name, size});
     });
   };
 

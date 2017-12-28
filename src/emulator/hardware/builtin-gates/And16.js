@@ -11,8 +11,6 @@ const {int16Table} = require('../../../util/typed-numbers');
 
 /**
  * Canonical truth table for the `And16` gate.
- *
- * Note: for PinBus instances use a subset of the testing table.
  */
 const TRUTH_TABLE = int16Table([
   {a: 0b0000000000000000, b: 0b0000000000000000, out: 0b0000000000000000},
@@ -40,8 +38,6 @@ class And16 extends BuiltInGate {
    *   ...
    *
    * Technically use JS bitwise operations at needed index.
-   *
-   * The inputs and output are stored as PinBus instances.
    */
   eval() {
     const a = this.getInputPins()[0].getValue();

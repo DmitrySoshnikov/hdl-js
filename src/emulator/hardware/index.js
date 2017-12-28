@@ -10,7 +10,6 @@ const BuiltInGates = require('./builtin-gates');
 const CompositeGate = require('./CompositeGate');
 const Gate = require('./Gate');
 const Pin = require('./Pin');
-const PinBus = require('./PinBus');
 
 /**
  * Simulates hardware chips (gates) evaluation.
@@ -25,11 +24,6 @@ const HardwareEmulator = {
    * Expose `Pin` class.
    */
   Pin,
-
-  /**
-   * Expose `PinBus` class.
-   */
-  PinBus,
 
   /**
    * Expose `BuiltInGate` class.

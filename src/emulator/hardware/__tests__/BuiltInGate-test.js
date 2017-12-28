@@ -7,7 +7,6 @@
 
 const BuiltInGate = require('../BuiltInGate');
 const Pin = require('../Pin');
-const PinBus = require('../PinBus');
 
 describe('BuiltInGate', () => {
 
@@ -52,7 +51,7 @@ describe('BuiltInGate', () => {
     expect(() => and.getPin('b')).not.toThrow();
     expect(() => and.getPin('out')).not.toThrow();
 
-    // Pin bus:
+    // Pin[16]:
 
     const Not16 = require('../builtin-gates/Not16');
     const not16 = Not16.defaultFromSpec();
@@ -60,9 +59,6 @@ describe('BuiltInGate', () => {
     expect(not16.getName()).toBe(Not16.name);
     expect(not16.getInputPins().length).toEqual(1);
     expect(not16.getOutputPins().length).toEqual(1);
-
-    expect(not16.getPin('in')).toBeInstanceOf(PinBus);
-    expect(not16.getPin('out')).toBeInstanceOf(PinBus);
 
     expect(not16.getPin('in').getSize()).toBe(16);
     expect(not16.getPin('out').getSize()).toBe(16);

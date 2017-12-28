@@ -7,7 +7,6 @@
 
 const Gate = require('./Gate');
 const Pin = require('./Pin');
-const PinBus = require('./PinBus');
 
 /**
  * Base class for all builtin gates.
@@ -37,7 +36,7 @@ class BuiltInGate extends Gate {
     const toPin = name => {
       return typeof name === 'string'
         ? new Pin({name})
-        : new PinBus({name: name.name, size: name.size});
+        : new Pin({name: name.name, size: name.size});
     };
 
     return new this({
@@ -67,15 +66,15 @@ class BuiltInGate extends Gate {
       );
     }
 
-    // Check that for sized-pins, a `PinBus` is passed.
+    // Check that for sized-pins, a `Pin` is passed.
     spec[kind].forEach((pinName, index) => {
       const size = typeof pinName === 'string'
         ? null
         : pinName.size;
-      if (size && !(pins[index] instanceof PinBus)) {
+      if (size && pins[index].getSize() !== size) {
         throw new TypeError(
-          `"${this._name}" gate: expect gate #${index} from ${kind} to be ` +
-          `an instance of PinBus, ${pins[index].constructor.name} is given.`
+          `"${this._name}" gate: expect gate #${index} from ${kind} to have ` +
+          `size ${size}, ${pins[index].getSize()} is given.`
         );
       }
     });

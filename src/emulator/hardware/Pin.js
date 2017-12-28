@@ -5,42 +5,101 @@
 
 'use strict';
 
+const {int16} = require('../../util/typed-numbers');
+
+/**
+ * Maximum word size.
+ */
+const MAX_WORD_SIZE = 16;
+
 /**
  * Represents a pin (node) in a gate.
+ *
+ * If `size` is 1 (default), it's a single pin ("wire"), otherwise,
+ * it's a "bus" (set of pins/wires).
+ *
+ * Encoded as a simple number with bitwise operations for needed bits.
  */
 class Pin {
-  constructor({name, value = null}) {
+  constructor({name, size = 1, value = null}) {
     this._name = name;
 
-    if (typeof value === 'string') {
-      value = Number.parseInt(value, 2);
+    if (size < 1 && size > MAX_WORD_SIZE) {
+      throw new Error(
+        `Invalid "size" for ${name} pin, should be ` +
+        `in 1-${MAX_WORD_SIZE} range.`
+      );
     }
 
-    this._value = value;
+    this._size = size;
+
+    if (value) {
+      this.setValue(value);
+    }
   }
 
   /**
-   * Returns the name of this pin.
+   * Returns name of this pin.
    */
   getName() {
     return this._name;
   }
 
   /**
-   * Returns the value.
+   * Returns size of this bus.
+   */
+  getSize() {
+    return this._size;
+  }
+
+  /**
+   * Sets the value for this pin/bus.
+   */
+  setValue(value) {
+    if (typeof value === 'string') {
+      value = Number.parseInt(value, 2);
+    }
+    this._value = int16(value);
+  }
+
+  /**
+   * Returns value of this pin bus.
    */
   getValue() {
     return this._value;
   }
 
   /**
-   * Udates the value of this pin.
+   * Updates the value of a particular bit in this bus.
    */
-  setValue(value) {
-    if (typeof value === 'string') {
-      value = Number.parseInt(value, 2);
+  setValueAt(index, value) {
+    this._checkIndex(index);
+
+    // Set 1.
+    if (value === 1) {
+      this._value |= (1 << index);
+      return;
     }
-    return this._value = value;
+
+    // Set 0 ("clear").
+    this._value &= ~(1 << index);
+  }
+
+  /**
+   * Returns the value of a particular bit of this bus.
+   */
+  getValueAt(index) {
+    this._checkIndex(index);
+    return (this._value >> index) & 1;
+  }
+
+  /**
+   * Returns slice (sub-bus) of this bus.
+   */
+  getSlice(from, to) {
+    this._checkIndex(from);
+    this._checkIndex(to);
+    return (this._value >> from) & ((1 << (to + 1 - from)) - 1);
   }
 
   /**
@@ -48,6 +107,7 @@ class Pin {
    *
    * 'a' -> 'a'
    * {name: 'a'} -> 'a'
+   * {name: 'a', size: 1} -> 'a'
    * {name: 'a', size: 16} -> 'a[16]'
    */
   static toFullName(name) {
@@ -56,13 +116,21 @@ class Pin {
       return name;
     }
 
-    // PinBus.
-    if (name.name && name.size) {
-      return `${name.name}[${name.size}]`;
-    }
+    return name.size > 1
+      ? `${name.name}[${name.size}]`
+      : name.name;
+  }
 
-    // Simple name from AST.
-    return name.name;
+  /**
+   * Checks the bounds of the index.
+   */
+  _checkIndex(index) {
+    if (index < 0 || index > this._size - 1) {
+      throw new TypeError(
+        `Pin "${this.getName()}": out of bounds index ${index}, ` +
+        `while the size is ${this._size}.`
+      );
+    }
   }
 }
 

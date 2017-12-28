@@ -11,8 +11,6 @@ const {int16Table} = require('../../../util/typed-numbers');
 
 /**
  * Canonical truth table for the `Or8Way` gate.
- *
- * Note: for PinBus instances use a subset of the testing table.
  */
 const TRUTH_TABLE = int16Table([
   {in: 0b00000000, out: 0b0},

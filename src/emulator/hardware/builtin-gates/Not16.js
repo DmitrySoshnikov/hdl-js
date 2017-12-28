@@ -37,8 +37,6 @@ class Not16 extends BuiltInGate {
    *   ...
    *
    * Technically use JS bitwise operations at needed index.
-   *
-   * The input and output are stored as PinBus instances.
    */
   eval() {
     const a = this.getInputPins()[0].getValue();

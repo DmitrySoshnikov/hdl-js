@@ -7,7 +7,6 @@
 
 const Gate = require('../Gate');
 const Pin = require('../Pin');
-const PinBus = require('../PinBus');
 
 const {int16} = require('../../../util/typed-numbers');
 
@@ -99,11 +98,11 @@ describe('Gate', () => {
     expect(conflicts.length).toBe(0);
   });
 
-  it('executes on data: PinBus', () => {
+  it('executes on data: Pin[16]', () => {
     const Not16 = require('../builtin-gates/Not16');
 
-    const _in = new PinBus({name: 'in', size: 16});
-    const _out = new PinBus({name: 'out', size: 16});
+    const _in = new Pin({name: 'in', size: 16});
+    const _out = new Pin({name: 'out', size: 16});
 
     const not16 = new Not16({
       inputPins: [_in],
