@@ -23,11 +23,11 @@ const TRUTH_TABLE = [
  */
 class DMux extends BuiltInGate {
   eval() {
-    const a = this.getInputPins()[0].getValue();
+    const _in = this.getInputPins()[0].getValue();
     const sel = this.getInputPins()[1].getValue();
 
-    this.getOutputPins()[0].setValue(sel === 0 ? a : 0);
-    this.getOutputPins()[1].setValue(sel === 0 ? 0 : a);
+    this.getOutputPins()[0].setValue(sel === 0 ? _in : 0);
+    this.getOutputPins()[1].setValue(sel === 0 ? 0 : _in);
   }
 }
 

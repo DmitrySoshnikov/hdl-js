@@ -10,7 +10,7 @@ const {int16} = require('../../util/typed-numbers');
 /**
  * Maximum word size.
  */
-const MAX_WORD_SIZE = 16;
+const WORD_SIZE = 16;
 
 /**
  * Represents a pin (node) in a gate.
@@ -24,10 +24,10 @@ class Pin {
   constructor({name, size = 1, value = null}) {
     this._name = name;
 
-    if (size < 1 && size > MAX_WORD_SIZE) {
+    if (size < 1 || size > WORD_SIZE) {
       throw new Error(
         `Invalid "size" for ${name} pin, should be ` +
-        `in 1-${MAX_WORD_SIZE} range.`
+        `in 1-${WORD_SIZE} range.`
       );
     }
 
