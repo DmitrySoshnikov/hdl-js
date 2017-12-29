@@ -41,6 +41,13 @@ const options = require('yargs')
       requiresArg: true,
       coerce: enforceUnique,
     },
+    format: {
+      alias: 'f',
+      describe: 'Values format (binary, hexidecimal, decimal)',
+      nargs: 1,
+      choices: ['bin', 'hex', 'dec'],
+      coerce: enforceUnique,
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
@@ -50,6 +57,19 @@ const options = require('yargs')
  * Directory with all built-in gates.
  */
 const BUILTINS_DIR = __dirname + '/../src/emulator/hardware/builtin-gates';
+
+/**
+ * Format to radix.
+ */
+const FORMAT_VALUES = {
+  bin: {radix: 2, pad: 16}, // 0000000000001111
+  hex: {radix: 16, pad: 4}, // 000F
+  dec: {radix: 10, pad: 0}, // no padding
+};
+
+/**
+ *
+ */
 
 /**
  * Lists built-in gates.
@@ -81,7 +101,7 @@ function loadBuiltInGate(name) {
 /**
  * Prints specification and truth table of a built-in gate.
  */
-function describeBuiltInGate(gate) {
+function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
   const GateClass = loadBuiltInGate(gate);
   const spec = GateClass.Spec;
 
@@ -121,8 +141,10 @@ function describeBuiltInGate(gate) {
 
   // Truth table:
   console.info(colors.bold('Truth table:'), '\n');
-  GateClass.printTruthTable();
-
+  GateClass.printTruthTable({
+    formatRadix,
+    formatStringLengh,
+  });
 }
 
 function main() {
@@ -132,7 +154,11 @@ function main() {
     list,
     describe,
     execOnData,
+    format = 'bin',
   } = options;
+
+  const formatRadix = FORMAT_VALUES[format].radix;
+  const formatStringLengh = FORMAT_VALUES[format].pad;
 
   if (gate && !describe && !execOnData) {
     console.info(
@@ -178,7 +204,7 @@ function main() {
     }
 
     // Built-in gates:
-    describeBuiltInGate(gate);
+    describeBuiltInGate(gate, formatRadix, formatStringLengh);
   }
 
   // ------------------------------------------------------
@@ -195,11 +221,18 @@ function main() {
     const GateClass = loadBuiltInGate(gate);
     const gateInstance = GateClass.defaultFromSpec();
 
-    // Treat values as binary numbers.
     const data = JSON.parse(execOnData, (_key, value) => {
-      if (typeof value === 'string' || typeof value === 'number') {
+
+      // Strings are converted to numbers according to the `formatRadix`.
+      if (typeof value === 'string') {
+        value = Number.parseInt(value, formatRadix);
+      }
+
+      // Trunc numbers to 16-bits.
+      if (typeof value === 'number') {
         return int16(value);
       }
+
       return value;
     });
 
@@ -231,22 +264,22 @@ function main() {
     // showing conflicting values in red.
     GateClass.printTruthTable({
       table: result,
+      formatRadix,
+      formatStringLengh,
       transformValue(value, row, column) {
         if (
           conflictingRows[row] &&
           conflictingRows[row].hasOwnProperty(column)
         ) {
-          let expected = (data[row][column] >>> 0).toString(2);
-
           const pinInfo = GateClass.getPinInfo(column);
 
-          if (pinInfo.size) {
-            expected = expected.padStart(pinInfo.size, '0');
-          }
+          let expected = (data[row][column] >>> 0)
+            .toString(formatRadix)
+            .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
+            .toUpperCase();
 
-          // 16-bit max in this machine.
-          if (expected.length > 16) {
-            expected = expected.slice(16);
+          if (expected.length > formatStringLengh) {
+            expected = expected.slice(-formatStringLengh);
           }
 
           return colors.red(expected) + ' / ' + colors.green(value);

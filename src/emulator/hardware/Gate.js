@@ -194,8 +194,16 @@ class Gate {
    *
    * If `transformValue` function is passed, it's called with
    * the current row, column, and value.
+   *
+   * formatRadix is: 2 (bin), 16 (hex), or 10 (dec).
+   * formatStringLengh is the max string length of a number in this format.
    */
-  static printTruthTable({table, transformValue = null}) {
+  static printTruthTable({
+    table,
+    formatRadix = 2,
+    formatStringLengh = 16,
+    transformValue = null,
+  }) {
     const spec = this.validateSpec(this.Spec);
 
     const {
@@ -222,12 +230,12 @@ class Gate {
         const pinInfo = this.getPinInfo(name);
 
         let content = (row[name] >>> 0)
-          .toString(2)
-          .padStart(pinInfo.size || 0, '0');
+          .toString(formatRadix)
+          .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
+          .toUpperCase();
 
-        // 16-bit max in this machine.
-        if (content.length > 16) {
-          content = content.slice(16);
+        if (content.length > formatStringLengh) {
+          content = content.slice(-formatStringLengh);
         }
 
         if (transformValue) {

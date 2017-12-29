@@ -55,6 +55,8 @@ hdl-js --help
 ```
 
 ```
+Usage: hdl-js [options]
+
 Options:
   --help, -h          Show help                                        [boolean]
   --version, -v       Show version number                              [boolean]
@@ -64,6 +66,8 @@ Options:
   --describe, -d      Prints gate's specification
   --exec-on-data, -e  Evaluates gate's logic on passed data; validates outputs
                       if passed
+  --format, -f        Values format (binary, hexidecimal, decimal)
+                                                  [choices: "bin", "hex", "dec"]
 ```
 
 > NOTE: the HDL format is based on the chips format from the [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
