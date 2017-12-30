@@ -491,6 +491,24 @@ Found 1 conflicts in:
 └───┴───┴───────┘
 ```
 
+It is possible using actual number values in binary (`0b1111`), hexidecimal (`0xF`), and decimal (`15`) formats. Otherwise, the values have to be passed as strings (`'FFFF'` for `0xFFFF`) with correct `--format` option:
+
+```
+./bin/hdl-js -g Not16 -e '[{in: 0xFFFF}]' -f hex
+```
+
+Output:
+
+```
+Truth table for data:
+
+┌────────┬─────────┐
+│ in[16] │ out[16] │
+├────────┼─────────┤
+│  FFFF  │  0000   │
+└────────┴─────────┘
+```
+
 ### Composite gates
 
 TODO; WIP

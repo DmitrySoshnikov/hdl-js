@@ -6,6 +6,7 @@ const colors = require('colors');
 const fs = require('fs');
 const hdl = require('..');
 const path = require('path');
+const vm = require('vm');
 
 const {int16} = require('../src/util/typed-numbers');
 
@@ -68,8 +69,34 @@ const FORMAT_VALUES = {
 };
 
 /**
- *
+ * Parse input data.
  */
+function parseInputData(data, formatRadix) {
+  const parsed = vm.runInNewContext(`(${data})`);
+  parsed.forEach(row => {
+    for (const prop in row) {
+      row[prop] = processInputValue(row[prop], formatRadix);
+    }
+  });
+  return parsed;
+}
+
+/**
+ * Process input data.
+ */
+function processInputValue(value, formatRadix) {
+  // Strings are converted to numbers according to the `formatRadix`.
+  if (typeof value === 'string') {
+    value = Number.parseInt(value, formatRadix);
+  }
+
+  // Trunc numbers to 16-bits.
+  if (typeof value === 'number') {
+    return int16(value);
+  }
+
+  return value;
+}
 
 /**
  * Lists built-in gates.
@@ -221,21 +248,7 @@ function main() {
     const GateClass = loadBuiltInGate(gate);
     const gateInstance = GateClass.defaultFromSpec();
 
-    const data = JSON.parse(execOnData, (_key, value) => {
-
-      // Strings are converted to numbers according to the `formatRadix`.
-      if (typeof value === 'string') {
-        value = Number.parseInt(value, formatRadix);
-      }
-
-      // Trunc numbers to 16-bits.
-      if (typeof value === 'number') {
-        return int16(value);
-      }
-
-      return value;
-    });
-
+    const data = parseInputData(execOnData, formatRadix);
     const {result, conflicts} = gateInstance.execOnData(data);
     const conflictingRows = {};
 
