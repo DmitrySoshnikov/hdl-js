@@ -88,7 +88,8 @@ describe('Gate', () => {
 
     expect(result).not.toEqual(data);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0]).toEqual({row: 0, pins: {out: 1}});
+    expect(conflicts[0])
+      .toEqual({row: 0, pins: {out: {expected: 0, actual: 1}}});
 
     // Sets the outputs, no conflicts.
     data = [{a: 1, b: 1}];
@@ -123,7 +124,15 @@ describe('Gate', () => {
     expect(result).not.toEqual(data);
     expect(conflicts.length).toBe(1);
     expect(conflicts[0])
-      .toEqual({row: 0, pins: {out: int16(0b1111111111111111)}});
+      .toEqual({
+        row: 0,
+        pins: {
+          out: {
+            expected: int16(0b1111111111111110),
+            actual: int16(0b1111111111111111),
+          }
+        }
+      });
 
     // Sets the outputs, no conflicts.
     data = [{in: '0000000000000000', out: int16(0b1111111111111111)}];

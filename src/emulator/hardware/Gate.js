@@ -175,7 +175,10 @@ class Gate {
 
         // If the (output) pin is provided, validate it.
         if (row.hasOwnProperty(pinName) && expectedValue !== actualValue) {
-          conflictsForRow[pinName] = actualValue;
+          conflictsForRow[pinName] = {
+            expected: expectedValue,
+            actual: actualValue,
+          };
         }
       }
 

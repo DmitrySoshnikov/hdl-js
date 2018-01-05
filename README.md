@@ -467,7 +467,15 @@ console.log(conflicts);
 Conflicts output:
 
 [
-  {row: 0, pins: {out: 0}},
+  {
+    row: 0,
+    pins: {
+      out: {
+        expected: 1,
+        actual: 0,
+      },
+    },
+  },
 ]
 
 */

@@ -286,7 +286,7 @@ function main() {
         ) {
           const pinInfo = GateClass.getPinInfo(column);
 
-          let expected = (data[row][column] >>> 0)
+          let expected = (data[row][column].expected >>> 0)
             .toString(formatRadix)
             .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
             .toUpperCase();
