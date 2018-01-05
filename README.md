@@ -398,6 +398,44 @@ and.eval();
 console.log(and.getOutputPins()[0].getValue()); // 1
 ```
 
+Input and output pins can also be passed as _specifications_, rather than as actual `Pin` instances:
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  And,
+  And16,
+} = hdl.emulator.BuiltInGates;
+
+// Simple names:
+
+const and1 = new And({
+  inputPins: ['a', 'b'],
+  outputPins: ['out'],
+});
+
+and1.setPinValues({a: 1, b: 0});
+and1.eval();
+
+console.log(and1.getPin('out').getValue()); // 0
+
+// Spec with values and sizes:
+
+const and2 = new And16({
+  inputPins: [
+    {name: 'a', size: 16, value: 1},
+    {name: 'b', size: 16, value: 0},
+  ],
+  outputPins: [
+    {name: 'out', size: 16},
+  ],
+});
+
+and2.eval();
+console.log(and2.getPin('out').getValue()); // 0
+```
+
 It is possible to execute and test gate logic on the set of data:
 
 ```js

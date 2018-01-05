@@ -31,8 +31,9 @@ class Gate {
     }
 
     this._name = name;
-    this._inputPins = inputPins;
-    this._outputPins = outputPins;
+
+    this._inputPins = Gate.toPins(inputPins);
+    this._outputPins = Gate.toPins(outputPins);
 
     this._buildNamesToPinsMap();
   }
@@ -275,6 +276,24 @@ class Gate {
     });
 
     return spec;
+  }
+
+  /**
+   * Creates a Pin instance from a spec, or propagates
+   * if it's already a Pin instance.
+   */
+  static toPins(pinSpecs) {
+    return pinSpecs.map(pin => {
+      if (pin instanceof Pin) {
+        return pin;
+      }
+
+      const spec = typeof pin === 'string'
+        ? {name: pin}
+        : pin;
+
+      return new Pin(spec);
+    });
   }
 
   /**

@@ -5,6 +5,8 @@
 
 'use strict';
 
+const And = require('../builtin-gates/And');
+const And16 = require('../builtin-gates/And16');
 const Gate = require('../Gate');
 const Pin = require('../Pin');
 
@@ -144,8 +146,6 @@ describe('Gate', () => {
   });
 
   it('get pin info', () => {
-    const And = require('../builtin-gates/And');
-
     expect(And.getPinInfo('a')).toEqual({kind: 'input', name: 'a'});
     expect(And.getPinInfo('b')).toEqual({kind: 'input', name: 'b'});
     expect(And.getPinInfo('out')).toEqual({kind: 'output', name: 'out'});
@@ -157,6 +157,76 @@ describe('Gate', () => {
 
     expect(Not16.getPinInfo('out'))
       .toEqual({kind: 'output', name: 'out', size: 16});
+  });
+
+  it('creates pins from spec', () => {
+
+    // ----------------------------------------
+    // Simple names spec.
+
+    const and1 = new And({
+      inputPins: ['a', 'b'],
+      outputPins: ['out'],
+    });
+
+    expect(and1.getInputPins()).toEqual([
+      new Pin({name: 'a'}),
+      new Pin({name: 'b'}),
+    ]);
+
+    expect(and1.getOutputPins()).toEqual([
+      new Pin({name: 'out'}),
+    ]);
+
+    // ----------------------------------------
+    // Object names spec.
+
+    const and2 = new And({
+      inputPins: [
+        {name: 'a', value: 1},
+        {name: 'b', value: 0},
+      ],
+      outputPins: [
+        {name: 'out'},
+      ],
+    });
+
+    expect(and2.getInputPins()).toEqual([
+      new Pin({name: 'a', value: 1}),
+      new Pin({name: 'b', value: 0}),
+    ]);
+
+    expect(and2.getPin('a').getValue()).toBe(1);
+    expect(and2.getPin('b').getValue()).toBe(0);
+
+    and2.eval();
+
+    expect(and1.getOutputPins()).toEqual([
+      new Pin({name: 'out'}),
+    ]);
+
+    expect(and2.getPin('out').getValue()).toBe(0);
+
+    // ----------------------------------------
+    // Size spec.
+
+    const and3 = new And16({
+      inputPins: [
+        {name: 'a', value: 1, size: 16},
+        {name: 'b', value: 0, size: 16},
+      ],
+      outputPins: [
+        {name: 'out', size: 16},
+      ],
+    });
+
+    expect(and3.getInputPins()).toEqual([
+      new Pin({name: 'a', value: 1, size: 16}),
+      new Pin({name: 'b', value: 0, size: 16}),
+    ]);
+
+    expect(and3.getPin('a').getSize()).toBe(16);
+    expect(and3.getPin('b').getSize()).toBe(16);
   });
 
 });

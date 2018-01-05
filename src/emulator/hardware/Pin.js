@@ -33,7 +33,7 @@ class Pin {
 
     this._size = size;
 
-    if (value) {
+    if (value !== null) {
       this.setValue(value);
     }
   }
