@@ -43,7 +43,7 @@ class Or16 extends BuiltInGate {
     const a = this.getInputPins()[0].getValue();
     const b = this.getInputPins()[1].getValue();
 
-    // In JS implemenation doesn't differ from the simple `Or` gate.
+    // In JS implementation doesn't differ from the simple `Or` gate.
     // Use 16-bit values with 0xFFFF mask.
     this.getOutputPins()[0].setValue((a | b) & 0xFFFF);
   }

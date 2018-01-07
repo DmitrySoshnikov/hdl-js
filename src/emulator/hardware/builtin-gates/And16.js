@@ -43,7 +43,7 @@ class And16 extends BuiltInGate {
     const a = this.getInputPins()[0].getValue();
     const b = this.getInputPins()[1].getValue();
 
-    // In JS implemenation doesn't differ from the simple `And` gate.
+    // In JS implementation doesn't differ from the simple `And` gate.
     this.getOutputPins()[0].setValue(a & b);
   }
 }
