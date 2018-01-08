@@ -27,7 +27,7 @@ class Gate {
   } = {}) {
     // Infer name from the class if not passed explicitly.
     if (!name) {
-      name = this.constructor.name;
+      name = this.getClass().name;
     }
 
     this._name = name;
@@ -335,6 +335,23 @@ class Gate {
   clockDown() {
     throw new Error(
       'Abstract method `Gate#clockDown` should be implemented '+
+      'in a concrete class.'
+    );
+  }
+
+  /**
+   * Returns a class object of this gate instance.
+   */
+  getClass() {
+    return this.constructor;
+  }
+
+  /**
+   * Whether this gate is clocked.
+   */
+  static isClocked() {
+    throw new Error(
+      'Abstract static method `Gate.isClocked` should be implemented '+
       'in a concrete class.'
     );
   }

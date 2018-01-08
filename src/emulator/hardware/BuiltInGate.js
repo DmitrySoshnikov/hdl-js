@@ -57,7 +57,7 @@ class BuiltInGate extends Gate {
    * Validates pin numbers.
    */
   _validatePins(pins, kind) {
-    const spec = BuiltInGate.validateSpec(this.constructor.Spec);
+    const spec = BuiltInGate.validateSpec(this.getClass().Spec);
 
     if (pins.length !== spec[kind].length) {
       throw new Error(
@@ -130,6 +130,14 @@ class BuiltInGate extends Gate {
   clockDown() {
     // Noop.
     return;
+  }
+
+  /**
+   * Whether this gate is clocked.
+   */
+  static isClocked() {
+    // Child classes can override.
+    return false;
   }
 }
 

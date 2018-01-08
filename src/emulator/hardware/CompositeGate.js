@@ -54,6 +54,47 @@ class CompositeGate extends Gate {
       part.eval();
     }
   }
+
+  /**
+   * Whether this gate is clocked.
+   */
+  static isClocked() {
+    // This default value is overriden in the child classes
+    // created from HDL files.
+    return false;
+  }
+
+  /**
+   * Handler for the rising edge of the clock: updates internal state,
+   * outputs are not updated ("latched").
+   */
+  clockUp() {
+    if (!this.getClass().isClocked()) {
+      throw new TypeError(
+        `Gate#clockUp: "${this._name}" is not clocked.`
+      );
+    }
+
+    for (const part of this._parts) {
+      part.tick();
+    }
+  }
+
+  /**
+   * Handler for the falling edge of the clock: commits the internal state,
+   * values to the output.
+   */
+  clockDown() {
+    if (!this.getClass().isClocked()) {
+      throw new TypeError(
+        `Gate#clockDown: "${this._name}" is not clocked.`
+      );
+    }
+
+    for (const part of this._parts) {
+      part.tock();
+    }
+  }
 }
 
 module.exports = CompositeGate;

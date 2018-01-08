@@ -31,10 +31,17 @@ describe('Gate', () => {
     expect(gate.getName()).toBe('And');
     expect(gate.getInputPins()).toEqual([a, b]);
     expect(gate.getOutputPins()).toEqual([out]);
+    expect(gate.getClass()).toBe(Gate);
 
     // Abstract `eval`.
     expect(() => gate.eval()).toThrow(
       'Abstract method `Gate#eval` should be implemented in a concrete class.'
+    );
+
+    // Abstract `isClocked`.
+    expect(() => gate.getClass().isClocked()).toThrow(
+      'Abstract static method `Gate.isClocked` should be implemented ' +
+      'in a concrete class.'
     );
 
     // Abstract `clockUp`.

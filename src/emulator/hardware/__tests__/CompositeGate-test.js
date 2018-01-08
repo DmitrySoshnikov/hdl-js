@@ -72,6 +72,9 @@ describe('CompositeGate', () => {
       parts: [xor, and],
     });
 
+    // By default is not clocked.
+    expect(halfAdder.getClass().isClocked()).toBe(false);
+
     expect(halfAdder.getInputPins()).toEqual([a, b]);
     expect(halfAdder.getOutputPins()).toEqual([sum, carry]);
     expect(halfAdder.getInternalPins()).toEqual([]);
