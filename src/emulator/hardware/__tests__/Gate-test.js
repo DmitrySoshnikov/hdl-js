@@ -32,9 +32,21 @@ describe('Gate', () => {
     expect(gate.getInputPins()).toEqual([a, b]);
     expect(gate.getOutputPins()).toEqual([out]);
 
-    // Abstract class.
+    // Abstract `eval`.
     expect(() => gate.eval()).toThrow(
       'Abstract method `Gate#eval` should be implemented in a concrete class.'
+    );
+
+    // Abstract `clockUp`.
+    expect(() => gate.clockUp()).toThrow(
+      'Abstract method `Gate#clockUp` should be implemented ' +
+      'in a concrete class.'
+    );
+
+    // Abstract `clockDown`.
+    expect(() => gate.clockDown()).toThrow(
+      'Abstract method `Gate#clockDown` should be implemented ' +
+      'in a concrete class.'
     );
   });
 
@@ -227,6 +239,43 @@ describe('Gate', () => {
 
     expect(and3.getPin('a').getSize()).toBe(16);
     expect(and3.getPin('b').getSize()).toBe(16);
+  });
+
+  it('tick-tock', () => {
+
+    let state = 0;
+    let order = [];
+
+    // Clocked gate.
+    class MyGate extends Gate {
+      eval() {
+        order.push('eval');
+      }
+
+      clockUp() {
+        order.push('clockUp');
+        state++;
+      }
+
+      clockDown() {
+        order.push('clockDown');
+        this.getOutputPins()[0].setValue(state);
+      }
+    }
+
+    const gate = new MyGate({
+      inputPins: ['in'],
+      outputPins: ['out'],
+    });
+
+    gate.tick();
+    expect(state).toBe(1);
+
+    gate.tock();
+    expect(state).toBe(1);
+    expect(gate.getPin('out').getValue()).toBe(state);
+
+    expect(order).toEqual(['eval', 'clockUp', 'clockDown', 'eval']);
   });
 
 });

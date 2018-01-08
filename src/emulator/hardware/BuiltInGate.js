@@ -113,6 +113,24 @@ class BuiltInGate extends Gate {
     // Noop.
     return;
   }
+
+  /**
+   * Handler for the rising edge of the clock: updates internal state,
+   * outputs are not updated ("latched").
+   */
+  clockUp() {
+    // Noop.
+    return;
+  }
+
+  /**
+   * Handler for the falling edge of the clock: commits the internal state,
+   * values to the output.
+   */
+  clockDown() {
+    // Noop.
+    return;
+  }
 }
 
 module.exports = BuiltInGate;

@@ -317,6 +317,50 @@ class Gate {
       'Abstract method `Gate#eval` should be implemented in a concrete class.'
     );
   }
+
+  /**
+   * Updates the internal state of a clocked gate according to the gate's functionality.
+   * (outputs are not updated).
+   */
+  clockUp() {
+    throw new Error(
+      'Abstract method `Gate#clockUp` should be implemented '+
+      'in a concrete class.'
+    );
+  }
+
+  /**
+   * Updates the outputs of the gate according to its internal state.
+   */
+  clockDown() {
+    throw new Error(
+      'Abstract method `Gate#clockDown` should be implemented '+
+      'in a concrete class.'
+    );
+  }
+
+  /**
+   * Clock rising edge.
+   *
+   * First computes the gate's output (from non-clocked information), and
+   * then updates the internal state of the gate (which doesn't
+   * affect the outputs).
+   */
+  tick() {
+    this.eval();
+    this.clockUp();
+  }
+
+  /**
+   * Clock falling edge.
+   *
+   * First updates the gate's outputs according to the internal state
+   * of the gate, and then computes the outputs from non-clocked information.
+   */
+  tock() {
+    this.clockDown();
+    this.eval();
+  }
 }
 
 module.exports = Gate;
