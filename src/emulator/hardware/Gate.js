@@ -39,6 +39,15 @@ class Gate {
   }
 
   /**
+   * Any extra initialization a gate may provide. Called at construction
+   * and reset signal.
+   */
+  init() {
+    // Noop.
+    return;
+  }
+
+  /**
    * Returns the name of this gate.
    */
   getName() {
@@ -163,7 +172,13 @@ class Gate {
     table.forEach((row, index) => {
       // Evaluate the row.
       this.setPinValues(row);
-      this.eval();
+
+      if (this.getClass().isClocked()) {
+        this.tick();
+        this.tock();
+      } else {
+        this.eval();
+      }
 
       const outputRow = {};
       const conflictsForRow = {};
