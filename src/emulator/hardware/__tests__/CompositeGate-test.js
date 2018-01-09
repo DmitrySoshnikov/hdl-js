@@ -9,6 +9,12 @@ const Gate = require('../Gate');
 const CompositeGate = require('../CompositeGate');
 const Pin = require('../Pin');
 
+class MyGate extends Gate {
+  static isClocked() {
+    return false;
+  }
+}
+
 describe('CompositeGate', () => {
 
   it('HalfAdder', () => {
@@ -37,7 +43,7 @@ describe('CompositeGate', () => {
     const carry = new Pin({name: 'carry'});
 
     // Xor part.
-    const xor = new Gate({
+    const xor = new MyGate({
       name: 'Xor',
       inputPins: [a, b],
       outputPins: [sum],
@@ -51,7 +57,7 @@ describe('CompositeGate', () => {
     };
 
     // And part.
-    const and = new Gate({
+    const and = new MyGate({
       name: 'And',
       inputPins: [a, b],
       outputPins: [carry],

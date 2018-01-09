@@ -134,4 +134,11 @@ class Pin {
   }
 }
 
+/**
+ * Special $clock "pin". Used to count clock cycles.
+ * Usually contains rising: +0, +1, +2, ..., and falling
+ * -0, -1, -2, ... edge values.
+ */
+Pin.CLOCK = '$clock';
+
 module.exports = Pin;

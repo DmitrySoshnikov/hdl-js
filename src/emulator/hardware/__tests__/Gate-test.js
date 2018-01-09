@@ -19,7 +19,13 @@ const b = new Pin({name: 'b', value: 0});
 // Output.
 const out = new Pin({name: 'out', value: 0});
 
-const gate = new Gate({
+class MyGate extends Gate {
+  static isClocked() {
+    return false;
+  }
+}
+
+const gate = new MyGate({
   name: 'And',
   inputPins: [a, b],
   outputPins: [out],
@@ -31,34 +37,15 @@ describe('Gate', () => {
     expect(gate.getName()).toBe('And');
     expect(gate.getInputPins()).toEqual([a, b]);
     expect(gate.getOutputPins()).toEqual([out]);
-    expect(gate.getClass()).toBe(Gate);
-
-    // Abstract `eval`.
-    expect(() => gate.eval()).toThrow(
-      'Abstract method `Gate#eval` should be implemented in a concrete class.'
-    );
-
-    // Abstract `isClocked`.
-    expect(() => gate.getClass().isClocked()).toThrow(
-      'Abstract static method `Gate.isClocked` should be implemented ' +
-      'in a concrete class.'
-    );
-
-    // Abstract `clockUp`.
-    expect(() => gate.clockUp()).toThrow(
-      'Abstract method `Gate#clockUp` should be implemented ' +
-      'in a concrete class.'
-    );
-
-    // Abstract `clockDown`.
-    expect(() => gate.clockDown()).toThrow(
-      'Abstract method `Gate#clockDown` should be implemented ' +
-      'in a concrete class.'
-    );
+    expect(gate.getClass()).toBe(MyGate);
   });
 
   it('infer name from constructor', () => {
-    class And extends Gate {}
+    class And extends Gate {
+      static isClocked() {
+        return false;
+      }
+    }
     expect((new And()).getName()).toBe('And');
   });
 
@@ -255,6 +242,10 @@ describe('Gate', () => {
 
     // Clocked gate.
     class MyGate extends Gate {
+      static isClocked() {
+        return true;
+      }
+
       eval() {
         order.push('eval');
       }
@@ -275,10 +266,21 @@ describe('Gate', () => {
       outputPins: ['out'],
     });
 
+    Gate.resetClock();
+    expect(Gate.isClockDown()).toBe(true);
+    expect(Gate.isClockUp()).toBe(false);
+    expect(Gate.getClockValue()).toBe(-0);
+
     gate.tick();
+    expect(Gate.isClockDown()).toBe(false);
+    expect(Gate.isClockUp()).toBe(true);
+    expect(Gate.getClockValue()).toBe(+0);
     expect(state).toBe(1);
 
     gate.tock();
+    expect(Gate.isClockDown()).toBe(true);
+    expect(Gate.isClockUp()).toBe(false);
+    expect(Gate.getClockValue()).toBe(-1);
     expect(state).toBe(1);
     expect(gate.getPin('out').getValue()).toBe(state);
 

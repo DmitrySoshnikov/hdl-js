@@ -12,8 +12,10 @@ const BuiltInGate = require('../BuiltInGate');
  * Canonical truth table for the `DFF` gate.
  */
 const TRUTH_TABLE = [
-  {in: 0, out: 0},
-  {in: 1, out: 1},
+  {$clock: -0, in: 0, out: 0},
+  {$clock: +0, in: 1, out: 0},
+  {$clock: -1, in: 0, out: 1},
+  {$clock: +1, in: 0, out: 0},
 ];
 
 /**

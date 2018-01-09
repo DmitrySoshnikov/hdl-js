@@ -13,6 +13,24 @@ const TablePrinter = require('../../table-printer');
 const {int16} = require('../../util/typed-numbers');
 
 /**
+ * Test for a neagtive zero.
+ */
+function isNegativeZero(value) {
+  return 1 / value === -Infinity;
+}
+
+/**
+ * Converts a number value to decimal string with the sign.
+ */
+function toSignString(value) {
+  if (isNegativeZero(value)) {
+    return '-0';
+  }
+
+  return (value >= 0 ? '+' : '') + value;
+}
+
+/**
  * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
  */
 class Gate {
@@ -85,7 +103,12 @@ class Gate {
    */
   static getPinInfo(name) {
     if (!this._pinsInfoMap) {
-      this._pinsInfoMap = {};
+      this._pinsInfoMap = {
+        [Pin.CLOCK]: {
+          kind: 'special',
+          name: Pin.CLOCK,
+        }
+      };
 
       const spec = this.validateSpec(this.Spec);
 
@@ -174,8 +197,7 @@ class Gate {
       this.setPinValues(row);
 
       if (this.getClass().isClocked()) {
-        this.tick();
-        this.tock();
+        Gate.isClockDown() ? this.tick() : this.tock();
       } else {
         this.eval();
       }
@@ -237,8 +259,13 @@ class Gate {
       };
     };
 
+    const clock = this.isClocked()
+      ? [Pin.CLOCK]
+      : [];
+
     const printer = new TablePrinter({
       head: [
+        ...clock,
         ...inputPins.map(toHeaderColumn),
         ...outputPins.map(toHeaderColumn),
       ],
@@ -247,18 +274,25 @@ class Gate {
     table.forEach((row, index) => {
       const tableRow = Object.keys(row).map(name => {
         const pinInfo = this.getPinInfo(name);
+        let content;
 
-        let content = (row[name] >>> 0)
-          .toString(formatRadix)
-          .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
-          .toUpperCase();
+        // Special pin ($clock, etc).
+        if (pinInfo.kind === 'special') {
+          content = toSignString(row[name]);
+        } else {
+          // Normal pin.
+          content = (row[name] >>> 0)
+            .toString(formatRadix)
+            .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
+            .toUpperCase();
 
-        if (content.length > formatStringLengh) {
-          content = content.slice(-formatStringLengh);
-        }
+          if (content.length > formatStringLengh) {
+            content = content.slice(-formatStringLengh);
+          }
 
-        if (transformValue) {
-          content = transformValue(content, index, name);
+          if (transformValue) {
+            content = transformValue(content, index, name);
+          }
         }
 
         return {
@@ -315,7 +349,15 @@ class Gate {
    * Builds a map from a pin name to the pin instance.
    */
   _buildNamesToPinsMap() {
-    this._namesToPinsMap = [];
+    this._namesToPinsMap = {};
+
+    if (this.getClass().isClocked()) {
+      this._namesToPinsMap[Pin.CLOCK] = new Pin({
+        name: Pin.CLOCK,
+        value: Gate.getClockValue(),
+      });
+    }
+
     this._inputPins.forEach(
       pin => this._namesToPinsMap[pin.getName()] = pin
     );
@@ -379,6 +421,7 @@ class Gate {
    * affect the outputs).
    */
   tick() {
+    Gate._clockValue = -Gate._clockValue;
     this.eval();
     this.clockUp();
   }
@@ -390,9 +433,43 @@ class Gate {
    * of the gate, and then computes the outputs from non-clocked information.
    */
   tock() {
+    Gate._clockValue = -(Math.abs(Gate._clockValue) + 1);
     this.clockDown();
     this.eval();
   }
+
+  /**
+   * Resets clock.
+   *
+   * Initial clock value. Each tick: set positive sign,
+   * each tock: increase, set negative sign back.
+   */
+  static resetClock() {
+    Gate._clockValue = -0;
+  }
+
+  /**
+   * Returns clock value.
+   */
+  static getClockValue() {
+    return Gate._clockValue;
+  }
+
+  /**
+   * Whether the clock is up.
+   */
+  static isClockUp() {
+    return !this.isClockDown();
+  }
+
+  /**
+   * Whether the clock is down.
+   */
+  static isClockDown() {
+    return isNegativeZero(Gate._clockValue) || Gate._clockValue < 0;
+  }
 }
+
+Gate.resetClock();
 
 module.exports = Gate;
