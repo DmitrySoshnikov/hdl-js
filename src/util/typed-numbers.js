@@ -22,6 +22,9 @@ function int16(v) {
 function int16Table(table) {
   for (const row of table) {
     for (const pin in row) {
+      if (pin === '$clock') {
+        continue;
+      }
       row[pin] = int16(row[pin]);
     }
   }

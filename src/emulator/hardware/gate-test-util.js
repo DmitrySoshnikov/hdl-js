@@ -6,6 +6,7 @@
 'use strict';
 
 const assert = require('assert');
+const Gate = require('./Gate');
 const Pin = require('./Pin');
 
 /**
@@ -23,6 +24,7 @@ const Pin = require('./Pin');
  * Throws if some `out` is not evaluate to the expected value.
  */
 function testTruthTable(table, gate) {
+  Gate.resetClock();
   const {result} = gate.execOnData(table);
   assert.deepEqual(table, result);
 }
