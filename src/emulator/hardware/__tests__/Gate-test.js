@@ -285,6 +285,9 @@ describe('Gate', () => {
     expect(gate.getPin('out').getValue()).toBe(state);
 
     expect(order).toEqual(['eval', 'clockUp', 'clockDown', 'eval']);
+
+    Gate.setClockValue(+3);
+    expect(Gate.getClockValue()).toBe(+3);
   });
 
 });

@@ -54,6 +54,7 @@ class Gate {
     this._outputPins = Gate.toPins(outputPins);
 
     this._buildNamesToPinsMap();
+    this.init();
   }
 
   /**
@@ -197,7 +198,11 @@ class Gate {
       this.setPinValues(row);
 
       if (this.getClass().isClocked()) {
-        Gate.isClockDown() ? this.tick() : this.tock();
+        // The -0 is a setup row, don't execute on it.
+        if (!isNegativeZero(row[Pin.CLOCK])) {
+          Gate.isClockDown() ? this.tick() : this.tock();
+          this.getPin(Pin.CLOCK).setValue(Gate.getClockValue());
+        }
       } else {
         this.eval();
       }
@@ -445,7 +450,14 @@ class Gate {
    * each tock: increase, set negative sign back.
    */
   static resetClock() {
-    Gate._clockValue = -0;
+    Gate.setClockValue(-0);
+  }
+
+  /**
+   * Sets clock value.
+   */
+  static setClockValue(value) {
+    Gate._clockValue = value;
   }
 
   /**
