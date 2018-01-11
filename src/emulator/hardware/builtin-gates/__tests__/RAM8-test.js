@@ -6,20 +6,19 @@
 'use strict';
 
 const Gate = require('../../Gate');
-const RAM = require('../RAM');
+const RAM8 = require('../RAM8');
 const GateTestUtil = require('../../gate-test-util');
 
-describe('RAM', () => {
-  it('RAM interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM))
+describe('RAM8', () => {
+  it('RAM8 interface', () => {
+    expect(() => GateTestUtil.autoTestGate(RAM8))
       .not.toThrow();
   });
 
   it('storage', () => {
     Gate.resetClock();
 
-    // Default is 8 registers.
-    const ram8Chip = new RAM(RAM.Spec);
+    const ram8Chip = new RAM8(RAM8.Spec);
 
     ram8Chip
       .setPinValues({
@@ -43,7 +42,7 @@ describe('RAM', () => {
 
     expect(() => ram8Chip.getValueAt(15)).toThrow(
       new TypeError(
-        `Chip "RAM": invalid address 15, while the size is 8.`
+        `Chip "RAM8": invalid address 15, while the size is 8.`
       )
     );
   });
