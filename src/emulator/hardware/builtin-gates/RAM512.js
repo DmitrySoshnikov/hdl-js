@@ -39,8 +39,8 @@ const TRUTH_TABLE = int16Table([
  *  OUT out[16];
  *
  *  DMux8Way(in=load, sel=address, ...);
- *  Register(in=in, load=l1, out=r1);
- *  Register(in=in, load=l2, out=r2);
+ *  RAM64(in=in, load=l1, address=address[0..5], out=r1);
+    RAM64(in=in, load=l2, address=address[0..5], out=r2);
  *  ...
  *  Mux8Way16(...);
  */
