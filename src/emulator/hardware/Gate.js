@@ -164,6 +164,7 @@ class Gate {
     for (const pinName in values) {
       this.getPin(pinName).setValue(values[pinName]);
     }
+    return this;
   }
 
   /**
@@ -441,6 +442,19 @@ class Gate {
     Gate._clockValue = -(Math.abs(Gate._clockValue) + 1);
     this.clockDown();
     this.eval();
+  }
+
+  /**
+   * Full clock cycle.
+   */
+  clockCycle() {
+    if (Gate.isClockDown()) {
+      this.tick();
+      this.tock();
+    } else {
+      this.tock();
+      this.tick();
+    }
   }
 
   /**

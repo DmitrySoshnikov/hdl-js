@@ -288,6 +288,19 @@ describe('Gate', () => {
 
     Gate.setClockValue(+3);
     expect(Gate.getClockValue()).toBe(+3);
+
+    gate.tock();
+    gate.tick();
+    expect(Gate.getClockValue()).toBe(+4);
+
+    gate.clockCycle();
+    expect(Gate.getClockValue()).toBe(+5);
+
+    gate.tock();
+    expect(Gate.getClockValue()).toBe(-6);
+
+    gate.clockCycle();
+    expect(Gate.getClockValue()).toBe(-7);
   });
 
 });

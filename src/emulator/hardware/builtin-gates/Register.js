@@ -8,7 +8,7 @@
 const colors = require('colors');
 const BuiltInGate = require('../BuiltInGate');
 
-const {int16Table} = require('../../../util/typed-numbers');
+const {int16Table, int16} = require('../../../util/typed-numbers');
 
 /**
  * Canonical truth table for the `Register` gate.
@@ -58,7 +58,7 @@ class Register extends BuiltInGate {
     const load = this.getInputPins()[1].getValue();
 
     if (load) {
-      this._value = this.getInputPins()[0].getValue();
+      this._value = int16(this.getInputPins()[0].getValue());
     }
   }
 
