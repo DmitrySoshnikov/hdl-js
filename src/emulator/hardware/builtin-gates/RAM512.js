@@ -11,31 +11,31 @@ const RAM = require('./RAM');
 const {int16Table} = require('../../../util/typed-numbers');
 
 /**
- * Canonical truth table for the `RAM64` gate.
+ * Canonical truth table for the `RAM512` gate.
  */
 const TRUTH_TABLE = int16Table([
-  {$clock: -0, in: 0b0000000000000000, load: 0, address:  0, out: 0b0000000000000000},
-  {$clock: +0, in: 0b0000000000010101, load: 1, address:  0, out: 0b0000000000000000},
-  {$clock: -1, in: 0b0000000000000001, load: 0, address:  0, out: 0b0000000000010101},
-  {$clock: +1, in: 0b0000000000010101, load: 0, address:  0, out: 0b0000000000010101},
-  {$clock: -2, in: 0b0000000000010101, load: 0, address:  0, out: 0b0000000000010101},
-  {$clock: +2, in: 0b1101001000010101, load: 1, address:  2, out: 0b0000000000010101},
-  {$clock: -3, in: 0b1101001000010101, load: 0, address:  2, out: 0b1101001000010101},
-  {$clock: +3, in: 0b1111111111111111, load: 1, address: 63, out: 0b1101001000010101},
-  {$clock: -4, in: 0b0000000000000000, load: 1, address: 63, out: 0b1111111111111111},
-  {$clock: +4, in: 0b0000000000000000, load: 1, address: 63, out: 0b1111111111111111},
-  {$clock: -5, in: 0b0000000000000000, load: 0, address: 63, out: 0b0000000000000000},
+  {$clock: -0, in: 0b0000000000000000, load: 0, address:   0, out: 0b0000000000000000},
+  {$clock: +0, in: 0b0000000000010101, load: 1, address:   0, out: 0b0000000000000000},
+  {$clock: -1, in: 0b0000000000000001, load: 0, address:   0, out: 0b0000000000010101},
+  {$clock: +1, in: 0b0000000000010101, load: 0, address:   0, out: 0b0000000000010101},
+  {$clock: -2, in: 0b0000000000010101, load: 0, address:   0, out: 0b0000000000010101},
+  {$clock: +2, in: 0b1101001000010101, load: 1, address:   2, out: 0b0000000000010101},
+  {$clock: -3, in: 0b1101001000010101, load: 0, address:   2, out: 0b1101001000010101},
+  {$clock: +3, in: 0b1111111111111111, load: 1, address: 511, out: 0b1101001000010101},
+  {$clock: -4, in: 0b0000000000000000, load: 1, address: 511, out: 0b1111111111111111},
+  {$clock: +4, in: 0b0000000000000000, load: 1, address: 511, out: 0b1111111111111111},
+  {$clock: -5, in: 0b0000000000000000, load: 0, address: 511, out: 0b0000000000000000},
 ]);
 
 /**
- * RAM chip of 64 16-bit registers.
+ * RAM chip of 512 16-bit registers.
  *
  * The output is the value stored at the memory location specified by address.
  * If load=1, loads the input into the memory location specified by address.
  *
  * Abstract:
  *
- *  IN in[16], load, address[6];
+ *  IN in[16], load, address[9];
  *  OUT out[16];
  *
  *  DMux8Way(in=load, sel=address, ...);
@@ -44,18 +44,18 @@ const TRUTH_TABLE = int16Table([
  *  ...
  *  Mux8Way16(...);
  */
-class RAM64 extends RAM {
+class RAM512 extends RAM {
   constructor(options) {
-    super(Object.assign({size: 64}, options));
+    super(Object.assign({size: 512}, options));
   }
 }
 
 /**
- * Specification of the `RAM64` gate.
+ * Specification of the `RAM512` gate.
  */
-RAM64.Spec = {
+RAM512.Spec = {
   description: [
-    'Memory chip consisting of 64 16-bit registers.',
+    'Memory chip consisting of 512 16-bit registers.',
     '',
     'If load[t]=1 then out[t+1] = in[t] else out does not change.',
     '',
@@ -72,7 +72,7 @@ RAM64.Spec = {
   inputPins: [
     {name: 'in', size: 16},
     {name: 'load', size: 1},
-    {name: 'address', size: 6},
+    {name: 'address', size: 9},
   ],
 
   outputPins: [
@@ -82,4 +82,4 @@ RAM64.Spec = {
   truthTable: TRUTH_TABLE,
 };
 
-module.exports = RAM64;
+module.exports = RAM512;
