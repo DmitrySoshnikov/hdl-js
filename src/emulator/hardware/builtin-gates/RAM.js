@@ -29,8 +29,6 @@ const TRUTH_TABLE = int16Table([
  * The output is the value stored at the memory location specified by address.
  * If load=1, loads the input into the memory location specified by address.
  *
- * Built as a set of Register chips with a Mux for address, and DMux for out.
- *
  * Abstract:
  *
  *  IN in[16], load, address[3];
