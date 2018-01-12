@@ -4,27 +4,27 @@
 
 Hardware description language (HDL) parser, and Hardware simulator.
 
-### Table of Contents
+## Table of Contents
 
 - [Installation](#installation)
 - [Development](#development)
-- [Usage as a CLI](#usage-as-a-cli)
-- [Usage from Node](#usage-from-node)
+- [Parser](#parser)
+  - [Usage as a CLI](#usage-as-a-cli)
+  - [Usage from Node](#usage-from-node)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
-    - [List of built-in chips](#list-of-built-in-chips)
-    - [Viewing gate specification](#viewing-gate-specification)
-    - [Specifying output format](#specifying-output-format)
-    - [Testing gates on passed data](#testing-gates-on-passed-data)
-    - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
-    - [Main chip groups](#main-chip-groups)
-      - [Very basic chips](#very-basic-chips)
-      - [Basic chips](#basic-chips)
-      - [ALU](#alu)
-      - [Memory chips](#memory-chips)
+  - [Viewing gate specification](#viewing-gate-specification)
+  - [Specifying output format](#specifying-output-format)
+  - [Testing gates on passed data](#testing-gates-on-passed-data)
+  - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
+  - [Main chip groups](#main-chip-groups)
+    - [Very basic chips](#very-basic-chips)
+    - [Basic chips](#basic-chips)
+    - [ALU](#alu)
+    - [Memory chips](#memory-chips)
   - [Composite gates](#composite-gates)
 
-### Installation
+## Installation
 
 The parser can be installed as an [npm module](https://www.npmjs.com/package/hdl-js):
 
@@ -34,14 +34,12 @@ npm install -g hdl-js
 hdl-js --help
 ```
 
-### Development
+## Development
 
 1. Fork https://github.com/DmitrySoshnikov/hdl-js repo
 2. Make your changes
 3. Make sure `npm test` still passes (add new tests if needed)
 4. Submit a PR
-
-The `hdl-js` is implemented as an automatic LR parser using [Syntax](https://www.npmjs.com/package/syntax-cli) tool. The parser module is generated from the corresponding [grammar](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g) file.
 
 For development from the github repository, run `build` command to generate the parser module:
 
@@ -55,6 +53,11 @@ npm run build
 ```
 
 > NOTE: You need to run `build` command every time you change the grammar file.
+
+## Parser
+
+The `hdl-js` is implemented as an automatic LR parser using [Syntax](https://www.npmjs.com/package/syntax-cli) tool. The parser module is generated from the corresponding [grammar](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g) file.
+
 
 ### Usage as a CLI
 
@@ -215,7 +218,7 @@ We get the parsed AST:
 }
 ```
 
-### Usage from Node
+#### Usage from Node
 
 The parser can also be used as a Node module:
 
@@ -228,15 +231,13 @@ const hdlFile = fs.readFileSync('./examples/And.hdl', 'utf-8');
 console.log(hdl.parse(hdlFile)); // HDL AST
 ```
 
-# Emulator
+## Emulator
 
 [Hardware emulator](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware) module simulates and tests logic gates and chips implemented in the HDL, and also provides canonical implementation of the [built-in chips](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware/builtin-gates).
 
 ### Built-in gates
 
 In general, all the gates can be built manually in HDL from the very basic Nand or Nor gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript. You can use these gates as building blocks with faster implementation, and also to check your own implementation in case you build custom versions of these chips.
-
-### List of built-in chips
 
 The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of _compound gates_.
 
