@@ -79,11 +79,11 @@ Options:
   --describe, -d      Prints gate's specification
   --exec-on-data, -e  Evaluates gate's logic on passed data; validates outputs
                       if passed
-  --format, -f        Values format (binary, hexidecimal, decimal)
+  --format, -f        Values format (binary, hexadecimal, decimal)
                                                   [choices: "bin", "hex", "dec"]
 ```
 
-> NOTE: the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
+> **NOTE:** the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
 
 For the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
@@ -237,7 +237,9 @@ console.log(hdl.parse(hdlFile)); // HDL AST
 
 ### Built-in gates
 
-In general, all the gates can be built manually in HDL from the very basic Nand or Nor gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript. You can use these gates as building blocks with faster implementation, and also to check your own implementation in case you build custom versions of these chips.
+In general, all the gates can be built manually in HDL from the very basic `Nand` or `Nor` gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript.
+
+You can use these gates as building blocks with a guaranteed faster implementation, and also to check your own implementation, in case you build a custom version of a particular basic chip.
 
 The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of _compound gates_.
 
