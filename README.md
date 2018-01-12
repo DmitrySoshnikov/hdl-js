@@ -8,9 +8,9 @@ Hardware description language (HDL) parser, and Hardware simulator.
 
 - [Installation](#installation)
 - [Development](#development)
+- [Usage as a CLI](#usage-as-a-cli)
+- [Usage from Node](#usage-from-node)
 - [Parser](#parser)
-  - [Usage as a CLI](#usage-as-a-cli)
-  - [Usage from Node](#usage-from-node)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
