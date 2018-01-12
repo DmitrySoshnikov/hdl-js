@@ -11,6 +11,8 @@ Hardware description language (HDL) parser, and Hardware simulator.
 - [Usage as a CLI](#usage-as-a-cli)
 - [Usage from Node](#usage-from-node)
 - [Parser](#parser)
+  - [Format of an HDL file][#format-of-an-hdl-file]
+  - [Parsing a file to AST][#parsing-a-file-to-ast]
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
@@ -122,9 +124,27 @@ The `hdl-js` exposes the following API:
 
 The `hdl-js` is implemented as an automatic LR parser using [Syntax](https://www.npmjs.com/package/syntax-cli) tool. The parser module is generated from the corresponding [grammar](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g) file.
 
-The parser can be used from CLI, and from Node.
+### Format of an HDL file
 
-For the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
+A hardware chip is described via the `CHIP` declaration, followed by a _chip name_, and a set of _sections_:
+
+```
+CHIP <chip-name> {
+  <section>
+  <section>
+  ...
+}
+```
+
+The [sections](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g#L121-L127) include:
+
+- `IN` -- inputs of a gate
+- `OUT` -- outputs of a gate
+- `PARTS` -- the actual implementation _body_ of a chip, composed from other chips
+- `BUILTIN` -- refer to the name of a built-in chip: in this case the implementation is fully take from the built-in gate, and `PARTS` can be omitted
+- `CLOCKED` -- describes which inputs/outputs are _clocked_ (note: see clock description below in [memory chips](#memory-chips))
+
+Let's see at the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
 ```
 /**
@@ -144,13 +164,19 @@ CHIP And {
 }
 ```
 
-Running the:
+Once we have an HDL file, we can feed it to the parser, and get its AST.
+
+### Parsing a file to AST
+
+The parser can be used from CLI, and from Node.
+
+Taking the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file from above, and running the:
 
 ```
 ./bin/hdl-js --gate examples/And.hdl --parse
 ```
 
-We get the parsed AST:
+We get the following AST (abstract syntax tree):
 
 ```js
 {
@@ -257,7 +283,7 @@ We get the parsed AST:
 }
 ```
 
-And from Node:
+The `parse` command is also available from Node:
 
 ```js
 const fs = require('fs');
