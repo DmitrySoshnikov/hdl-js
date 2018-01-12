@@ -145,7 +145,7 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
 
   const description = spec.description.split('\n')
     .map(line => '  ' + line)
-    .join('\n')
+    .join('\n');
 
   console.info('\n' + colors.bold('Description:\n\n') + description);
 
