@@ -92,7 +92,6 @@ Description:
   Implements bitwise 1-bit Xor ^ operation.
 
 ...
-
 ```
 
 ### Usage from Node
@@ -103,31 +102,21 @@ The tool can also be used as a Node module:
 const hdl = require('hdl-js');
 
 // Check the API:
-
 console.log(hdl);
-
-/*
-
-Output:
-
-{
-  parser: { ... },
-
-  emulator: {
-    Gate,
-    BuiltInGates: {
-      And,
-      Or,
-      ...
-    }
-  },
-
-  ...
-}
-
-*/
-
 ```
+
+The `hdl-js` exposes the following API:
+
+- `parse(hdl: string)` -- parses a gate description from an HDL file
+- `parser` -- the parser module exposed
+- `emulator` -- hardware emulator, which includes:
+  - `Pin` - a pin "wire" used to patch inputs and outputs of a gate
+  - `BuiltInGate` -- base class for all built-in gates
+  - `CompositeGate` -- base class used for user-defined gates from HDL
+  - `BuiltInGates` -- map of all [built-in gates](#built-in-gates):
+    - `And`
+    - `Or`
+    - ...
 
 ## Parser
 
