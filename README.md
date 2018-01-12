@@ -52,14 +52,9 @@ npm run build
 ./bin/hdl-js --help
 ```
 
-> NOTE: You need to run `build` command every time you change the grammar file.
+> **NOTE:** You need to run `build` command only when you change the grammar file.
 
-## Parser
-
-The `hdl-js` is implemented as an automatic LR parser using [Syntax](https://www.npmjs.com/package/syntax-cli) tool. The parser module is generated from the corresponding [grammar](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g) file.
-
-
-### Usage as a CLI
+## Usage as a CLI
 
 Check the options available from CLI:
 
@@ -84,6 +79,61 @@ Options:
 ```
 
 > **NOTE:** the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
+
+Example of a CLI command to describe `Xor` gate:
+
+```
+hdl-js --gate Xor --describe
+
+"Xor" gate:
+
+Description:
+
+  Implements bitwise 1-bit Xor ^ operation.
+
+...
+
+```
+
+### Usage from Node
+
+The tool can also be used as a Node module:
+
+```js
+const hdl = require('hdl-js');
+
+// Check the API:
+
+console.log(hdl);
+
+/*
+
+Output:
+
+{
+  parser: { ... },
+
+  emulator: {
+    Gate,
+    BuiltInGates: {
+      And,
+      Or,
+      ...
+    }
+  },
+
+  ...
+}
+
+*/
+
+```
+
+## Parser
+
+The `hdl-js` is implemented as an automatic LR parser using [Syntax](https://www.npmjs.com/package/syntax-cli) tool. The parser module is generated from the corresponding [grammar](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/hdl.g) file.
+
+The parser can be used from CLI, and from Node.
 
 For the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
@@ -218,9 +268,7 @@ We get the parsed AST:
 }
 ```
 
-#### Usage from Node
-
-The parser can also be used as a Node module:
+And from Node:
 
 ```js
 const fs = require('fs');
