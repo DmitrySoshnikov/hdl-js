@@ -12,6 +12,16 @@ Hardware description language (HDL) parser, and Hardware simulator.
 - [Usage from Node](#usage-from-node)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
+    - [List of built-in chips](#list-of-built-in-chips)
+    - [Viewing gate specification](#viewing-gate-specification)
+    - [Specifying output format](#specifying-output-format)
+    - [Testing gates on passed data](#testing-gates-on-passed-data)
+    - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
+    - [Main chip groups](#main-chip-groups)
+      - [Very basic chips](#very-basic-chips)
+      - [Basic chips](#basic-chips)
+      - [ALU](#alu)
+      - [Memory chips](#memory-chips)
   - [Composite gates](#composite-gates)
 
 ### Installation
@@ -70,7 +80,7 @@ Options:
                                                   [choices: "bin", "hex", "dec"]
 ```
 
-> NOTE: the HDL format is based on the chips format from the [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
+> NOTE: the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
 
 For the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
@@ -224,6 +234,10 @@ console.log(hdl.parse(hdlFile)); // HDL AST
 
 ### Built-in gates
 
+In general, all the gates can be built manually in HDL from the very basic Nand or Nor gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript. You can use these gates as building blocks with faster implementation, and also to check your own implementation in case you build custom versions of these chips.
+
+### List of built-in chips
+
 The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of _compound gates_.
 
 ```
@@ -236,6 +250,10 @@ Built-in gates:
 - Or
 - ...
 ```
+
+Once you know a gate of interest, you can introspect its specification.
+
+### Viewing gate specification
 
 To see the specification of a particular gate, we can use `--describe` (`-d`) option, passing the name of a needed `--gate` (`-g`):
 
@@ -278,7 +296,40 @@ Truth table:
 
 > NOTE: the `--gate` option handles both, built-in gates by name, and custom gates from HDL files.
 
-Using `--format` option it is possible to control format of the input/output values. For example, the truth table of the `And16` gate in binary (default), and hexidecimal formats:
+From Node the specification of a built-in gate is exposed via `Spec` option on the gate class:
+
+```js
+const hdl = require('hdl-js');
+
+const {And} = hdl.emulator.BuiltInGates;
+
+console.log(And.Spec);
+
+/*
+
+Output:
+
+{
+  description: 'Implements bitwise 1-bit And & operation.',
+
+  inputPins: ['a', 'b'],
+
+  outputPins: ['out'],
+
+  truthTable: [
+    {a: 0, b: 0, out: 0},
+    {a: 0, b: 1, out: 0},
+    {a: 1, b: 0, out: 0},
+    {a: 1, b: 1, out: 1},
+  ]
+}
+
+*/
+```
+
+### Specifying output format
+
+Using `--format` option it is possible to control the format of the input/output values. For example, the truth table of the `And16` gate in binary (default), and hexadecimal formats:
 
 ```
 ./bin/hdl-js --gate And16 --describe
@@ -330,36 +381,7 @@ Hexidecimal output format:
 └───────┴───────┴─────────┘
 ```
 
-From Node the specification of a built-in gate is exposed via `Spec` option on the gate class:
-
-```js
-const hdl = require('hdl-js');
-
-const {And} = hdl.emulator.BuiltInGates;
-
-console.log(And.Spec);
-
-/*
-
-Output:
-
-{
-  description: 'Implements bitwise 1-bit And & operation.',
-
-  inputPins: ['a', 'b'],
-
-  outputPins: ['out'],
-
-  truthTable: [
-    {a: 0, b: 0, out: 0},
-    {a: 0, b: 1, out: 0},
-    {a: 1, b: 0, out: 0},
-    {a: 1, b: 1, out: 1},
-  ]
-}
-
-*/
-```
+### Testing gates on passed data
 
 It is possible to manually test and evaluate the outputs of a gate based on its inputs:
 
@@ -398,7 +420,7 @@ and.eval();
 console.log(and.getOutputPins()[0].getValue()); // 1
 ```
 
-Input and output pins can also be passed as _specifications_, rather than as actual `Pin` instances:
+Input and output pins can also be passed as _plain objects_, rather than as `Pin` instances:
 
 ```js
 const hdl = require('hdl-js');
@@ -464,6 +486,8 @@ Output for `result`:
 
 */
 ```
+
+### Validating passed data on gate logic
 
 In addition, if _output pins_ are passed, the `execOnData` will validates them, and report conflicting pins, if the expected values differ from the actual ones:
 
@@ -554,6 +578,161 @@ Truth table for data:
 │  FFFF  │  0000   │
 └────────┴─────────┘
 ```
+
+### Main chip groups
+
+All gates are grouped into the following categories:
+
+#### Very basic chips
+
+This group includes two gates which can be used to build _anything else_.
+
+- [Nand](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nand.js) (negative-And)
+- [Nor](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nor.js) (negative-Or)
+
+For example, as was shown above, the basic `And` chip can be built on top of two connected `Nand` gates:
+
+```
+CHIP And {
+  IN a, b;
+  OUT out;
+
+  PARTS:
+
+  Nand(a=a, b=b, out=n);
+  Nand(a=n, b=n, out=out);
+}
+```
+
+#### Basic chips
+
+The basic group of chips includes primitive building blocks for more complex chips. The basic chips themselves are built from the [very basic chips](#very-basic-chips). The group includes:
+
+- [And](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/And.js)
+- [And16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/And16.js)
+- [Or](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Or.js)
+- [Or16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Or16.js)
+- [Or8Way](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Or8Way.js)
+- [Not](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Not.js)
+- [Not16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Not16.js)
+- [Xor](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Xor.js)
+- [Mux](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Mux.js) (multiplexer)
+- [Mux16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Mux16.js)
+- [Mux4Way16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Mux4Way16.js)
+- [Mux8Way16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Mux8Way16.js)
+- [DMux](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DMux.js) (demultiplexer)
+- [DMux4Way](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DMux4Way.js)
+- [DMux8Way](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DMux8Way.js)
+
+For example, the more complex [HalfAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/HalfAdder.js) chip can be built on top of Xor, and And gates:
+
+```
+CHIP HalfAdder {
+  IN a, b;    // 1-bit inputs
+  OUT sum,    // Right bit of a + b
+      carry;  // Left bit of a + b
+
+  PARTS:
+
+  Xor(a=a, b=b, out=sum);
+  And(a=a, b=b, out=carry);
+}
+```
+
+The `Mux` (multiplexer) gate, which provides basic _selection_ (or _"if"_ operation), and being a basic chip, can itself be built from other basic chips from this group, such as `Not`, `And`, and `Or`.
+
+To see the _full specification_ and _truth table_ of a needed gate, use `--describe` (`-d`) option from CLI.
+
+#### ALU
+
+The _arithmetic-logic unit_ is an abstraction which encapsulates inside several operations, implemented as smaller sub-chips. Usually ALU accepts two numbers, and based on the _OpCode (operation code)_, evaluates needed result. This group of chips includes:
+
+- [HalfAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/HalfAdder.js) (2 bits adder)
+- [FullAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/FullAdder.js) (3 bits adder)
+- [Add16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Add16.js)
+- [Inc16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Inc16.js)
+- ALU
+
+The ALU chip itself evaluates both, arithmetic (such as addition), and logic (such as `And`, `Or`, etc) operations.
+
+#### Memory chips
+
+The basic building block for memory chips is a [Flip-Flop](https://en.wikipedia.org/wiki/Flip-flop_(electronics)). In particular, in this specific case, it's the _DFF (Data/Delay Flip-Flop)_.
+
+On top of `DFF` other storage chips, such as 1 `Bit` abstraction, or 16-bit `Register` abstraction, are built. The group includes the following chips:
+
+- [DFF](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DFF.js) (Data/Delay Flip-Flop)
+- [Bit](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Bit.js) (1-bit memory unit)
+- [Register](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Register.js) (16-bit memory unit)
+- ARegister (Address Register)
+- DRegister (Data Register)
+- PC (Program Counter)
+- [RAM](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM.js) (Random Access Memory)
+- [RAM8](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM8.js)
+- [RAM64](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM64.js)
+- [RAM512](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM512.js)
+- [RAM4K](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM4K.js)
+- [RAM16K](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM16K.js)
+
+Memory chips are synchronized by the [clock](https://en.wikipedia.org/wiki/Clock_signal), and operate on _rising_ and _falling_ edges of the [clock cycle](https://en.wikipedia.org/wiki/Clock_rate). Specification, and truth table of such chips contains `$clock` information, where negative values (e.g. `-0`) mean low logical level, and positive (`+0`) -- high logical level, or the rising edge.
+
+Running the:
+
+```
+hdl-js --gate Bit --describe
+```
+
+Shows the clock information:
+
+```
+"Bit" gate:
+
+Description:
+
+  1 bit memory register.
+
+  If load[t]=1 then out[t+1] = in[t] else out does not change.
+
+  Clock rising edge updates internal state from the input,
+  if the `load` is set; otherwise, preserves the state.
+
+    ↗ : state = load ? in : state
+
+  Clock falling edge propagates the internal state to the output:
+
+    ↘ : out = state
+
+Inputs:
+
+  - in
+  - load
+
+Outputs:
+
+  - out
+
+Truth table:
+
+┌────────┬────┬──────┬─────┐
+│ $clock │ in │ load │ out │
+├────────┼────┼──────┼─────┤
+│   -0   │ 0  │  0   │  0  │
+├────────┼────┼──────┼─────┤
+│   +0   │ 1  │  1   │  0  │
+├────────┼────┼──────┼─────┤
+│   -1   │ 1  │  0   │  1  │
+├────────┼────┼──────┼─────┤
+│   +1   │ 1  │  0   │  1  │
+├────────┼────┼──────┼─────┤
+│   -2   │ 1  │  0   │  1  │
+├────────┼────┼──────┼─────┤
+│   +2   │ 0  │  1   │  1  │
+├────────┼────┼──────┼─────┤
+│   -3   │ 0  │  0   │  0  │
+└────────┴────┴──────┴─────┘
+```
+
+The _internal state_ of a clocked chip can _only_ change on the _rising edge_. While the _output_ is _committed_ (usually to reflect the internal state) on the _falling edge_ of the clock. This _delay_ of the output is exactly reflected in the DFF, that is _Delay_ Flip-Flop, name.
 
 ### Composite gates
 
