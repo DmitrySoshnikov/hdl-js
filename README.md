@@ -141,10 +141,10 @@ The [sections](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/
 - `IN` -- inputs of a gate
 - `OUT` -- outputs of a gate
 - `PARTS` -- the actual implementation _body_ of a chip, composed from other chips
-- `BUILTIN` -- refer to the name of a built-in chip: in this case the implementation is fully take from the built-in gate, and `PARTS` can be omitted
-- `CLOCKED` -- describes which inputs/outputs are _clocked_ (note: see clock description below in [memory chips](#memory-chips))
+- `BUILTIN` -- refer to a name of a built-in chip: in this case the implementation is fully take from the built-in gate, and the `PARTS` section can be omitted
+- `CLOCKED` -- describes which inputs/outputs are _clocked_ (see clock description below in [memory chips](#memory-chips))
 
-Let's see at the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
+Let's take a look at the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
 ```
 /**
@@ -427,7 +427,7 @@ With `--format hex`:
 ./bin/hdl-js --gate And16 --describe --format hex
 ```
 
-Hexidecimal output format:
+Hexadecimal output format:
 
 ```
 ┌───────┬───────┬─────────┐
@@ -627,7 +627,7 @@ Found 1 conflicts in:
 └───┴───┴───────┘
 ```
 
-It is possible using actual number values in binary (`0b1111`), hexidecimal (`0xF`), and decimal (`15`) formats. Otherwise, the values have to be passed as strings (`'FFFF'` for `0xFFFF`) with correct `--format` option:
+It is possible using actual number values in binary (`0b1111`), hexadecimal (`0xF`), and decimal (`15`) formats. Otherwise, the values have to be passed as strings (`'FFFF'` for `0xFFFF`) with correct `--format` option:
 
 ```
 ./bin/hdl-js -g Not16 -e '[{in: 0xFFFF}]' -f hex
