@@ -531,7 +531,7 @@ console.log(and2.getPin('out').getValue()); // 0
 All gates known their own specification, so we can omit passing explicit pins info, and use a constructor without parameters, or create gates via the `defaultFromSpec` method:
 
 ```js
-const hdl = require('hdl-js');
+const hdl = require('.');
 
 const {And} = hdl.emulator.BuiltInGates;
 
@@ -541,20 +541,20 @@ const {And} = hdl.emulator.BuiltInGates;
 const and1 = new And();
 
 and1
-  .setPinValues({a: 1, b: 1});
+  .setPinValues({a: 1, b: 1})
   .eval();
 
-console.log(and1.getPin(0).getValue()); // 1
+console.log(and1.getPin('out').getValue()); // 1
 
 // The same as:
 
 const and2 = And.defaultFromSpec();
 
 and2
-  .setPinValues({a: 1, b: 0});
+  .setPinValues({a: 1, b: 0})
   .eval();
 
-console.log(and2.getPin(0).getValue()); // 0
+console.log(and2.getPin('out').getValue()); // 0
 ```
 
 ### Exec on set of data

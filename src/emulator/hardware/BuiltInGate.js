@@ -14,12 +14,8 @@ class BuiltInGate extends Gate {
   /**
    * Creates a gate instance with the given name.
    */
-  constructor({
-    name = null,
-    inputPins = [],
-    outputPins = [],
-  } = {}) {
-    super({name, inputPins, outputPins});
+  constructor(options) {
+    super(options);
     this._validate();
   }
 
