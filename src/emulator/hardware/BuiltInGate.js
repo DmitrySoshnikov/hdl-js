@@ -6,7 +6,6 @@
 'use strict';
 
 const Gate = require('./Gate');
-const Pin = require('./Pin');
 
 /**
  * Base class for all builtin gates.
@@ -22,27 +21,6 @@ class BuiltInGate extends Gate {
   } = {}) {
     super({name, inputPins, outputPins});
     this._validate();
-  }
-
-  /**
-   * Creates an default instance of this gate from the spec.
-   */
-  static defaultFromSpec() {
-    const {
-      inputPins,
-      outputPins,
-    } = BuiltInGate.validateSpec(this.Spec);
-
-    const toPin = name => {
-      return typeof name === 'string'
-        ? new Pin({name})
-        : new Pin({name: name.name, size: name.size});
-    };
-
-    return new this({
-      inputPins: inputPins.map(toPin),
-      outputPins: outputPins.map(toPin),
-    });
   }
 
   /**

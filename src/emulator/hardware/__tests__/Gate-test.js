@@ -46,6 +46,12 @@ describe('Gate', () => {
         return false;
       }
     }
+
+    And.Spec = {
+      inputPins: ['a', 'b'],
+      outputPins: ['out'],
+    };
+
     expect((new And()).getName()).toBe('And');
   });
 
@@ -301,6 +307,61 @@ describe('Gate', () => {
 
     gate.clockCycle();
     expect(Gate.getClockValue()).toBe(-7);
+  });
+
+  it('default from spec', () => {
+    class And extends Gate {
+      static isClocked() {
+        return false;
+      }
+    }
+
+    And.Spec = {
+      inputPins: ['a', 'b'],
+      outputPins: ['out'],
+    };
+
+    const and1 = And.defaultFromSpec();
+
+    expect(and1.getName()).toBe(And.name);
+    expect(and1.getInputPins().length).toEqual(2);
+    expect(and1.getOutputPins().length).toEqual(1);
+
+    expect(() => and1.getPin('a')).not.toThrow();
+    expect(() => and1.getPin('b')).not.toThrow();
+    expect(() => and1.getPin('out')).not.toThrow();
+
+    const and2 = new And();
+
+    expect(and2.getName()).toBe(And.name);
+    expect(and2.getInputPins().length).toEqual(2);
+    expect(and2.getOutputPins().length).toEqual(1);
+
+    // Pin[16]:
+
+    class Not16 extends Gate {
+      static isClocked() {
+        return false;
+      }
+    }
+
+    Not16.Spec = {
+      inputPins: [
+        {name: 'in', size: 16},
+      ],
+      outputPins: [
+        {name: 'out', size: 16},
+      ],
+    };
+
+    const not16 = Not16.defaultFromSpec();
+
+    expect(not16.getName()).toBe(Not16.name);
+    expect(not16.getInputPins().length).toEqual(1);
+    expect(not16.getOutputPins().length).toEqual(1);
+
+    expect(not16.getPin('in').getSize()).toBe(16);
+    expect(not16.getPin('out').getSize()).toBe(16);
   });
 
 });

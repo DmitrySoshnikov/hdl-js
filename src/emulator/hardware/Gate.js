@@ -38,11 +38,17 @@ class Gate {
   /**
    * Creates a gate instance with the given name.
    */
-  constructor({
-    name = null,
-    inputPins = [],
-    outputPins = [],
-  } = {}) {
+  constructor(options = null) {
+    if (!options) {
+      return this.getClass().defaultFromSpec();
+    }
+
+    let {
+      name = null,
+      inputPins = [],
+      outputPins = [],
+    } = options;
+
     // Infer name from the class if not passed explicitly.
     if (!name) {
       name = this.getClass().name;
@@ -64,6 +70,27 @@ class Gate {
   init() {
     // Noop.
     return;
+  }
+
+  /**
+   * Creates an default instance of this gate from the spec.
+   */
+  static defaultFromSpec() {
+    const {
+      inputPins,
+      outputPins,
+    } = this.validateSpec(this.Spec);
+
+    const toPin = name => {
+      return typeof name === 'string'
+        ? new Pin({name})
+        : new Pin({name: name.name, size: name.size});
+    };
+
+    return new this({
+      inputPins: inputPins.map(toPin),
+      outputPins: outputPins.map(toPin),
+    });
   }
 
   /**

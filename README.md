@@ -18,6 +18,8 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Viewing gate specification](#viewing-gate-specification)
   - [Specifying output format](#specifying-output-format)
   - [Testing gates on passed data](#testing-gates-on-passed-data)
+  - [Creating gates from default spec](#creating-gates-from-default-spec)
+  - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
   - [Main chip groups](#main-chip-groups)
     - [Very basic chips](#very-basic-chips)
@@ -524,7 +526,40 @@ and2.eval();
 console.log(and2.getPin('out').getValue()); // 0
 ```
 
-It is possible to execute and test gate logic on the set of data:
+### Creating gates from default spec
+
+All gates known their own specification, so we can omit passing explicit pins info, and use a constructor without parameters, or create gates via the `defaultFromSpec` method:
+
+```js
+const hdl = require('hdl-js');
+
+const {And} = hdl.emulator.BuiltInGates;
+
+// Creates input `a` and `b` pins, and
+// ouput `out` pin automatically:
+
+const and1 = new And();
+
+and1
+  .setPinValues({a: 1, b: 1});
+  .eval();
+
+console.log(and1.getPin(0).getValue()); // 1
+
+// The same as:
+
+const and2 = And.defaultFromSpec();
+
+and2
+  .setPinValues({a: 1, b: 0});
+  .eval();
+
+console.log(and2.getPin(0).getValue()); // 0
+```
+
+### Exec on set of data
+
+It is also possible to execute and test gate logic on the set of data:
 
 ```js
 // const and = new And({ ... });
