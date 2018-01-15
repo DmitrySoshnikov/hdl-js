@@ -725,7 +725,7 @@ The basic group of chips includes primitive building blocks for more complex chi
 - [DMux4Way](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DMux4Way.js)
 - [DMux8Way](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/DMux8Way.js)
 
-For example, the more complex [HalfAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/HalfAdder.js) chip can be built on top of Xor, and And gates:
+For example, the more complex [HalfAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/HalfAdder.js) chip can be built on top of `Xor`, and `And` gates:
 
 ```
 CHIP HalfAdder {
