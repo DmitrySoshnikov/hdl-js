@@ -732,7 +732,7 @@ On top of `DFF` other storage chips, such as 1 `Bit` abstraction, or 16-bit `Reg
 - [Register](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Register.js) (16-bit memory unit)
 - ARegister (Address Register)
 - DRegister (Data Register)
-- PC (Program Counter)
+- [PC](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/PC.js) (Program Counter)
 - [RAM](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM.js) (Random Access Memory)
 - [RAM8](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM8.js)
 - [RAM64](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/RAM64.js)
