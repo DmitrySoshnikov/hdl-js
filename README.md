@@ -788,9 +788,9 @@ The _System clock_ is used to synchronize clocked chips (see example above in [m
 
 A clock operates on the [clock rate](https://en.wikipedia.org/wiki/Clock_rate), that is, _number of cycles per second_, measured in **Hz**. The higher the clock rate, the faster machine is.
 
-And a **clock cycle** consists of two parts: _rising edge_, and _falling edge_.
+Clock's runtime consists of _cycles_, and _clock cycle_ has two phases: _rising edge_, and _falling edge_.
 
-As mentioned in the [memory chips](#memory-chips) section, all clocked gates can change their internal state _only on the rising edge_. And on the falling edge the _commit_ the value form the state to the output pins.
+As mentioned in the [memory chips](#memory-chips) section, all clocked gates can change their internal state _only on the rising edge_. And on the falling edge they _commit_ the value form the state to the output pins.
 
 For example, running the:
 
