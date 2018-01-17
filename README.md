@@ -786,7 +786,7 @@ See detailed clock description in the next section.
 
 The _System clock_ is used to synchronize clocked chips (see example above in [memory chips](#memory-chips)).
 
-A clock operates on the [clock rate](https://en.wikipedia.org/wiki/Clock_rate), that is, _number of cycles per second_, measured in **Hz**. The hight the clock rate, the faster machine is.
+A clock operates on the [clock rate](https://en.wikipedia.org/wiki/Clock_rate), that is, _number of cycles per second_, measured in **Hz**. The higher the clock rate, the faster machine is.
 
 And a **clock cycle** consists of two parts: _rising edge_, and _falling edge_.
 
