@@ -5,7 +5,7 @@
 
 'use strict';
 
-const {int16} = require('../../util/typed-numbers');
+const {int16} = require('../../util/numbers');
 
 /**
  * Maximum word size.

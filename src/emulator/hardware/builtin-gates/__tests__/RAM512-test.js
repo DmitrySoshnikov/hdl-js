@@ -5,9 +5,10 @@
 
 'use strict';
 
-const Gate = require('../../Gate');
 const RAM512 = require('../RAM512');
 const GateTestUtil = require('../../gate-test-util');
+
+const {SystemClock} = require('../../Clock');
 
 describe('RAM512', () => {
   it('RAM512 interface', () => {
@@ -16,7 +17,7 @@ describe('RAM512', () => {
   });
 
   it('storage', () => {
-    Gate.resetClock();
+    SystemClock.reset();
 
     const ram512Chip = new RAM512(RAM512.Spec);
 

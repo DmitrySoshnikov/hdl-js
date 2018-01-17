@@ -10,7 +10,9 @@ const And16 = require('../builtin-gates/And16');
 const Gate = require('../Gate');
 const Pin = require('../Pin');
 
-const {int16} = require('../../../util/typed-numbers');
+const {SystemClock} = require('../Clock');
+
+const {int16} = require('../../../util/numbers');
 
 // Inputs.
 const a = new Pin({name: 'a', value: 1});
@@ -272,41 +274,41 @@ describe('Gate', () => {
       outputPins: ['out'],
     });
 
-    Gate.resetClock();
-    expect(Gate.isClockDown()).toBe(true);
-    expect(Gate.isClockUp()).toBe(false);
-    expect(Gate.getClockValue()).toBe(-0);
+    SystemClock.reset();
 
-    gate.tick();
-    expect(Gate.isClockDown()).toBe(false);
-    expect(Gate.isClockUp()).toBe(true);
-    expect(Gate.getClockValue()).toBe(+0);
+    const gateClock = gate.getPin('$clock');
+
+    SystemClock.tick();
+    expect(gateClock.getValue()).toBe(+0);
     expect(state).toBe(1);
 
-    gate.tock();
-    expect(Gate.isClockDown()).toBe(true);
-    expect(Gate.isClockUp()).toBe(false);
-    expect(Gate.getClockValue()).toBe(-1);
+    SystemClock.tock();
+    expect(gateClock.getValue()).toBe(-1);
     expect(state).toBe(1);
     expect(gate.getPin('out').getValue()).toBe(state);
 
     expect(order).toEqual(['eval', 'clockUp', 'clockDown', 'eval']);
 
-    Gate.setClockValue(+3);
-    expect(Gate.getClockValue()).toBe(+3);
+    SystemClock.setValue(+3);
+    expect(gateClock.getValue()).toBe(+3);
 
-    gate.tock();
-    gate.tick();
-    expect(Gate.getClockValue()).toBe(+4);
+    SystemClock.tock();
+    SystemClock.tick();
+    expect(gateClock.getValue()).toBe(+4);
+
+    SystemClock.cycle();
+    expect(gateClock.getValue()).toBe(+5);
+
+    // Convenient wrapper for `SystemClock.cycle`.
+    gate.clockCycle();
+    expect(SystemClock.getValue()).toBe(+6);
+    expect(gateClock.getValue()).toBe(+6);
+
+    SystemClock.tock();
+    expect(gateClock.getValue()).toBe(-7);
 
     gate.clockCycle();
-    expect(Gate.getClockValue()).toBe(+5);
-
-    gate.tock();
-    expect(Gate.getClockValue()).toBe(-6);
-
-    gate.clockCycle();
-    expect(Gate.getClockValue()).toBe(-7);
+    expect(gateClock.getValue()).toBe(-8);
   });
 
   it('default from spec', () => {

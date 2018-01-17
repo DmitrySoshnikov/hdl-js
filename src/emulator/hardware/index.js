@@ -8,6 +8,7 @@
 const BuiltInGate = require('./BuiltInGate');
 const BuiltInGates = require('./builtin-gates');
 const CompositeGate = require('./CompositeGate');
+const Clock = require('./Clock');
 const Gate = require('./Gate');
 const Pin = require('./Pin');
 
@@ -15,6 +16,11 @@ const Pin = require('./Pin');
  * Simulates hardware chips (gates) evaluation.
  */
 const HardwareEmulator = {
+  /**
+   * Expose `Clock` class.
+   */
+  Clock,
+
   /**
    * Expose `Gate` class.
    */

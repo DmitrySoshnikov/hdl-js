@@ -8,7 +8,7 @@
 const colors = require('colors');
 const RAM = require('./RAM');
 
-const {int16Table} = require('../../../util/typed-numbers');
+const {int16Table} = require('../../../util/numbers');
 
 /**
  * Canonical truth table for the `RAM4K` gate.

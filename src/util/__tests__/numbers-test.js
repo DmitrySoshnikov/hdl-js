@@ -8,9 +8,9 @@
 const {
   int16,
   uint16,
-} = require('../typed-numbers');
+} = require('../numbers');
 
-describe('typed-numbers', () => {
+describe('numbers', () => {
 
   it('int16', () => {
     expect(int16(0xFFFF)).toBe(-1);

@@ -38,8 +38,28 @@ function uint16(v) {
   return v & 0xFFFF;
 }
 
+/**
+ * Test for a neagtive zero.
+ */
+function isNegativeZero(value) {
+  return value === 0 && (1 / value === -Infinity);
+}
+
+/**
+ * Converts a number value to decimal string with the sign.
+ */
+function toSignedString(value) {
+  if (isNegativeZero(value)) {
+    return '-0';
+  }
+
+  return (value >= 0 ? '+' : '') + value;
+}
+
 module.exports = {
   int16,
   int16Table,
   uint16,
+  isNegativeZero,
+  toSignedString,
 };

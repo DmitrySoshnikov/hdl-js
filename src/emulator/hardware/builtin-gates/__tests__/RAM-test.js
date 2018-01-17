@@ -5,9 +5,10 @@
 
 'use strict';
 
-const Gate = require('../../Gate');
 const RAM = require('../RAM');
 const GateTestUtil = require('../../gate-test-util');
+
+const {SystemClock} = require('../../Clock');
 
 describe('RAM', () => {
   it('RAM interface', () => {
@@ -16,7 +17,7 @@ describe('RAM', () => {
   });
 
   it('storage', () => {
-    Gate.resetClock();
+    SystemClock.reset();
 
     // Default is 8 registers.
     const ram8Chip = new RAM(RAM.Spec);

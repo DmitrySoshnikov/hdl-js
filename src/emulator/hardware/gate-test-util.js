@@ -6,8 +6,9 @@
 'use strict';
 
 const assert = require('assert');
-const Gate = require('./Gate');
 const Pin = require('./Pin');
+
+const {SystemClock} = require('./Clock');
 
 /**
  * Evaluates the gate logic on the truth table input.
@@ -24,7 +25,7 @@ const Pin = require('./Pin');
  * Throws if some `out` is not evaluate to the expected value.
  */
 function testTruthTable(table, gate) {
-  Gate.resetClock();
+  SystemClock.reset();
   const {result} = gate.execOnData(table);
   assert.deepEqual(table, result);
 }

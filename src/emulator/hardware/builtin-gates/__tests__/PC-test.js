@@ -5,11 +5,12 @@
 
 'use strict';
 
-const Gate = require('../../Gate');
 const GateTestUtil = require('../../gate-test-util');
 const PC = require('../PC');
 
-const {int16Table} = require('../../../../util/typed-numbers');
+const {SystemClock} = require('../../Clock');
+
+const {int16Table} = require('../../../../util/numbers');
 
 /**
  * Testing data.
@@ -55,7 +56,7 @@ describe('PC', () => {
   });
 
   it('testing data', () => {
-    Gate.resetClock();
+    SystemClock.reset();
 
     expect(() => GateTestUtil.testTruthTable(data, PC.defaultFromSpec()))
       .not.toThrow();

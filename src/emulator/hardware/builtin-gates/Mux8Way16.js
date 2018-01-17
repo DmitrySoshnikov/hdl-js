@@ -7,7 +7,7 @@
 
 const BuiltInGate = require('../BuiltInGate');
 
-const {int16Table} = require('../../../util/typed-numbers');
+const {int16Table} = require('../../../util/numbers');
 
 /**
  * Canonical truth table for the `Mux8Way16` gate.

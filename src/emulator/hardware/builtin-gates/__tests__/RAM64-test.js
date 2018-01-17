@@ -5,9 +5,10 @@
 
 'use strict';
 
-const Gate = require('../../Gate');
 const RAM64 = require('../RAM64');
 const GateTestUtil = require('../../gate-test-util');
+
+const {SystemClock} = require('../../Clock');
 
 describe('RAM64', () => {
   it('RAM64 interface', () => {
@@ -16,7 +17,7 @@ describe('RAM64', () => {
   });
 
   it('storage', () => {
-    Gate.resetClock();
+    SystemClock.reset();
 
     const ram64Chip = new RAM64(RAM64.Spec);
 

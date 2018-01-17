@@ -26,6 +26,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
     - [Basic chips](#basic-chips)
     - [ALU](#alu)
     - [Memory chips](#memory-chips)
+  - [Clock](#clock)
   - [Composite gates](#composite-gates)
 
 ## Installation
@@ -144,7 +145,7 @@ The [sections](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/parser/
 - `OUT` -- outputs of a gate
 - `PARTS` -- the actual implementation _body_ of a chip, composed from other chips
 - `BUILTIN` -- refer to a name of a built-in chip: in this case the implementation is fully take from the built-in gate, and the `PARTS` section can be omitted
-- `CLOCKED` -- describes which inputs/outputs are _clocked_ (see clock description below in [memory chips](#memory-chips))
+- `CLOCKED` -- describes which inputs/outputs are [clocked](#clock)
 
 Let's take a look at the [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl) file:
 
@@ -777,7 +778,21 @@ On top of `DFF` other storage chips, such as 1 `Bit` abstraction, or 16-bit `Reg
 
 Memory chips are synchronized by the [clock](https://en.wikipedia.org/wiki/Clock_signal), and operate on _rising_ and _falling_ edges of the [clock cycle](https://en.wikipedia.org/wiki/Clock_rate). Specification, and truth table of such chips contains `$clock` information, where negative values (e.g. `-0`) mean low logical level, and positive (`+0`) -- high logical level, or the rising edge.
 
-Running the:
+The _internal state_ of a clocked chip can _only_ change on the _rising edge_. While the _output_ is _committed_ (usually to reflect the internal state) on the _falling edge_ of the clock. This _delay_ of the output is exactly reflected in the DFF, that is _Delay_ Flip-Flop, name.
+
+See detailed clock description in the next section.
+
+### Clock
+
+The _System clock_ is used to synchronize clocked chips (see example above in [memory chips](#memory-chips)).
+
+A clock operates on the [clock rate](https://en.wikipedia.org/wiki/Clock_rate), that is, _number of cycles per second_, measured in **Hz**. The hight the clock rate, the faster machine is.
+
+And a **clock cycle** consists of two parts: _rising edge_, and _falling edge_.
+
+As mentioned in the [memory chips](#memory-chips) section, all clocked gates can change their internal state _only on the rising edge_. And on the falling edge the _commit_ the value form the state to the output pins.
+
+For example, running the:
 
 ```
 hdl-js --gate Bit --describe
@@ -833,7 +848,90 @@ Truth table:
 └────────┴────┴──────┴─────┘
 ```
 
-The _internal state_ of a clocked chip can _only_ change on the _rising edge_. While the _output_ is _committed_ (usually to reflect the internal state) on the _falling edge_ of the clock. This _delay_ of the output is exactly reflected in the DFF, that is _Delay_ Flip-Flop, name.
+From Node the `Clock` is available on the `emulator` object, and we can also get access to the global singleton `SystemClock`, which is used to synchronize the clocked chips:
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  emulator: {
+    Clock,
+    Pin,
+  },
+} = hdl;
+
+const clock = new Clock({rate: 10, value: -5});
+const pin = new Pin({name: 'a'});
+
+// Track clock events.
+clock.on('tick', value => pin.setValue(value));
+
+clock.tick();
+
+console.log(pin.getValue()); // +5;
+```
+
+The clock emits the following events:
+
+- `tick` - rising edge
+- `tock` - falling edge
+- `next` - half cycle (`tick` or `tock`)
+- `cycle` - full cycle (`tick` -> `tock`)
+- `value` - clock value change
+
+All the clocked gates are automatically subscribed to `SystemClock` events, and update the value of their `$clock` pin:
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  emulator: {
+    Gate,
+    Clock: {
+      SystemClock,
+    },
+  },
+} = hdl;
+
+class MyGate extends Gate {
+  static isClocked() {
+    return true;
+  }
+
+  eval() {
+    // Noop, handle only clock signal.
+    return;
+  }
+
+  clockUp(clockValue) {
+    console.log('Handle rising edge:', clockValue);
+  }
+
+  clockDown(clockValue) {
+    console.log('Handle falling edge:', clockValue);
+  }
+}
+
+MyGate.Spec = {
+  inputPins: ['a'],
+  outputPins: ['b'],
+};
+
+const gate = MyGate.defaultFromSpec();
+
+// Run full clock cycle.
+SystemClock.cycle();
+
+
+/*
+
+Output:
+
+Handle rising edge: 0
+Handle falling edge: -1
+
+*/
+```
 
 ### Composite gates
 

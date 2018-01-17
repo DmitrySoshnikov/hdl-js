@@ -10,25 +10,13 @@ const parser = require('../../parser');
 const Pin = require('./Pin');
 const TablePrinter = require('../../table-printer');
 
-const {int16} = require('../../util/typed-numbers');
+const {SystemClock} = require('./Clock');
 
-/**
- * Test for a neagtive zero.
- */
-function isNegativeZero(value) {
-  return value === 0 && (1 / value === -Infinity);
-}
-
-/**
- * Converts a number value to decimal string with the sign.
- */
-function toSignString(value) {
-  if (isNegativeZero(value)) {
-    return '-0';
-  }
-
-  return (value >= 0 ? '+' : '') + value;
-}
+const {
+  int16,
+  isNegativeZero,
+  toSignedString,
+} = require('../../util/numbers');
 
 /**
  * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
@@ -61,6 +49,15 @@ class Gate {
 
     this._buildNamesToPinsMap();
     this.init();
+
+    // Subscribe to the clock events for clocked gates.
+    if (this.getClass().isClocked()) {
+      SystemClock.on('tick', () => this.tick());
+      SystemClock.on('tock', () => this.tock());
+      SystemClock.on('value', value => {
+        this.getPin(Pin.CLOCK).setValue(value);
+      });
+    }
   }
 
   /**
@@ -225,12 +222,10 @@ class Gate {
       // Evaluate the row.
       this.setPinValues(row);
 
-      if (this.getClass().isClocked()) {
-        // The -0 is a setup row, don't execute on it.
-        if (!isNegativeZero(row[Pin.CLOCK])) {
-          Gate.isClockDown() ? this.tick() : this.tock();
-          this.getPin(Pin.CLOCK).setValue(Gate.getClockValue());
-        }
+      // The -0 is a setup row, don't execute on it,
+      // otherwise, emulate next clock half-cycle (tick or tock).
+      if (this.getClass().isClocked() && !isNegativeZero(row[Pin.CLOCK])) {
+        SystemClock.next();
       } else {
         this.eval();
       }
@@ -311,7 +306,7 @@ class Gate {
 
         // Special pin ($clock, etc).
         if (pinInfo.kind === 'special') {
-          content = toSignString(row[name]);
+          content = toSignedString(row[name]);
         } else {
           // Normal pin.
           content = (row[name] >>> 0)
@@ -387,7 +382,7 @@ class Gate {
     if (this.getClass().isClocked()) {
       this._namesToPinsMap[Pin.CLOCK] = new Pin({
         name: Pin.CLOCK,
-        value: Gate.getClockValue(),
+        value: SystemClock.getValue(),
       });
     }
 
@@ -454,9 +449,9 @@ class Gate {
    * affect the outputs).
    */
   tick() {
-    Gate._clockValue = -Gate._clockValue;
     this.eval();
-    this.clockUp();
+    this.clockUp(this.getPin(Pin.CLOCK).getValue());
+    return this;
   }
 
   /**
@@ -466,63 +461,18 @@ class Gate {
    * of the gate, and then computes the outputs from non-clocked information.
    */
   tock() {
-    Gate._clockValue = -(Math.abs(Gate._clockValue) + 1);
-    this.clockDown();
+    this.clockDown(this.getPin(Pin.CLOCK).getValue());
     this.eval();
+    return this;
   }
 
   /**
    * Full clock cycle.
    */
   clockCycle() {
-    if (Gate.isClockDown()) {
-      this.tick();
-      this.tock();
-    } else {
-      this.tock();
-      this.tick();
-    }
-  }
-
-  /**
-   * Resets clock.
-   *
-   * Initial clock value. Each tick: set positive sign,
-   * each tock: increase, set negative sign back.
-   */
-  static resetClock() {
-    Gate.setClockValue(-0);
-  }
-
-  /**
-   * Sets clock value.
-   */
-  static setClockValue(value) {
-    Gate._clockValue = value;
-  }
-
-  /**
-   * Returns clock value.
-   */
-  static getClockValue() {
-    return Gate._clockValue;
-  }
-
-  /**
-   * Whether the clock is up.
-   */
-  static isClockUp() {
-    return !this.isClockDown();
-  }
-
-  /**
-   * Whether the clock is down.
-   */
-  static isClockDown() {
-    return isNegativeZero(Gate._clockValue) || Gate._clockValue < 0;
+    SystemClock.cycle();
+    return this;
   }
 }
-
-Gate.resetClock();
 
 module.exports = Gate;
