@@ -926,7 +926,6 @@ const gate = MyGate.defaultFromSpec();
 // Run full clock cycle.
 SystemClock.cycle();
 
-
 /*
 
 Output:
@@ -935,6 +934,46 @@ Handle rising edge: 0
 Handle falling edge: -1
 
 */
+```
+
+It is also possible to `start`, `stop`, and `reset` the clock:
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  emulator: {
+    Clock: {
+      SystemClock,
+    },
+  },
+} = hdl;
+
+// Reset the clock:
+SystemClock.reset();
+
+// Subscribe to the events:
+
+SystemClock.on('tick', value => console.log('tick:', value));
+SystemClock.on('tock', value => console.log('tock:', value));
+
+// Run it:
+SystemClock.start();
+
+/*
+
+Output (every second):
+
+tick: +0
+tock: -1
+tick: +1
+tock: -2
+tick: +2
+tock: -3
+...
+
+*/
+
 ```
 
 ### Composite gates
