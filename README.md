@@ -791,7 +791,7 @@ A clock operates on the [clock rate](https://en.wikipedia.org/wiki/Clock_rate), 
 Clock's runtime consists of _cycles_, and _clock cycle_ has two phases: _rising edge_ (aka "tick"), and _falling edge_ (aka "tock").
 
 <p align="center">
-  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/hdl-js-system-clock-1024x337.png" alt="Clock image" width="700" />
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/hdl-js-system-clock-1024x302.png" alt="Clock image" width="700" />
 <p/>
 
 As mentioned in the [memory chips](#memory-chips) section, all clocked gates can change their internal state _only on the rising edge_. And on the falling edge they _commit_ the value form the state to the output pins.
