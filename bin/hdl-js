@@ -8,7 +8,7 @@ const hdl = require('..');
 const path = require('path');
 const vm = require('vm');
 
-const {int16} = require('../src/util/typed-numbers');
+const {int16} = require('../src/util/numbers');
 
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
