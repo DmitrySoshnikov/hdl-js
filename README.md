@@ -82,6 +82,8 @@ Options:
                       if passed
   --format, -f        Values format (binary, hexadecimal, decimal)
                                                   [choices: "bin", "hex", "dec"]
+  --run, -r           Runs sequentially the rows from --exec-on-data table
+  --clock-rate, -c    Rate (number of cycles per second) for the System clock
 ```
 
 > **NOTE:** the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.

@@ -46,7 +46,7 @@ const options = require('yargs')
     },
     format: {
       alias: 'f',
-      describe: 'Values format (binary, hexidecimal, decimal)',
+      describe: 'Values format (binary, hexadecimal, decimal)',
       nargs: 1,
       choices: ['bin', 'hex', 'dec'],
       coerce: enforceUnique,
