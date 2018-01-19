@@ -1,6 +1,6 @@
 # hdl-js
 
-[![Build Status](https://travis-ci.org/DmitrySoshnikov/hdl-js.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/hdl-js) [![npm version](https://badge.fury.io/js/hdl-js.svg)](https://badge.fury.io/js/hdl-js)
+[![Build Status](https://travis-ci.org/DmitrySoshnikov/hdl-js.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/hdl-js) [![npm version](https://badge.fury.io/js/hdl-js.svg)](https://badge.fury.io/js/hdl-js) [![npm downloads](https://img.shields.io/npm/dt/hdl-js.svg)](https://www.npmjs.com/package/hdl-js)
 
 Hardware description language (HDL) parser, and Hardware simulator.
 
@@ -990,7 +990,20 @@ tock: -3
 ...
 
 */
+```
 
+The `--clock-rate` (`-c`) parameter controls the rate of the System clock. For example, the second run executes operations faster:
+
+With default clock rate 1:
+
+```
+./bin/hdl-js --gate Register --describe --run
+```
+
+With clock rate 3:
+
+```
+./bin/hdl-js --gate Register --describe --run --clock-rate 3
 ```
 
 ### Composite gates
