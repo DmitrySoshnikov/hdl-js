@@ -49,6 +49,10 @@ const options = require('yargs')
       choices: ['bin', 'hex', 'dec'],
       coerce: enforceUnique,
     },
+    run: {
+      alias: 'r',
+      describe: 'Runs sequentially the rows from --exec-on-data table',
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
@@ -90,7 +94,7 @@ function processInputValue(value, formatRadix) {
     value = Number.parseInt(value, formatRadix);
   }
 
-  // Trunc numbers to 16-bits.
+  // Truncate numbers to 16-bits.
   if (typeof value === 'number') {
     return int16(value);
   }
@@ -129,6 +133,10 @@ function loadBuiltInGate(name) {
  * Prints specification and truth table of a built-in gate.
  */
 function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
+  const {
+    run,
+  } = options;
+
   const GateClass = loadBuiltInGate(gate);
   const spec = GateClass.Spec;
 
@@ -166,12 +174,45 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
   console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
   console.info('');
 
+  const {truthTable} = spec;
+
+  const printTable = table => {
+    GateClass.printTruthTable({
+      table,
+      formatRadix,
+      formatStringLengh,
+    });
+  };
+
+  if (run) {
+    console.info(colors.bold('\nCurrent results for pins:'), '\n');
+    runSlice(truthTable, 0, printTable);
+    return;
+  }
+
   // Truth table:
   console.info(colors.bold('Truth table:'), '\n');
-  GateClass.printTruthTable({
-    formatRadix,
-    formatStringLengh,
-  });
+  printTable(truthTable);
+}
+
+/**
+ * Runs a slice of calculation, printing a table
+ * one row at a time.
+ */
+function runSlice(data, index, action) {
+  const slice = data.slice(index, index + 1);
+  action(slice);
+
+  if (index === data.length - 1) {
+    // Reset and run forever in a loop.
+    index = -1;
+  }
+
+  setTimeout(() => {
+    // Clear 6 previous lines, which take a previous table row.
+    process.stdout.write('\r\x1B[K\r\x1B[1A'.repeat(6));
+    runSlice(data, index + 1, action);
+  }, 1000);
 }
 
 function main() {
@@ -182,6 +223,7 @@ function main() {
     describe,
     execOnData,
     format = 'bin',
+    run,
   } = options;
 
   const formatRadix = FORMAT_VALUES[format].radix;
@@ -249,8 +291,46 @@ function main() {
     const gateInstance = GateClass.defaultFromSpec();
 
     const data = parseInputData(execOnData, formatRadix);
-    const {result, conflicts} = gateInstance.execOnData(data);
     const conflictingRows = {};
+
+    /**
+     * Prints truth table from the result.
+     */
+    const printTable = table => {
+      GateClass.printTruthTable({
+        table,
+        formatRadix,
+        formatStringLengh,
+        transformValue(value, row, column) {
+          if (
+            conflictingRows[row] &&
+            conflictingRows[row].hasOwnProperty(column)
+          ) {
+            const pinInfo = GateClass.getPinInfo(column);
+
+            let expected = (data[row][column].expected >>> 0)
+              .toString(formatRadix)
+              .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
+              .toUpperCase();
+
+            if (expected.length > formatStringLengh) {
+              expected = expected.slice(-formatStringLengh);
+            }
+
+            return colors.red(expected) + ' / ' + colors.green(value);
+          }
+          return value;
+        }
+      });
+    };
+
+    if (run) {
+      console.info(colors.bold('\nCurrent results for pins:'), '\n');
+      runSlice(data, 0, printTable);
+      return;
+    }
+
+    const {result, conflicts} = gateInstance.execOnData(data);
 
     if (conflicts.length) {
       console.info(
@@ -267,7 +347,6 @@ function main() {
 
         console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`, '\n');
       });
-
     } else {
       // No conflicts.
       console.info(colors.bold('\nTruth table for data:'), '\n');
@@ -275,31 +354,7 @@ function main() {
 
     // Always print correct table eventually,
     // showing conflicting values in red.
-    GateClass.printTruthTable({
-      table: result,
-      formatRadix,
-      formatStringLengh,
-      transformValue(value, row, column) {
-        if (
-          conflictingRows[row] &&
-          conflictingRows[row].hasOwnProperty(column)
-        ) {
-          const pinInfo = GateClass.getPinInfo(column);
-
-          let expected = (data[row][column].expected >>> 0)
-            .toString(formatRadix)
-            .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
-            .toUpperCase();
-
-          if (expected.length > formatStringLengh) {
-            expected = expected.slice(-formatStringLengh);
-          }
-
-          return colors.red(expected) + ' / ' + colors.green(value);
-        }
-        return value;
-      }
-    });
+    printTable(result);
   }
 
   // ------------------------------------------------------

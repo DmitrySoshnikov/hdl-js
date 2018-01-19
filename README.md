@@ -21,6 +21,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Creating gates from default spec](#creating-gates-from-default-spec)
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
+  - [Sequential run](#sequential-run)
   - [Main chip groups](#main-chip-groups)
     - [Very basic chips](#very-basic-chips)
     - [Basic chips](#basic-chips)
@@ -680,6 +681,22 @@ Truth table for data:
 │  FFFF  │  0000   │
 └────────┴─────────┘
 ```
+
+### Sequential run
+
+When the `--run` (`-r`) command is passed, it is possible to analyze how the pin values change in time (especially for the clocked gates). This options work with both, `--exect-on-data` (`-e`), and `--describe` (`-d`).
+
+Here's an example running the `Register` truth table:
+
+```
+./bin/hdl-js --gate Register --describe --run
+```
+
+Which executes the gate in time:
+
+<p align="center">
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/Register-run.gif" alt="Register run" width="600" />
+<p/>
 
 ### Main chip groups
 
