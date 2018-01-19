@@ -10,6 +10,8 @@ const vm = require('vm');
 
 const {int16} = require('../src/util/numbers');
 
+const {SystemClock} = require('../src/emulator/hardware/Clock');
+
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
 }
@@ -52,6 +54,12 @@ const options = require('yargs')
     run: {
       alias: 'r',
       describe: 'Runs sequentially the rows from --exec-on-data table',
+    },
+    'clock-rate': {
+      alias: 'c',
+      describe: 'Rate (number of cycles per second) for the System clock',
+      requiresArg: true,
+      coerce: enforceUnique,
     },
   })
   .alias('help', 'h')
@@ -200,10 +208,10 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
  * one row at a time.
  */
 function runSlice(data, index, action) {
-  const slice = data.slice(index, index + 1);
+  const slice = data.slice(index, ++index);
   action(slice);
 
-  if (index === data.length - 1) {
+  if (index === data.length) {
     // Reset and run forever in a loop.
     index = -1;
   }
@@ -212,7 +220,7 @@ function runSlice(data, index, action) {
     // Clear 6 previous lines, which take a previous table row.
     process.stdout.write('\r\x1B[K\r\x1B[1A'.repeat(6));
     runSlice(data, index + 1, action);
-  }, 1000);
+  }, 1000 / SystemClock.getRate());
 }
 
 function main() {
@@ -224,7 +232,12 @@ function main() {
     execOnData,
     format = 'bin',
     run,
+    clockRate,
   } = options;
+
+  if (clockRate) {
+    SystemClock.setRate(clockRate);
+  }
 
   const formatRadix = FORMAT_VALUES[format].radix;
   const formatStringLengh = FORMAT_VALUES[format].pad;
