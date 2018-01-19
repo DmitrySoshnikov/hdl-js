@@ -208,10 +208,10 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
  * one row at a time.
  */
 function runSlice(data, index, action) {
-  const slice = data.slice(index, ++index);
+  const slice = data.slice(index, index + 1);
   action(slice);
 
-  if (index === data.length) {
+  if (index === data.length - 1) {
     // Reset and run forever in a loop.
     index = -1;
   }
