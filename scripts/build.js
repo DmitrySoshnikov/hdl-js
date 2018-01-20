@@ -16,7 +16,6 @@ if (watchMode) {
 
 console.info(colors.bold(`Building${watchMsg}...\n`));
 
-
 // ----------------------------------------------------------
 // Rebuild parser.
 
@@ -40,7 +39,6 @@ console.info('  - pre-push:   .git/hooks/pre-push\n');
 if (!shell.test('-f', '.git/hooks/pre-push')) {
   shell.ln('-s', '../../scripts/git-pre-push', '.git/hooks/pre-push');
 }
-
 
 // ----------------------------------------------------------
 // Transform code for older Node versions.

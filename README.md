@@ -47,7 +47,7 @@ hdl-js --help
 3. Make sure `npm test` still passes (add new tests if needed)
 4. Submit a PR
 
-For development from the github repository, run `build` command to generate the parser module:
+For development from the github repository, run build command to generate the parser module, and transpile JS code:
 
 ```
 git clone https://github.com/<your-github-account>/hdl-js.git
@@ -58,7 +58,7 @@ npm run build
 ./bin/hdl-js --help
 ```
 
-> **NOTE:** You need to run `build` command only when you change the grammar file.
+> **NOTE:** JS code transpilation is used to support older versions of Node. For faster development cycle you can use npm run watch command, which continuously transpiles JS code.
 
 ## Usage as a CLI
 
