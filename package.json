@@ -8,8 +8,9 @@
   "bugs": "https://github.com/DmitrySoshnikov/hdl-js/issues",
   "scripts": {
     "build": "node scripts/build.js",
+    "watch": "node scripts/build.js --watch",
     "test": "jest",
-    "prepublish": "npm test && npm run build",
+    "prepublish": "npm run build && npm test",
     "eslint": "eslint src/ && eslint bin/hdl-js"
   },
   "bin": {
@@ -23,15 +24,15 @@
     "Simulator"
   ],
   "author": "Dmitry Soshnikov",
-  "engines": {
-    "node": ">=9"
-  },
   "dependencies": {
     "cli-table2": "^0.2.0",
     "colors": "^1.1.2",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "1.6.1",
+    "babel-preset-flow": "6.23.0",
     "eslint": "^4.11.0",
     "jest-cli": "^19.0.2",
     "shelljs": "^0.7.8",
