@@ -18,6 +18,9 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Viewing gate specification](#viewing-gate-specification)
   - [Specifying output format](#specifying-output-format)
   - [Testing gates on passed data](#testing-gates-on-passed-data)
+  - [Pins](#pins)
+    - [Pin size and slices](#pin-size-and-slices)
+    - [Pin events](#pin-events)
   - [Creating gates from default spec](#creating-gates-from-default-spec)
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
@@ -533,6 +536,101 @@ and2.eval();
 console.log(and2.getPin('out').getValue()); // 0
 ```
 
+### Pins
+
+As mentioned above, `Pin`s are used to define _inputs_ and _outputs_ of gates. A single pin represents a _wire_, on which a signal can be transmitted. Logically, a pin can store a _number_ or a needed _size_.
+
+For example, a pin of size 16 (default is size 1, i.e. a single "wire"):
+
+```
+const hdl = require('hdl-js');
+
+const {
+  emulator: {
+    Pin,
+  }
+} = hdl;
+
+const p1 = new Pin({
+  value: 'p',
+  size: 16,
+});
+
+p1.setValue(255);
+console.log(p1.getValue()); // 255
+```
+
+Usually when creating a gate instance, explicit usage of the `Pin` class can be omitted (they are created behind the scene), however, it is possible to get a needed pin using `getPin(name)` method on a gate.
+
+#### Pin size and slices
+
+A pin can be of a needed size. For example, in HDL:
+
+```
+IN sel[3];
+```
+
+tells that the maximum value of the `sel` pin is 3 bits (`0b111`), or _"3 wires"_.
+
+Individual bits in HDL can be accessed with direct indices (as in the `sel[2]`), or using _slice_ notation (as with the `sel[0..1])`:
+
+```
+Mux4Way16(..., sel=sel[0..1], ...)
+Mux16(..., sel=sel[2], ...);
+```
+
+In JS, the individual bits can be manipulated using `setValueAt`, `getSlice`, and other methods:
+
+```js
+...
+
+const p1 = new Pin({
+  value: 'p',
+  size: 3,
+  value: 0,
+});
+
+p1.setValue(0b111); // 7
+
+console.log(p1.getValueAt(1)); // 1
+
+p1.setValueAt(1, 0);
+console.log(p1.getValueAt(1)); // 0
+
+console.log(p1.getValue()); // 0b101, i.e. 5
+console.log(p1.getSlice(0, 1)); // first 2 bits: 0b01
+```
+
+#### Pin events
+
+All `Pin` instances emit the following events:
+
+- `change(newValue, oldValue, index)` - an event emitted whenever a pin changes its value.
+
+```js
+...
+
+const p1 = new Pin({
+  value: 'p',
+  size: 16,
+  value: 0,
+});
+
+p1.on('change', (newValue, oldValue) => {
+  console.log(`p1 change from ${oldValue} to ${newValue}.`);
+});
+
+p1.setValue(255);
+
+/*
+
+Output:
+
+p1 changed from 0 to 255.
+
+*/
+```
+
 ### Creating gates from default spec
 
 All gates known their own specification, so we can omit passing explicit pins info, and use a constructor without parameters, or create gates via the `defaultFromSpec` method:
@@ -749,6 +847,8 @@ SystemClock
   .reset()
   .cycle();
 ```
+
+> **NOTE:** as described in [Pins](#pins) section, it is also possible to subscribe to `'change'` event of individual pins.
 
 ### Main chip groups
 

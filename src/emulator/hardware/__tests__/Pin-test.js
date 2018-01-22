@@ -121,4 +121,33 @@ describe('Pin', () => {
     expect(a16.getValue()).toBe(0b0101010101010101);
   });
 
+  it('pin events', () => {
+    const a16 = new Pin({
+      name: 'a',
+      size: 16,
+      value: 0,
+    });
+
+    let _new, _old, _index;
+
+    a16.on('change', (newValue, oldValue, index) => {
+      _new = newValue;
+      _old = oldValue;
+      _index = index;
+    });
+
+    a16.setValue(255);
+    expect(_old).toBe(0);
+    expect(_new).toBe(255);
+
+    a16.setValue(0b111);
+    expect(_old).toBe(255);
+    expect(_new).toBe(0b111);
+
+    a16.setValueAt(1, 0);
+    expect(_old).toBe(0b111);
+    expect(_new).toBe(0b101);
+    expect(_index).toBe(1);
+  });
+
 });

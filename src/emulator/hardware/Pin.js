@@ -5,6 +5,8 @@
 
 'use strict';
 
+const EventEmitter = require('events');
+
 const {int16} = require('../../util/numbers');
 
 /**
@@ -19,9 +21,13 @@ const WORD_SIZE = 16;
  * it's a "bus" (set of pins/wires).
  *
  * Encoded as a simple number with bitwise operations for needed bits.
+ *
+ * Emits 'change' event on `setValue`.
  */
-class Pin {
+class Pin extends EventEmitter {
   constructor({name, size = 1, value = null}) {
+    super();
+
     this._name = name;
 
     if (size < 1 || size > WORD_SIZE) {
@@ -56,10 +62,12 @@ class Pin {
    * Sets the value for this pin/bus.
    */
   setValue(value) {
+    const oldValue = this._value;
     if (typeof value === 'string') {
       value = Number.parseInt(value, 2);
     }
     this._value = int16(value);
+    this.emit('change', this._value, oldValue);
   }
 
   /**
@@ -74,15 +82,17 @@ class Pin {
    */
   setValueAt(index, value) {
     this._checkIndex(index);
+    const oldValue = this._value;
 
     // Set 1.
     if (value === 1) {
       this._value |= (1 << index);
-      return;
+    } else {
+      // Set 0 ("clear").
+      this._value &= ~(1 << index);
     }
 
-    // Set 0 ("clear").
-    this._value &= ~(1 << index);
+    this.emit('change', this._value, oldValue, index);
   }
 
   /**
