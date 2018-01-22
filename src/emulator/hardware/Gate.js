@@ -64,7 +64,7 @@ class Gate extends EventEmitter {
     if (this.getClass().isClocked()) {
       SystemClock.on('tick', () => this.tick());
       SystemClock.on('tock', () => this.tock());
-      SystemClock.on('value', value => {
+      SystemClock.on('change', value => {
         this.getPin(Pin.CLOCK).setValue(value);
       });
     }

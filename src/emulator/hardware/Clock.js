@@ -65,7 +65,7 @@ class Clock extends EventEmitter {
     // this set value, so reset the halfs counter.
     this._halfs = 0;
 
-    this.emit('value', this._value);
+    this.emit('change', this._value);
     return this;
   }
 

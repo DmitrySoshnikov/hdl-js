@@ -1052,7 +1052,7 @@ The clock emits the following events:
 - `tock` - falling edge
 - `next` - half cycle (`tick` or `tock`)
 - `cycle` - full cycle (`tick` -> `tock`)
-- `value` - clock value change
+- `change` - clock value change
 
 All the clocked gates are automatically subscribed to `SystemClock` events, and update the value of their `$clock` pin:
 

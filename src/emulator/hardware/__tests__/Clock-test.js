@@ -34,11 +34,11 @@ describe('Clock', () => {
     expect(clock.getValue()).toBe(-5);
   });
 
-  it('value', () => {
+  it('change', () => {
     let data;
 
     const clock = new Clock({rate: 1, value: -5})
-      .on('value', value => data = value);
+      .on('change', value => data = value);
 
     clock.setValue(-10);
     expect(data).toBe(-10);
