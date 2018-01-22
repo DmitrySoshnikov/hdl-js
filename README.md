@@ -605,7 +605,9 @@ console.log(p1.getSlice(0, 1)); // first 2 bits: 0b01
 
 All `Pin` instances emit the following events:
 
-- `change(newValue, oldValue, index)` - an event emitted whenever a pin changes its value.
+- `change(newValue, oldValue, fromIndex, toIndex)` - an event emitted whenever a pin changes its value.
+
+If the `fromIndex` is passed, this means a specific bit was updated, e.g. `a[2]`. If both, `fromIndex`, and `toIndex` are passed, this means a _slice_ was updated, e.g. `a[1..3]`. Otherwise, the whole value was updated.
 
 ```js
 ...

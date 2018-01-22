@@ -96,6 +96,28 @@ describe('Pin', () => {
     expect(a16.getSlice(0, 15)).toBe(0b0101010101010101);
   });
 
+  it('set slice', () => {
+    const a = new Pin({
+      name: 'a',
+      size: 5,
+      value: 0b10101,
+    });
+
+    a.setSlice(1, 3, 0b101);
+
+    // Slice: a[1..3] = 0b101
+    expect(a.getSlice(1, 3)).toBe(0b101);
+    expect(a.getValue()).toBe(0b11011);
+
+    // The whole value: a[0..4] = a = 0b01010
+    a.setSlice(0, 4, 0b01010);
+    expect(a.getValue()).toBe(0b01010);
+
+    // One bit: a[0..0] = a[0] = 0b1
+    a.setSlice(0, 0, 0b1);
+    expect(a.getValue()).toBe(0b01011);
+  });
+
   it('check index', () => {
     expect(() => a16.setValueAt(31, 1)).toThrow();
     expect(() => a16.setValueAt(-1, 1)).toThrow();

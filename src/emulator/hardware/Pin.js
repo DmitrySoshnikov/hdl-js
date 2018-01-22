@@ -113,6 +113,27 @@ class Pin extends EventEmitter {
   }
 
   /**
+   * Sets a value of a slice.
+   *
+   * Value: 0b1010
+   * Slice: 0b101
+   * From: 0
+   * To: 2
+   *
+   * Result: 0b1101
+   */
+  setSlice(from, to, slice) {
+    this._checkIndex(from);
+    this._checkIndex(to);
+
+    const oldValue = this._value;
+    const mask = ((1 << (to + 1 - from)) - 1) << from;
+    this._value = (oldValue & ~mask) | ((slice << from) & mask);
+
+    this.emit('change', this._value, oldValue, from, to);
+  }
+
+  /**
    * Builds a full name of a pin or pin bus:
    *
    * 'a' -> 'a'
