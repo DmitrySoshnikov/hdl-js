@@ -538,7 +538,7 @@ console.log(and2.getPin('out').getValue()); // 0
 
 ### Pins
 
-As mentioned above, `Pin`s are used to define _inputs_ and _outputs_ of gates. A single pin represents a _wire_, on which a signal can be transmitted. Logically, a pin can store a _number_ or a needed _size_.
+As mentioned above, `Pin`s are used to define _inputs_ and _outputs_ of gates. A single pin represents a _wire_, on which a signal can be transmitted. Logically, a pin can store a _number_ of a needed _size_.
 
 For example, a pin of size 16 (default is size 1, i.e. a single "wire"):
 
@@ -560,7 +560,7 @@ p1.setValue(255);
 console.log(p1.getValue()); // 255
 ```
 
-Usually when creating a gate instance, explicit usage of the `Pin` class can be omitted (they are created behind the scene), however, it is possible to get a needed pin using `getPin(name)` method on a gate.
+Usually when creating a gate instance, explicit usage of the `Pin` class can be omitted (they are created automatically behind the scene), however, it is possible to get a needed pin using `getPin(name)` method on a gate. Then one can get a value of the pin, or subscribe to its `'change'` event.
 
 #### Pin size and slices
 
