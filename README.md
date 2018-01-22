@@ -542,7 +542,7 @@ As mentioned above, `Pin`s are used to define _inputs_ and _outputs_ of gates. A
 
 For example, a pin of size 16 (default is size 1, i.e. a single "wire"):
 
-```
+```js
 const hdl = require('hdl-js');
 
 const {
