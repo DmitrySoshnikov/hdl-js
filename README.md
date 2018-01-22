@@ -617,7 +617,7 @@ const p1 = new Pin({
 });
 
 p1.on('change', (newValue, oldValue) => {
-  console.log(`p1 change from ${oldValue} to ${newValue}.`);
+  console.log(`p1 changed from ${oldValue} to ${newValue}.`);
 });
 
 p1.setValue(255);
