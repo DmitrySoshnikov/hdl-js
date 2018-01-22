@@ -789,7 +789,7 @@ Truth table for data:
 
 ### Sequential run
 
-When the `--run` (`-r`) command is passed, it is possible to analyze how the pin values change in time (especially for the clocked gates). This options work with both, `--exect-on-data` (`-e`), and `--describe` (`-d`).
+When the `--run` (`-r`) command is passed, it is possible to analyze how the pin values change in time (especially for the clocked gates). This options work with both, `--exec-on-data` (`-e`), and `--describe` (`-d`).
 
 Here's an example running the `Register` truth table:
 
