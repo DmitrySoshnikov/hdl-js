@@ -366,4 +366,47 @@ describe('Gate', () => {
     expect(not16.getPin('out').getSize()).toBe(16);
   });
 
+  it.only('gate events', () => {
+    let state = 0;
+    let output = [];
+
+    class MyGate extends Gate {
+      static isClocked() {
+        return true;
+      }
+
+      eval() {
+        // Noop.
+        return;
+      }
+
+      clockUp() {
+        state++;
+      }
+
+      clockDown() {
+        this.getOutputPins()[0].setValue(state);
+      }
+    }
+
+    const gate = new MyGate({
+      inputPins: ['in'],
+      outputPins: ['out'],
+    });
+
+    // External observer:
+    gate.on('eval', () => output.push('eval'));
+    gate.on('clockUp', value => output.push(['clockUp', value]));
+    gate.on('clockDown', value => output.push(['clockDown', value]));
+
+    SystemClock
+      .reset()
+      .cycle();
+
+    expect(output).toEqual(['eval', ['clockUp', 0], ['clockDown', -1], 'eval']);
+    expect(state).toBe(1);
+    expect(gate.getPin('out').getValue()).toBe(state);
+
+  });
+
 });

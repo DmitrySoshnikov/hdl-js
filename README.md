@@ -22,12 +22,15 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
   - [Sequential run](#sequential-run)
+  - [Gate events](#gate-events)
   - [Main chip groups](#main-chip-groups)
     - [Very basic chips](#very-basic-chips)
     - [Basic chips](#basic-chips)
     - [ALU](#alu)
     - [Memory chips](#memory-chips)
   - [Clock](#clock)
+    - [Clock events](#clock-events)
+    - [Clock rate](#clock-rate)
   - [Composite gates](#composite-gates)
 
 ## Installation
@@ -700,6 +703,53 @@ Which executes the gate in time:
   <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/Register-run.gif" alt="Register run" width="600" />
 <p/>
 
+### Gate events
+
+All gates emit events, which correspond to their internal logic handlers:
+
+- `eval` -- an event happening on evaluation of the compositional logic
+- `clockUp(value)` -- an event happening, when a gate handled the [clock](#clock)'s _rising edge_ (aka "tick")
+- `clockDown(value)` -- an event happening, when a gate handled the [clock](#clock)'s _falling edge_ (aka "tock")
+
+Here's an example, how an external observer may subscribe to gate logic events:
+
+```js
+const hdl = require('.');
+
+const {
+  emulator: {
+    BuiltInGates: {
+      Register,
+    },
+    Clock: {
+      SystemClock,
+    },
+  },
+} = hdl;
+
+const r1 = Register.defaultFromSpec();
+
+// Handle the event, when `r1` gets its output value:
+
+r1.on('clockDown', () => {
+  console.log(`r1 = ${r1.getPin('out').getValue()}`); // 255
+});
+
+// Setup the `r1` inputs, on the falling edge (clockDown)
+// the value is set to the `out` pin:
+
+r1.setPinValues({
+  in: 255,
+  load: true,
+});
+
+// Run the full clock cycle:
+
+SystemClock
+  .reset()
+  .cycle();
+```
+
 ### Main chip groups
 
 All gates are grouped into the following categories:
@@ -894,6 +944,8 @@ clock.tick();
 console.log(pin.getValue()); // +5;
 ```
 
+#### Clock events
+
 The clock emits the following events:
 
 - `tick` - rising edge
@@ -993,6 +1045,8 @@ tock: -3
 
 */
 ```
+
+#### Clock rate
 
 The `--clock-rate` (`-c`) parameter controls the rate of the System clock. For example, the second run executes operations faster:
 

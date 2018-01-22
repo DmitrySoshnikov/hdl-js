@@ -5,6 +5,7 @@
 
 'use strict';
 
+const EventEmitter = require('events');
 const fs = require('fs');
 const parser = require('../../parser');
 const Pin = require('./Pin');
@@ -20,13 +21,17 @@ const {
 
 /**
  * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
+ *
+ * Emits events for `eval`, `clockUp`, and `clockDown`.
  */
-class Gate {
+class Gate extends EventEmitter {
 
   /**
    * Creates a gate instance with the given name.
    */
   constructor(options = null) {
+    super();
+
     if (!options) {
       return this.getClass().defaultFromSpec();
     }
@@ -48,6 +53,11 @@ class Gate {
     this._outputPins = Gate.toPins(outputPins);
 
     this._buildNamesToPinsMap();
+
+    // Setup emitter hooks:
+    this._setupEventHooks();
+
+    // Extra user-initialization code:
     this.init();
 
     // Subscribe to the clock events for clocked gates.
@@ -422,6 +432,47 @@ class Gate {
       'Abstract method `Gate#clockDown` should be implemented '+
       'in a concrete class.'
     );
+  }
+
+  /**
+   * Sets up hooks for `eval`, `clockUp`, and `clockDown` by
+   * decorating the original methods with the emitter code.
+   */
+  _setupEventHooks() {
+    // `eval`:
+    this._originalEval = this.eval;
+    this.eval = this._evalEmit;
+
+    // `clockUp`:
+    this._originalClockUp = this.clockUp;
+    this.clockUp = this._clockUpEmit;
+
+    this._originalClockDown = this.clockDown;
+    this.clockDown = this._clockDownEmit;
+  }
+
+  /**
+   * Decorated `eval` with the emitter code.
+   */
+  _evalEmit() {
+    this._originalEval();
+    this.emit('eval');
+  }
+
+  /**
+   * Decorated `clockUp` with the emitter code.
+   */
+  _clockUpEmit(clockValue) {
+    this._originalClockUp(clockValue);
+    this.emit('clockUp', clockValue);
+  }
+
+  /**
+   * Decorated `clockDown` with the emitter code.
+   */
+  _clockDownEmit(clockValue) {
+    this._originalClockDown(clockValue);
+    this.emit('clockDown', clockValue);
   }
 
   /**
