@@ -6,8 +6,6 @@
 'use strict';
 
 const EventEmitter = require('events');
-const fs = require('fs');
-const parser = require('../../parser');
 const Pin = require('./Pin');
 const TablePrinter = require('../../table-printer');
 
@@ -174,21 +172,6 @@ class Gate extends EventEmitter {
     }
 
     return this._pinsInfoMap[name];
-  }
-
-  /**
-   * Creates a gate from an HDL file.
-   */
-  static fromHDLFile(fileName) {
-    const ast = parser.parse(fs.readFileSync(fileName, 'utf-8'));
-    return Gate.fromAST(ast);
-  }
-
-  /**
-   * Creates a gate from an AST.
-   */
-  static fromAST(ast) {
-    throw new Error('Gate.fromAST: Not implemented yet!', ast);
   }
 
   /**

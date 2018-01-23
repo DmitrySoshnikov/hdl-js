@@ -30,6 +30,11 @@ class CompositeGate extends Gate {
 
     this._internalPins = internalPins;
     this._parts = parts;
+
+    // Add internal pins to the pins map.
+    this._internalPins.forEach(
+      pin => this._namesToPinsMap[pin.getName()] = pin
+    );
   }
 
   /**
@@ -59,7 +64,7 @@ class CompositeGate extends Gate {
    * Whether this gate is clocked.
    */
   static isClocked() {
-    // This default value is overriden in the child classes
+    // This default value is overridden in the child classes
     // created from HDL files.
     return false;
   }
