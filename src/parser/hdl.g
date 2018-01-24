@@ -36,34 +36,34 @@
 /**
  * List of inputs for this chip.
  */
-let inputs = [];
+let inputs = null;
 
 /**
  * List of outputs for this chip.
  */
-let outputs = [];
+let outputs = null;
 
 /**
  * Actual definitions.
  */
-let parts = [];
+let parts = null;
 
 /**
  * Builtin parts.
  */
-let builtins = [];
+let builtins = null;
 
 /**
  * Clocked parts.
  */
-let clocked = [];
+let clocked = null;
 
 yyparse.onParseBegin = (_string) => {
-  inputs.length = 0;
-  outputs.length = 0;
-  parts.length = 0;
-  builtins.length = 0;
-  clocked.length = 0;
+  inputs = [];
+  outputs = [];
+  parts = [];
+  builtins = [];
+  clocked = [];
 };
 
 /**

@@ -6,6 +6,7 @@
 'use strict';
 
 const And = require('../builtin-gates/And');
+const BuiltInGate = require('../BuiltInGate');
 const CompositeGate = require('../CompositeGate');
 const fs = require('fs');
 const HDLClassFactory = require('../HDLClassFactory');
@@ -31,14 +32,15 @@ const MuxHDL = `
   }
 `;
 
+const EXAMPLES_DIR = __dirname + '/../../../../examples/';
+
 // Compile gate class from HDL.
-const ast = parser.parse(MuxHDL);
-const MuxClass = HDLClassFactory.fromAST(ast);
+const MuxClass = HDLClassFactory.fromHDL(MuxHDL);
 
 describe('HDLClassFactory', () => {
   it('fromHDLFile', () => {
     const and = HDLClassFactory
-      .fromHDLFile(__dirname + '/../../../../examples/And.hdl')
+      .fromHDLFile(EXAMPLES_DIR + 'And.hdl')
       .defaultFromSpec();
 
     and.setPinValues({a: 1, b: 1});
@@ -49,7 +51,7 @@ describe('HDLClassFactory', () => {
   it('fromHDL', () => {
     const and = HDLClassFactory
       .fromHDL(
-        fs.readFileSync(__dirname + '/../../../../examples/And.hdl', 'utf-8')
+        fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
       )
       .defaultFromSpec();
 
@@ -62,7 +64,7 @@ describe('HDLClassFactory', () => {
     const and = HDLClassFactory
       .fromAST(
         parser.parse(
-          fs.readFileSync(__dirname + '/../../../../examples/And.hdl', 'utf-8')
+          fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
         )
       )
       .defaultFromSpec();
@@ -290,5 +292,45 @@ describe('HDLClassFactory', () => {
 
     // out[0..2]=tmp
     expect(myChip.getPin('tmp').getValue()).toBe(0b101);
+  });
+
+  it('custom HDL parts', () => {
+    // In `Mux.hdl` from example directory, `And` gate is loaded
+    // from the current directory with custom implementation, rather
+    // then taking it from built-ins, while `Not`, and `Or` gates are
+    // loaded from built-ins:
+
+    const mux = HDLClassFactory
+      .fromHDLFile(EXAMPLES_DIR + 'Mux.hdl')
+      .defaultFromSpec();
+
+    expect(mux).toBeInstanceOf(CompositeGate);
+
+    const [
+      not,
+      and1,
+      and2,
+      or,
+    ] = mux.getParts();
+
+    expect(not).toBeInstanceOf(BuiltInGate);
+    expect(and1).toBeInstanceOf(CompositeGate);
+    expect(and2).toBeInstanceOf(CompositeGate);
+    expect(or).toBeInstanceOf(BuiltInGate);
+
+    const fullTruthTable = [
+      {a: 0, b: 0, sel: 0, out: 0, nel: 1, A: 0, B: 0},
+      {a: 0, b: 0, sel: 1, out: 0, nel: 0, A: 0, B: 0},
+      {a: 0, b: 1, sel: 0, out: 0, nel: 1, A: 0, B: 0},
+      {a: 0, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1},
+      {a: 1, b: 0, sel: 0, out: 1, nel: 1, A: 1, B: 0},
+      {a: 1, b: 0, sel: 1, out: 0, nel: 0, A: 0, B: 0},
+      {a: 1, b: 1, sel: 0, out: 1, nel: 1, A: 1, B: 0},
+      {a: 1, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1}
+    ];
+
+    // Test full table:
+    let result = mux.execOnData(fullTruthTable).result;
+    expect(result).toEqual(fullTruthTable);
   });
 });

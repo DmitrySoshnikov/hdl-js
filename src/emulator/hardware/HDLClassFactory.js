@@ -5,9 +5,10 @@
 
 'use strict';
 
-const fs = require('fs');
 const CompositeGate = require('./CompositeGate');
+const fs = require('fs');
 const parser = require('../../parser');
+const path = require('path');
 const Pin = require('./Pin');
 
 /**
@@ -17,28 +18,40 @@ const Pin = require('./Pin');
 const HDLClassFactory = {
   /**
    * Creates a gate class from HDL file.
+   *
+   * The directory of the file is used further as a working
+   * directory to load other gates from it.
    */
   fromHDLFile(fileName) {
-    return this.fromHDL(fs.readFileSync(fileName, 'utf-8'));
+    return this.fromHDL(
+      fs.readFileSync(fileName, 'utf-8'),
+      path.dirname(fileName)
+    );
   },
 
   /**
    * Creates a gate class from HDL chip definition.
+   *
+   * If working directory is passed, it's used to load
+   * other gates from it.
    */
-  fromHDL(hdl) {
-    return this.fromAST(parser.parse(hdl));
+  fromHDL(hdl, workingDir = __dirname) {
+    return this.fromAST(parser.parse(hdl), workingDir);
   },
 
   /**
    * Creates a gate class from an AST.
+   *
+   * If working directory is passed, it's used to load
+   * other gates from it.
    */
-  fromAST(ast) {
+  fromAST(ast, workingDir = __dirname) {
     const [
       inputPins,
       outputPins,
       internalPins,
       parts,
-    ] = compile(ast);
+    ] = compile(ast, workingDir);
 
     const GateClass = class extends CompositeGate {
       constructor(options) {
@@ -82,10 +95,22 @@ function createPins(pinsData) {
 }
 
 /**
+ * Loads part gate: custom (in the current working directory),
+ * or, if a gate doesn't existing in this directory, loads the built-in.
+ */
+function loadGate(name, workingDir) {
+  const hdlFile = path.join(workingDir, name + '.hdl');
+  if (fs.existsSync(hdlFile)) {
+    return HDLClassFactory.fromHDLFile(hdlFile);
+  }
+  return require('./builtin-gates/' + name);
+}
+
+/**
  * Creates input/output/internal pins, and parts for
  * a composite gate.
  */
-function compile(ast) {
+function compile(ast, workingDir) {
   const [inputPins, inputPinsMap] = createPins(ast.inputs);
   const [outputPins, outputPinsMap] = createPins(ast.outputs);
 
@@ -96,7 +121,7 @@ function compile(ast) {
 
   const parts = ast.parts.map(part => {
     // Load Gate class (built-ins).
-    const PartGateClass = require('./builtin-gates/' + part.name);
+    const PartGateClass = loadGate(part.name, workingDir);
 
     // Instance.
     const partGateInstance = PartGateClass.defaultFromSpec();
@@ -142,7 +167,7 @@ function handlePartArg(
   const pin = partGateInstance.getPin(name.value);
   const pinInfo = PartGateClass.getPinInfo(name.value);
 
-  // Creat new (internal) pin, which is not part of inputs/outputs.
+  // Create new (internal) pin, which is not part of inputs/outputs.
   const isInternalPin = (
     !inputPinsMap.hasOwnProperty(value.value) &&
     !outputPinsMap.hasOwnProperty(value.value)
