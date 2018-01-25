@@ -148,6 +148,7 @@ class Gate extends EventEmitter {
       const {
         inputPins,
         outputPins,
+        internalPins,
       } = spec;
 
       const processPins = (pins, kind) => {
@@ -163,6 +164,10 @@ class Gate extends EventEmitter {
 
       processPins(inputPins, 'input');
       processPins(outputPins, 'output');
+
+      if (internalPins) {
+        processPins(internalPins, 'internal');
+      }
     }
 
     if (!this._pinsInfoMap.hasOwnProperty(name)) {
@@ -205,13 +210,13 @@ class Gate extends EventEmitter {
    * the outputs, and also returns found conflicts if some
    * evaluated output doesn't equal to the provided.
    */
-  execOnData(table) {
+  execOnData(inputData) {
     const result = [];
 
     // Entries with conflicting data: {row, pins}.
     const conflicts = [];
 
-    table.forEach((row, index) => {
+    inputData.forEach((row, index) => {
       // Evaluate the row.
       this.setPinValues(row);
 
@@ -271,6 +276,7 @@ class Gate extends EventEmitter {
     const {
       inputPins,
       outputPins,
+      internalPins = [],
     } = spec;
 
     const toHeaderColumn = (name) => {
@@ -288,6 +294,7 @@ class Gate extends EventEmitter {
       head: [
         ...clock,
         ...inputPins.map(toHeaderColumn),
+        ...internalPins.map(toHeaderColumn),
         ...outputPins.map(toHeaderColumn),
       ],
     });
@@ -382,6 +389,13 @@ class Gate extends EventEmitter {
     this._inputPins.forEach(
       pin => this._namesToPinsMap[pin.getName()] = pin
     );
+
+    if (this._internalPins) {
+      this._internalPins.forEach(
+        pin => this._namesToPinsMap[pin.getName()] = pin
+      );
+    }
+
     this._outputPins.forEach(
       pin => this._namesToPinsMap[pin.getName()] = pin
     );

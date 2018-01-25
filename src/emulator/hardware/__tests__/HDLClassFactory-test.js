@@ -139,6 +139,30 @@ describe('HDLClassFactory', () => {
     expect(and1.getPin('out').getValue()).toBe(1);
   });
 
+  it('And example', () => {
+    const and = HDLClassFactory
+      .fromHDLFile(EXAMPLES_DIR + 'And.hdl')
+      .defaultFromSpec();
+
+    const inputData = [
+      {a: 0, b: 0},
+      {a: 0, b: 1},
+      {a: 1, b: 0},
+      {a: 1, b: 1},
+    ];
+
+    const truthTable = [
+      {a: 0, b: 0, n: 1, out: 0},
+      {a: 0, b: 1, n: 1, out: 0},
+      {a: 1, b: 0, n: 1, out: 0},
+      {a: 1, b: 1, n: 0, out: 1},
+    ];
+
+    const {result} = and.execOnData(inputData);
+    expect(result).toEqual(truthTable);
+  });
+
+
   it('Compile class', () => {
     expect(typeof MuxClass).toBe('function');
     expect(Object.getPrototypeOf(MuxClass)).toBe(CompositeGate);

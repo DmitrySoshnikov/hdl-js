@@ -8,6 +8,8 @@
 const parser = require('./parser');
 const emulator = require('./emulator/hardware');
 
+const {HDLClassFactory} = emulator;
+
 /**
  * An API object for HDL processing.
  */
@@ -40,6 +42,20 @@ const hdl = {
    */
   parse(hdlCode, options) {
     return parser.parse(`${hdlCode}`, options);
+  },
+
+  /**
+   * Loads a custom composite gate class from HDL file.
+   */
+  fromHDLFile(fileName) {
+    return HDLClassFactory.fromHDLFile(fileName);
+  },
+
+  /**
+   * Loads a custom composite gate class from HDL file.
+   */
+  fromHDL(hdl) {
+    return HDLClassFactory.fromHDL(hdl);
   },
 };
 

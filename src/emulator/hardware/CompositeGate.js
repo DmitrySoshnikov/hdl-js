@@ -31,10 +31,8 @@ class CompositeGate extends Gate {
     this._internalPins = internalPins;
     this._parts = parts;
 
-    // Add internal pins to the pins map.
-    this._internalPins.forEach(
-      pin => this._namesToPinsMap[pin.getName()] = pin
-    );
+    // Rebuild map to consider internal pins.
+    this._buildNamesToPinsMap();
   }
 
   /**

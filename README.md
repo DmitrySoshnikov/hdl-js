@@ -35,6 +35,9 @@ Hardware description language (HDL) parser, and Hardware simulator.
     - [Clock events](#clock-events)
     - [Clock rate](#clock-rate)
   - [Composite gates](#composite-gates)
+    - [Building chips in HDL](#building-chips-in-hdl)
+    - [Viewing composite gate specification](#viewing-composite-gate-specification)
+    - [Using custom and built-in gates in implementation](#using-custom-and-built-in-gates-in-implementation)
 
 ## Installation
 
@@ -1166,4 +1169,165 @@ With clock rate 3:
 
 ### Composite gates
 
-TODO; WIP
+The _composite gates_ are created from other, more primitive, gates. By connecting inputs and outputs of the internal implementation chips, it is possible to build an _abstraction_ in a view of a resulting composition, which encapsulates inside details of smaller sub-parts.
+
+Although it is possible to create a composite gate manually using `CompositeGate` class from `emulator`, usually they are created via HDL.
+
+#### Building chips in HDL
+
+We already discussed briefly [format of the HDL](#format-of-an-hdl-file), and here we show how to create custom chips, building them from smaller blocks.
+
+As mentioned, two [very basic gates](#very-basic-chips), the [Nand](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nand.js), and [Nor](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nor.js), can be used to build everything else in the computer chips.
+
+In the example below, we use the `Nand` gate to implement a custom version of the `And` gate (even though the [built-in And](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nand.js) gate implementation exists):
+
+```
+// File: examples/And.hdl
+
+CHIP And {
+  IN a, b;
+  OUT out;
+
+  PARTS:
+
+  Nand(a=a, b=b, out=n);
+  Nand(a=n, b=n, out=out);
+}
+```
+
+Here we connect two `Nand` gates in needed order, patching the output of the first one (via the _internal pin_ `n`) to the inputs of the second `Nand` gate.
+
+How this works? The `Nand` stands for "negative-And" (or "not-And"). And first we feed our own `a` and `b` inputs to the first internal `Nand` chip, and get the "nand-result", saving it to the temporary (internal) pin `n`:
+
+```
+Nand(a=a, b=b, out=n);
+```
+
+As you can see, the `Nand` itself defines its inputs as `a`, and `b`, and output as `out`, which is propagated to our internal `n`.
+
+> **NOTE:** run `hdl-js --gate Nand --describe` to see its specification.
+
+Then, if to feed _the same value_ to `Nand` chip, we get the "Not" operation -- and that exactly what we do in the second `Nand` "call", feeding the value of `n` to both, `a`, and `b` inputs:
+
+```
+Nand(a=n, b=n, out=out);
+```
+
+The resulting `out` from the second `Nand` is fed further to our own `out` [pin](#pin). Eventually we got "not-not-And", and what is just "And":
+
+```
+Not(Nand(a, b)) == And(a, b)
+```
+
+> **NOTE:** you can also get more details on the implementation in the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
+
+#### Viewing composite gate specification
+
+Getting a specification of a composite gate from HDL doesn't differ from getting the specification of a built-in chip, since the `--gate` option handles both gate types.
+
+For example, to view the specification of our custom And gate from above (see also [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl)), we can just use the same `--describe` (`-d`) option:
+
+```
+hdl-js --gate examples/And.hdl --describe
+```
+
+What results to:
+
+```
+Custom "And" gate:
+
+Description:
+
+  Compiled from HDL composite Gate class "And".
+
+Inputs:
+
+  - a
+  - b
+
+Internal pins:
+
+  - n
+
+Outputs:
+
+  - out
+
+Truth table:
+
+┌───┬───┬───┬─────┐
+│ a │ b │ n │ out │
+├───┼───┼───┼─────┤
+│ 0 │ 0 │ 1 │  0  │
+├───┼───┼───┼─────┤
+│ 0 │ 1 │ 1 │  0  │
+├───┼───┼───┼─────┤
+│ 1 │ 0 │ 1 │  0  │
+├───┼───┼───┼─────┤
+│ 1 │ 1 │ 0 │  1  │
+└───┴───┴───┴─────┘
+```
+
+As we can see, it correctly determined our internal pin `n`, and even showed it in the generated truth table.
+
+> **NOTE:** for 1-bit values the generated truth table shows all values. For larger pins, e.g. with size 16, a table with 5 random rows is shown. Try running the `hdl-js -g examples/Not16.hdl -d`.
+
+The truth table allows us also to check, whether our implementation in the `PARTS` section is correct (and it really is in this case!).
+
+As an alternative, check also the specification of the built-in `And` gate -- you'll notice that it doesn't differ much, resulting to the same truth table for inputs and outputs.
+
+And of course it is possible to do a [sequential run](#sequential-run) of a custom gate too:
+
+```
+hdl-js --gate examples/Not16.hdl --describe --run
+```
+
+#### Using custom and built-in gates in implementation
+
+In the example above, we used built-in native `Nand` gate to implement our own version of the `And` gate. However, one you have implemented some custom gate, you are free to use it further as a _building block_ for _even more abstracted chips_.
+
+For example, if we look at the [examples/Mux.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/Mux.hdl) file:
+
+```
+/**
+ * Multiplexor:
+ * out = a if sel == 0
+ *       b otherwise
+ */
+
+CHIP Mux {
+  IN a, b, sel;
+  OUT out;
+
+  PARTS:
+
+  Not(in=sel, out=nel);
+  And(a=a, b=nel, out=A);
+  And(a=b, b=sel, out=B);
+  Or(a=A, b=B, out=out);
+}
+```
+
+Assuming the `Mux.hdl` file is in the same directory as the `And.hdl`, the `And` gate in the implementation is loaded exactly from our local _custom_ implementation. Whereas, the `Not`, and `Or` are loaded from the built-ins. If we remove `And.hdl` from this directory, it will also be loaded from built-ins then.
+
+#### Using from Node
+
+In Node it is possible to load a composite HDL gate class using the `HDLClassFactory` module, which is exposed on the `emulator`. The `hdl-js` itself also exposes two convenient wrappers: `fromHDLFile`, and `fromHDL`:
+
+```js
+const hdl = require('hdl-js');
+
+// Load `And` class from HDL:
+const And = hdl.fromHDLFile('./examples/And.hdl');
+
+// Instance of the class:
+const and = And.defaultFromSpec();
+
+// Test:
+and
+  .setPinValues({a: 1, b: 1})
+  .eval();
+
+// {a: 1, b: 1, n: 0, out: 1}
+console.log(and.getPinValues());
+```

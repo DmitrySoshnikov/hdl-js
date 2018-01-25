@@ -42,6 +42,9 @@ class Pin extends EventEmitter {
     if (value !== null) {
       this.setValue(value);
     }
+
+    // There might be more than 11 pins (default in Node).
+    this.setMaxListeners(Infinity);
   }
 
   /**

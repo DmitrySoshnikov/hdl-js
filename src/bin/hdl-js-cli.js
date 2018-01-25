@@ -11,9 +11,15 @@ const hdl = require('../../index');
 const path = require('path');
 const vm = require('vm');
 
-const {int16} = require('../util/numbers');
+const {
+  BuiltInGate,
+  HDLClassFactory,
+  Clock: {
+    SystemClock,
+  },
+} = hdl.emulator;
 
-const {SystemClock} = require('../emulator/hardware/Clock');
+const {int16} = require('../util/numbers');
 
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
@@ -128,35 +134,48 @@ function listBuiltInGates() {
 }
 
 /**
- * Loads built-in gate class.
+ * Loads a gate class.
  */
-function loadBuiltInGate(name) {
+function loadGate(gate) {
   try {
-    return require(BUILTINS_DIR + '/' + name);
+    // Custom gate from HDL.
+    if (fs.existsSync(gate)) {
+      return HDLClassFactory.fromHDLFile(gate);
+    }
+    // Built-in gate.
+    return require(BUILTINS_DIR + '/' + gate);
   } catch (_e) {
-    console.error(colors.red(`\nUnknown gate: "${name}".`));
+    console.error(colors.red(`\nUnknown gate: "${gate}".`));
     listBuiltInGates();
     process.exit(1);
   }
 }
 
 /**
- * Prints specification and truth table of a built-in gate.
+ * Prints specification and truth table of a gate.
  */
-function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
+function describeGate(gate, formatRadix, formatStringLengh) {
   const {
     run,
   } = options;
 
-  const GateClass = loadBuiltInGate(gate);
+  const GateClass = loadGate(gate);
+  const isBuiltIn = Object.getPrototypeOf(GateClass) === BuiltInGate;
   const spec = GateClass.Spec;
 
   console.info('');
-  console.info(colors.bold(`"${GateClass.name}"`) + ' gate:');
+  console.info(
+    (isBuiltIn ? 'BuiltIn ' : 'Custom ') +
+    colors.bold(`"${GateClass.name}"`) + ' gate:'
+  );
 
   const toFullName = (name) => {
-    return name = typeof name === 'string'
-      ? `  - ${name}`
+    const isSimple = (
+      typeof name === 'string' ||
+      name.size === 1
+    );
+    return name = isSimple
+      ? `  - ${name.name || name}`
       : `  - ${name.name}[${name.size}]`;
   };
 
@@ -176,6 +195,16 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
 
   console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
 
+  // Internal pins:
+
+  if (spec.internalPins && spec.internalPins.length > 0) {
+    const internalPins = spec.internalPins
+      .map(internal => toFullName(internal))
+      .join('\n');
+
+    console.info('\n' + colors.bold('Internal pins:\n\n') + internalPins);
+  }
+
   // Output pins:
 
   const outputPins = spec.outputPins
@@ -185,7 +214,16 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
   console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
   console.info('');
 
-  const {truthTable} = spec;
+  let {truthTable} = spec;
+  let isCustomTable = truthTable.length === 0;
+
+  // Compiled gates from HDL don't provide static canonical
+  // truth table, so we calculate it for 5 rows on random data.
+  if (isCustomTable) {
+    truthTable = generateTruthTable(GateClass);
+  } else {
+    console.info(colors.bold('Truth table:'), '\n');
+  }
 
   const printTable = table => {
     GateClass.printTruthTable({
@@ -195,6 +233,7 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
     });
   };
 
+  // Sequential table run.
   if (run) {
     console.info(colors.bold('\nCurrent results for pins:'), '\n');
     runSlice(truthTable, 0, printTable);
@@ -202,8 +241,78 @@ function describeBuiltInGate(gate, formatRadix, formatStringLengh) {
   }
 
   // Truth table:
-  console.info(colors.bold('Truth table:'), '\n');
+
+  if (isCustomTable) {
+    let isSimple = spec.inputPins.every(input => {
+      return typeof input === 'string' || input.size === 1;
+    });
+    if (isSimple) {
+      console.info(colors.bold('Truth table:'), '\n');
+    } else {
+      console.info(colors.bold('Truth table:'), '(generated, random 5 rows)\n');
+    }
+  } else {
+    console.info(colors.bold('Truth table:'), '\n');
+  }
+
   printTable(truthTable);
+}
+
+/**
+ * Generates a truth table on random data, according
+ * to the gate logic.
+ */
+function generateTruthTable(GateClass) {
+  const gateInstance = GateClass.defaultFromSpec();
+  const {inputPins} = GateClass.Spec;
+
+  let isSimple = inputPins.every(input => {
+    return typeof input === 'string' || input.size === 1;
+  });
+
+  const inputData = [];
+
+  // For simple tables generate all permutations.
+  if (isSimple) {
+    // Number of rows.
+    const n = Math.pow(inputPins.length, 2);
+    for (let i = 0; i < n; i++) {
+      const row = {};
+      // Use 2-radix to get a binary number, and get `0`s, and `1`s
+      // for the table from it.
+      i.toString(2)
+        .padStart(inputPins.length, '0')
+        .split('')
+        .forEach((bit, idx) => {
+          const key = typeof inputPins[idx] === 'string'
+            ? inputPins[idx]
+            : inputPins[idx].name;
+          row[key] = Number(bit);
+        });
+      inputData.push(row);
+    }
+  } else {
+    // Else, generate random input numbers for 5 rows.
+    for (let i = 0; i < 5; i++) {
+      const row = {};
+      inputPins.forEach(input => {
+        const size = input.size || 1;
+        const name = typeof input === 'string' ? input : input.name;
+        row[name] = randomNumberInRange(0, Math.pow(2, size));
+      });
+      inputData.push(row);
+    }
+  }
+
+  const {result} = gateInstance.execOnData(inputData);
+  return result;
+}
+
+/**
+ * Returns a random integer number in range.
+ */
+function randomNumberInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 /**
@@ -280,16 +389,7 @@ function main() {
   // Describes a gate (built-in or composite).
 
   if (gate && describe) {
-    // Custom gates from HDL files:
-    if (hdlFile) {
-      console.error(colors.red(
-        `\n--describe currently works only with built-in gates.\n`
-      ));
-      process.exit(1);
-    }
-
-    // Built-in gates:
-    describeBuiltInGate(gate, formatRadix, formatStringLengh);
+    describeGate(gate, formatRadix, formatStringLengh);
   }
 
   // ------------------------------------------------------
@@ -303,7 +403,7 @@ function main() {
       );
       return;
     }
-    const GateClass = loadBuiltInGate(gate);
+    const GateClass = loadGate(gate);
     const gateInstance = GateClass.defaultFromSpec();
 
     const data = parseInputData(execOnData, formatRadix);
