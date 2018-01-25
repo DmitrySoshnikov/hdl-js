@@ -74,6 +74,35 @@ describe('HDLClassFactory', () => {
     expect(and.getPin('out').getValue()).toBe(1);
   });
 
+  it('fromHDLFile cache', () => {
+    const And1Class = HDLClassFactory.fromHDLFile(EXAMPLES_DIR + 'And.hdl');
+    const And2Class = HDLClassFactory.fromHDLFile(EXAMPLES_DIR + 'And.hdl');
+    expect(And1Class).toBe(And2Class);
+  });
+
+  it('fromHDL cache', () => {
+    const And1Class = HDLClassFactory.fromHDL(
+      fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8'),
+      EXAMPLES_DIR
+    );
+
+    const And2Class = HDLClassFactory.fromHDL(
+      fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8'),
+      EXAMPLES_DIR
+    );
+
+    expect(And1Class).toBe(And2Class);
+
+    // From other dir:
+    const And3Class = HDLClassFactory.fromHDL(
+      fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8'),
+      './other/dir'
+    );
+
+    expect(And3Class).not.toBe(And1Class);
+    expect(And3Class).not.toBe(And2Class);
+  });
+
   it('Several instances', () => {
     const And = HDLClassFactory.fromHDLFile(EXAMPLES_DIR + 'And.hdl');
 

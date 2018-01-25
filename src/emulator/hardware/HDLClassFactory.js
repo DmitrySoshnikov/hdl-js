@@ -12,6 +12,16 @@ const path = require('path');
 const Pin = require('./Pin');
 
 /**
+ * Cache map from file names to gates class.
+ */
+const fileNamesToGateClasses = {};
+
+/**
+ * Cache map from HDL code to gate classes.
+ */
+const hdlCodeToGateClasses = {};
+
+/**
  * This factory creates a gate class from the parsed HDL.
  * The resulting class inherits from the `CompositeGate`.
  */
@@ -23,10 +33,14 @@ const HDLClassFactory = {
    * directory to load other gates from it.
    */
   fromHDLFile(fileName) {
-    return this.fromHDL(
-      fs.readFileSync(fileName, 'utf-8'),
-      path.dirname(fileName)
-    );
+    const cacheKey = path.resolve(fileName);
+    if (!fileNamesToGateClasses.hasOwnProperty(cacheKey)) {
+      fileNamesToGateClasses[cacheKey] = this.fromHDL(
+        fs.readFileSync(fileName, 'utf-8'),
+        path.dirname(fileName)
+      );
+    }
+    return fileNamesToGateClasses[cacheKey];
   },
 
   /**
@@ -36,7 +50,14 @@ const HDLClassFactory = {
    * other gates from it.
    */
   fromHDL(hdl, workingDir = __dirname) {
-    return this.fromAST(parser.parse(hdl), workingDir);
+    const cacheKey = `${hdl}:${workingDir}`;
+    if (!hdlCodeToGateClasses.hasOwnProperty(cacheKey)) {
+      hdlCodeToGateClasses[cacheKey] = this.fromAST(
+        parser.parse(hdl),
+        workingDir
+      );
+    }
+    return hdlCodeToGateClasses[cacheKey];
   },
 
   /**
