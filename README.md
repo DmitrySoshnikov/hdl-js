@@ -316,11 +316,11 @@ console.log(hdl.parse(hdlFile)); // HDL AST
 
 ### Built-in gates
 
-In general, all the gates can be built manually in HDL from the very basic `Nand` or `Nor` gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript.
+In general, all the gates can be built [manually in HDL](#composite-gates) from the very basic `Nand` or `Nor` gates. However, `hdl-js` also provides implementation of most of the computer chips, built directly in JavaScript.
 
 You can use these gates as building blocks with a guaranteed faster implementation, and also to check your own implementation, in case you build a custom version of a particular basic chip.
 
-The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of _compound gates_.
+The `--list` (`-l`) command shows all the _built-in gates_ available in the emulator. The gates can be analyzed, executed, and used further as basic building blocks in construction of [compound gates](#composite-gates).
 
 ```
 ./bin/hdl-js --list
@@ -1170,7 +1170,7 @@ With clock rate 3:
 
 ### Composite gates
 
-The _composite gates_ are created from other, more primitive, gates. By connecting inputs and outputs of the internal implementation chips, it is possible to build an _abstraction_ in a view of a resulting composition, which encapsulates inside details of smaller sub-parts.
+The _composite gates_ are created from other, more primitive, gates. By connecting inputs and outputs of the internal chips, it is possible to build an _abstraction_ in a view of a resulting component, which encapsulates inside details of smaller sub-parts.
 
 Although it is possible to create a composite gate manually using `CompositeGate` class from `emulator`, usually they are created via HDL.
 
@@ -1197,6 +1197,20 @@ CHIP And {
 ```
 
 Here we connect two `Nand` gates in needed order, patching the output of the first one (via the _internal pin_ `n`) to the inputs of the second `Nand` gate.
+
+From user perspective, the _interface_ of our `And` gate looks as follows:
+
+<p align="center">
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/and-gate-interface.png" alt="And gate interface" width="400" />
+<p/>
+
+While if we look under the hood of the `And` gate _implementation_, we'll see the following picture:
+
+<p align="center">
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/and-gate-implementation.png" alt="And gate implementation" width="400" />
+<p/>
+
+> **NOTE:** as in other systems, in hardware chips there might be _multiple implementations_ for the _same interface_. E.g. we could build the `And` chip using `Nor` gates, instead of `Nand`.
 
 How this works? The `Nand` stands for "negative-And" (or "not-And"). And first we feed our own `a` and `b` inputs to the first internal `Nand` chip, and get the "nand-result", saving it to the temporary (internal) pin `n`:
 
@@ -1226,7 +1240,7 @@ Not(Nand(a, b)) == And(a, b)
 
 Getting a specification of a composite gate from HDL doesn't differ from getting the specification of a built-in chip, since the `--gate` option handles both gate types.
 
-For example, to view the specification of our custom And gate from above (see also [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl)), we can just use the same `--describe` (`-d`) option:
+For example, to view the specification of our custom `And` gate from above (see also [examples/And.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/And.hdl)), we can just use the same `--describe` (`-d`) option:
 
 ```
 hdl-js --gate examples/And.hdl --describe
