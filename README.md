@@ -38,6 +38,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
     - [Building chips in HDL](#building-chips-in-hdl)
     - [Viewing composite gate specification](#viewing-composite-gate-specification)
     - [Using custom and built-in gates in implementation](#using-custom-and-built-in-gates-in-implementation)
+    - [Loading HDL chips from Node](#loading-hdl-chips-from-node)
 
 ## Installation
 
@@ -1310,7 +1311,7 @@ CHIP Mux {
 
 Assuming the `Mux.hdl` file is in the same directory as the `And.hdl`, the `And` gate in the implementation is loaded exactly from our local _custom_ implementation. Whereas, the `Not`, and `Or` are loaded from the built-ins. If we remove `And.hdl` from this directory, it will also be loaded from built-ins then.
 
-#### Using from Node
+#### Loading HDL chips from Node
 
 In Node it is possible to load a composite HDL gate class using the `HDLClassFactory` module, which is exposed on the `emulator`. The `hdl-js` itself also exposes two convenient wrappers: `fromHDLFile`, and `fromHDL`:
 
