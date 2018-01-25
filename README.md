@@ -1180,7 +1180,7 @@ We already discussed briefly [format of the HDL](#format-of-an-hdl-file), and he
 
 As mentioned, two [very basic gates](#very-basic-chips), the [Nand](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nand.js), and [Nor](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nor.js), can be used to build everything else in the computer chips.
 
-In the example below, we use the `Nand` gate to implement a custom version of the `And` gate (even though the [built-in And](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Nand.js) gate implementation exists):
+In the example below, we use the `Nand` gate to implement a custom version of the `And` gate (even though the [built-in And](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/And.js) gate implementation exists):
 
 ```
 // File: examples/And.hdl
