@@ -74,6 +74,42 @@ describe('HDLClassFactory', () => {
     expect(and.getPin('out').getValue()).toBe(1);
   });
 
+  it('Several instances', () => {
+    const And = HDLClassFactory.fromHDLFile(EXAMPLES_DIR + 'And.hdl');
+
+    const and1 = new And({
+      inputPins: ['a', 'b'],
+      outputPins: ['out'],
+    });
+
+    and1.setPinValues({a: 1, b: 1});
+    and1.eval();
+    expect(and1.getPin('out').getValue()).toBe(1);
+
+    const and2 = new And({
+      inputPins: [
+        {name: 'a', size: 1},
+        {name: 'b', size: 1},
+      ],
+      outputPins: [
+        {name: 'out', size: 1},
+      ]
+    });
+
+    and2.setPinValues({a: 0, b: 1});
+    and2.eval();
+    expect(and2.getPin('out').getValue()).toBe(0);
+
+    // and1 still uses own pins:
+    and1.eval();
+    expect(and1.getPin('out').getValue()).toBe(1);
+
+    const and3 = And.defaultFromSpec();
+    and3.setPinValues({a: 1, b: 1});
+    and3.eval();
+    expect(and1.getPin('out').getValue()).toBe(1);
+  });
+
   it('Compile class', () => {
     expect(typeof MuxClass).toBe('function');
     expect(Object.getPrototypeOf(MuxClass)).toBe(CompositeGate);

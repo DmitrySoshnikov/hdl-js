@@ -46,20 +46,32 @@ const HDLClassFactory = {
    * other gates from it.
    */
   fromAST(ast, workingDir = __dirname) {
-    const [
-      inputPins,
-      outputPins,
-      internalPins,
-      parts,
-    ] = compile(ast, workingDir);
+    // Load part classes (built-in, or custom from other HDL files).
+    const partsClasses = ast.parts.map(part => loadGate(part.name, workingDir));
 
+    // Gate class, corresponding to the HDL file.
     const GateClass = class extends CompositeGate {
-      constructor(options) {
+      constructor(options = {}) {
+        if (!options.inputPins) {
+          options.inputPins = createPins(ast.inputs);
+        }
+
+        options.inputPins = CompositeGate.toPins(options.inputPins);
+
+        if (!options.outputPins) {
+          options.outputPins = createPins(ast.outputs);
+        }
+
+        options.outputPins = CompositeGate.toPins(options.outputPins);
+
+        // Internal pins used in PARTS.
+        options.internalPins = [];
+
+        // Create instances used in PARTS implementation.
+        const parts = instantiateParts(ast, options, partsClasses);
+
         super(Object.assign(options, {
           name: ast.name,
-          inputPins,
-          outputPins,
-          internalPins,
           parts,
         }));
       }
@@ -81,17 +93,23 @@ const HDLClassFactory = {
 };
 
 /**
- * Creates pins, and pins map from AST data.
+ * Creates pins from AST data.
  */
 function createPins(pinsData) {
+  const pins = pinsData.map(pinSpec => new Pin({
+    name: pinSpec.value,
+    size: pinSpec.size || 1,
+  }));
+  return pins;
+}
+
+/**
+ * Creates pins map.
+ */
+function createPinsMap(pins) {
   const pinsMap = {};
-  const pins = pinsData.map(pinSpec => {
-    return pinsMap[pinSpec.value] = new Pin({
-      name: pinSpec.value,
-      size: pinSpec.size || 1,
-    });
-  });
-  return [pins, pinsMap];
+  pins.forEach(pin => pinsMap[pin.getName()] = pin);
+  return pinsMap;
 }
 
 /**
@@ -107,21 +125,23 @@ function loadGate(name, workingDir) {
 }
 
 /**
- * Creates input/output/internal pins, and parts for
- * a composite gate.
+ * Loads gate classes used in the `PARTS` implementation.
+ * These may include built-in, and custom classes from HDL.
  */
-function compile(ast, workingDir) {
-  const [inputPins, inputPinsMap] = createPins(ast.inputs);
-  const [outputPins, outputPinsMap] = createPins(ast.outputs);
+function instantiateParts(ast, options, partsClasses) {
+  const {
+    inputPins,
+    outputPins,
+    internalPins,
+  } = options;
 
-  // Internal pins are collected during traversal
-  // of the part arguments section.
-  const internalPins = [];
+  const inputPinsMap = createPinsMap(inputPins);
+  const outputPinsMap = createPinsMap(outputPins);
   const internalPinsMap = {};
 
-  const parts = ast.parts.map(part => {
-    // Load Gate class (built-ins).
-    const PartGateClass = loadGate(part.name, workingDir);
+  const parts = ast.parts.map((part, idx) => {
+    // Gate class (built-ins, or custom from HDL).
+    const PartGateClass = partsClasses[idx];
 
     // Instance.
     const partGateInstance = PartGateClass.defaultFromSpec();
@@ -142,12 +162,7 @@ function compile(ast, workingDir) {
     return partGateInstance;
   });
 
-  return [
-    inputPins,
-    outputPins,
-    internalPins,
-    parts,
-  ];
+  return parts;
 }
 
 // ----------------------------------------------------------------
