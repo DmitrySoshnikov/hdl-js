@@ -1198,7 +1198,7 @@ CHIP And {
 
 Here we connect two `Nand` gates in needed order, patching the output of the first one (via the _internal pin_ `n`) to the inputs of the second `Nand` gate.
 
-From user perspective, the _interface_ of our `And` gate looks as follows:
+From a user perspective, the _interface_ of our `And` gate looks as follows:
 
 <p align="center">
   <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/01/and-gate-interface.png" alt="And gate interface" width="400" />
