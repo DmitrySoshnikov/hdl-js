@@ -275,7 +275,7 @@ function generateTruthTable(GateClass) {
   // For simple tables generate all permutations.
   if (isSimple) {
     // Number of rows.
-    const n = Math.pow(inputPins.length, 2);
+    const n = Math.pow(2, inputPins.length);
     for (let i = 0; i < n; i++) {
       const row = {};
       // Use 2-radix to get a binary number, and get `0`s, and `1`s
