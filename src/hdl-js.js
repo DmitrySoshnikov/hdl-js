@@ -5,7 +5,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const parser = require('./parser');
 const emulator = require('./emulator/hardware');
 
@@ -46,10 +45,10 @@ const hdl = {
   },
 
   /**
-   * Similar to `parse`, but reads a file first.
+   * Facade method; similar to `parse`, but reads a file first.
    */
   parseFile(fileName, options) {
-    return this.parse(fs.readFileSync(fileName, 'utf-8'), options);
+    return parser.parseFile(fileName, options);
   },
 
   /**

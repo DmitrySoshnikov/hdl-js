@@ -201,4 +201,10 @@ describe('hdl-parser', () => {
     });
   });
 
+  it('file', () => {
+    const ast = parser.parseFile(__dirname + '/../../../examples/And.hdl');
+    expect(ast.type).toBe('Chip');
+    expect(ast.name).toBe('And');
+  });
+
 });
