@@ -305,9 +305,17 @@ The `parse` command is also available from Node:
 const fs = require('fs');
 const hdl = require('hdl-js');
 
-const hdlFile = fs.readFileSync('./examples/And.hdl', 'utf-8');
+const hdlCode = fs.readFileSync('./examples/And.hdl', 'utf-8');
 
-console.log(hdl.parse(hdlFile)); // HDL AST
+console.log(hdl.parse(hdlCode)); // HDL AST
+```
+
+There is also convenient `parseFile` method:
+
+```js
+const hdl = require('hdl-js');
+
+console.log(hdl.parseFile('./examples/And.hdl')); // AST
 ```
 
 ## Emulator
