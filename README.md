@@ -13,6 +13,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
 - [Parser](#parser)
   - [Format of an HDL file](#format-of-an-hdl-file)
   - [Parsing a file to AST](#parsing-a-file-to-ast)
+- [Code generator](#code-generator)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
@@ -323,6 +324,14 @@ const hdl = require('hdl-js');
 
 console.log(hdl.parseFile('./examples/And.hdl')); // AST
 ```
+
+## Code generator
+
+The _code generator_ module allows exporting _to_ HDL files from gate structures in other forms: from AST, from a composite gate instance, etc.
+
+In general case it's an inverse procedure to parsing. In the simplest case you have a parsed AST, and the code generator can build an HDL code from it.
+
+**WIP:** track [issue #17](https://github.com/DmitrySoshnikov/hdl-js/issues/17).
 
 ## Emulator
 
