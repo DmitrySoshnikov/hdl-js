@@ -125,13 +125,19 @@ console.log(hdl);
 
 The `hdl-js` exposes the following API:
 
-- `parse(hdl: string)` -- parses a gate description from an HDL file
-- `parser` -- the parser module exposed
-- `emulator` -- hardware emulator, which includes:
+- `parse(hdl: string)` -- parses an HDL code; convenient facade method for `parser.parse`
+- `parseFile(fileName: string)` -- parses an HDL file; facade for `parser.parseFile`
+- `fromHDLFile(fileName: string)` -- loads a gate class defined in an HDL file; facade for `HDLClassFactory.fromHDLFile`
+- `fromHDL(hdl: string)` -- creates a gate class accoding to passed HDL spec; facade for `HDLClassFactory.fromHDL`
+- [parser](#parser) -- the parser module exposed
+- [emulator](#emulator) -- hardware emulator, which includes:
   - `Pin` - a pin "wire" used to patch inputs and outputs of a gate
   - `BuiltInGate` -- base class for all built-in gates
-  - `CompositeGate` -- base class used for user-defined gates from HDL
-  - `BuiltInGates` -- map of all [built-in gates](#built-in-gates):
+  - `CompositeGate` -- base class used for user-defined gates from HDL; see [Composite gates](#built-in-gates) section
+  - `HDLClassFactory` -- class loader for gates defined in HDL
+  - [Clock](#clock) -- class to manage clocked gates. Contains:
+    - `SystemClock` -- main System clock used to synchronize all gated chips
+  - [BuiltInGates](#built-in-gates) -- map of all [built-in gates](#built-in-gates):
     - `And`
     - `Or`
     - ...
