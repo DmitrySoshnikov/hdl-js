@@ -133,7 +133,7 @@ The `hdl-js` exposes the following API:
 - [emulator](#emulator) -- hardware emulator, which includes:
   - `Pin` - a pin "wire" used to patch inputs and outputs of a gate
   - `BuiltInGate` -- base class for all built-in gates
-  - `CompositeGate` -- base class used for user-defined gates from HDL; see [Composite gates](#built-in-gates) section
+  - `CompositeGate` -- base class used for user-defined gates from HDL; see [Composite gates](#composite-gates) section
   - `HDLClassFactory` -- class loader for gates defined in HDL
   - [Clock](#clock) -- class to manage clocked gates. Contains:
     - `SystemClock` -- main System clock used to synchronize all gated chips
