@@ -137,7 +137,7 @@ The `hdl-js` exposes the following API:
   - `HDLClassFactory` -- class loader for gates defined in HDL
   - [Clock](#clock) -- class to manage clocked gates. Contains:
     - `SystemClock` -- main System clock used to synchronize all gated chips
-  - [BuiltInGates](#built-in-gates) -- map of all [built-in gates](#built-in-gates):
+  - BuiltInGates` -- map of all [built-in gates](#built-in-gates):
     - `And`
     - `Or`
     - ...
