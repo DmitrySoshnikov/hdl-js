@@ -1,0 +1,19 @@
+/**
+ * Decoder:
+ *
+ * Assert one of four outputs based on two inputs
+ */
+
+CHIP Decoder {
+  IN a, b;
+  OUT o1, o2, o3, o4;
+
+  PARTS:
+
+  Not(in=a, out=not_a);
+  Not(in=b, out=not_b);
+  And(a=not_a, b=not_b, out=o1);
+  And(a=not_a, b=b, out=o2);
+  And(a=a, b=not_b, out=o3);
+  And(a=a, b=b, out=o4);
+}
