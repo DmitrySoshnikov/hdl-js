@@ -298,7 +298,7 @@ function generateTruthTable(GateClass) {
       inputPins.forEach(input => {
         const size = input.size || 1;
         const name = typeof input === 'string' ? input : input.name;
-        row[name] = randomNumberInRange(0, Math.pow(2, size));
+        row[name] = randomNumberInRange(0, Math.pow(2, size) - 1);
       });
       inputData.push(row);
     }
