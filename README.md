@@ -382,28 +382,28 @@ The `Name` type is used to define the names of the input/output pins, names of t
   value: string,
 
   /**
-   * The `size` is only available in input/output names.
+   * The `size` is only available in the input/output names.
    *
    * Example: `IN a[16];`, the `size` is 16.
    */
-  size: number,
+  size?: number,
 
   /**
    * An index of a particular bit. The `index` property is
-   * available only in the arguments.
+   * only available in the arguments of a `ChipCall`.
    *
    * Example: `And(a=a[4], ...)`, the `index` is 4 here.
    */
-  index: number,
+  index?: number,
 
   /**
    * A range of the bits. The `range` property is
-   * available only in arguments.
+   * only available in arguments of a `ChipCall`/
    *
    * Example: `Mux4Way16(..., sel=address[0..11])`,
    * the range (inclusive) here is `0..11`.
    */
-  range: {
+  range?: {
     from: number,
     to: number,
   },
