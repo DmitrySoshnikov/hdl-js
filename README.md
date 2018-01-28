@@ -426,7 +426,7 @@ It has the following properties:
   name: string,
 
   /**
-   * The list of arguments to the call. The values in each [argument](#argument-ast-node)
+   * The list of arguments to the call. The values in each argument
    * correspond to the inputs/outputs specification of a gate.
    */
   arguments: [Argument, ...]
