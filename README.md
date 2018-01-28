@@ -13,6 +13,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
 - [Parser](#parser)
   - [Format of an HDL file](#format-of-an-hdl-file)
   - [Parsing a file to AST](#parsing-a-file-to-ast)
+  - [AST nodes specification](#ast-nodes-specification)
 - [Code generator](#code-generator)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
@@ -54,9 +55,10 @@ hdl-js --help
 ## Development
 
 1. Fork https://github.com/DmitrySoshnikov/hdl-js repo
-2. Make your changes
-3. Make sure `npm test` still passes (add new tests if needed)
-4. Submit a PR
+2. If there is an actual issue from the [issues](https://github.com/DmitrySoshnikov/hdl-js/issues) list you'd like to work on, feel free to assign it yourself, or comment on it to avoid collisions (open a new issue if needed)
+3. Make your changes
+4. Make sure `npm test` still passes (add new tests if needed)
+5. Submit a PR
 
 For development from the github repository, run build command to generate the parser module, and transpile JS code:
 
@@ -323,6 +325,130 @@ There is also convenient `parseFile` method:
 const hdl = require('hdl-js');
 
 console.log(hdl.parseFile('./examples/And.hdl')); // AST
+```
+
+### AST nodes specification
+
+The AST format of the HDL is currently simple, and includes the following node types:
+
+#### `Chip` AST node
+
+This is the top-level `"Chip"` node, and has the following properties:
+
+```js
+{
+  type: 'Chip',
+
+  /**
+   * List of inputs pins.
+   */
+  inputs: [Name, ...],
+
+  /**
+   * List of output pins.
+   */
+  outputs: [Name, ...],
+
+  /**
+   * Gate implementation list.
+   */
+  parts: [ChipCall, ...],
+
+  /**
+   * If present, contains the name of a built-in chip.
+   */
+  builtins: [Name],
+
+  /**
+   * If present, shows the list of clocked inputs/outputs.
+   */
+  clocked: [Name, ...],
+}
+```
+
+#### `Name` AST node
+
+The `Name` type is used to define the names of the input/output pins, names of the arguments in [ChipCall](#chipcall-ast-node), etc. The node has the following properties:
+
+```js
+{
+  type: 'Name',
+
+  /*
+   * The actual name of a pin.
+   *
+   * Example: `IN a;`, the `value` is `a`.
+   */
+  value: string,
+
+  /**
+   * The `size` is only available in input/output names.
+   *
+   * Example: `IN a[16];`, the `size` is 16.
+   */
+  size: number,
+
+  /**
+   * An index of a particular bit. The `index` property is
+   * available only in the arguments.
+   *
+   * Example: `And(a=a[4], ...)`, the `index` is 4 here.
+   */
+  index: number,
+
+  /**
+   * A range of the bits. The `range` property is
+   * available only in arguments.
+   *
+   * Example: `Mux4Way16(..., sel=address[0..11])`,
+   * the range (inclusive) here is `0..11`.
+   */
+  range: {
+    from: number,
+    to: number,
+  },
+}
+```
+
+#### `ChipCall` AST node
+
+The `ChipCall` can appear only in the `parts` section of the `'Chip'` node. This is an evaluation call to an internal chip, used in implementation of this gate.
+
+It has the following properties:
+
+```js
+{
+  type: 'ChipCall',
+
+  /**
+   * The name of the internal chip, which is being called.
+   */
+  name: string,
+
+  /**
+   * The list of arguments to the call. The values in each [argument](#argument-ast-node)
+   * correspond to the inputs/outputs specification of a gate.
+   */
+  arguments: [Argument, ...]
+}
+```
+
+#### `Argument` AST node
+
+```js
+{
+  type: 'Argument',
+
+  /**
+   * The name of the argument.
+   */
+  name: Name,
+
+  /**
+   * The value of the argument.
+   */
+  value: Name,
+}
 ```
 
 ## Code generator
