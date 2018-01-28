@@ -435,6 +435,8 @@ It has the following properties:
 
 #### `Argument` AST node
 
+Arguments appear as parts of the [ChipCall](#chipcall-ast-node) node types. An argument has the following properties:
+
 ```js
 {
   type: 'Argument',
