@@ -1,0 +1,61 @@
+/**
+ * Example of an ALU, similar to MIPS architecture.
+ *
+ * ./bin/hdl-js --gate examples/MipsAlu.hdl --describe
+ *
+ * Logic:
+ *
+ *   a & b: op = 0
+ *   a | b: op = 1
+ *   a NOR b => ~a & ~b: op = 0, na = 1, nb = 1
+ *
+ * Math:
+ *
+ *   a + b: op = 2
+ *   a - b: op = 2, nb = 1, cin = 1
+ *   b - a: op = 2, na = 1, cin = 1
+ *
+ * Example `a - b`:
+ *
+ *  ./bin/hdl-js -g examples/MipsAlu.hdl -e '[{a: 1, b: 1, nb: 1, cin: 1, op: 2}]'
+ */
+CHIP MipsAlu {
+
+  IN
+    a,      /* 1-bit input */
+    b,      /* 1-bit input */
+    na,     /* negate a? */
+    nb,     /* negate b? */
+    less,   /* "less than" propagated */
+    cin,    /* carry-in (from previous ALU result) */
+    op[2]   /* opcode: 0 - AND, 1 - OR, 2 - ADD, 3 - propagate `less` */
+  ;
+
+  OUT
+    out,    /* 1-bit output */
+    cout,   /* carry-out from full-adder */
+    set     /* adder result, used as `less` input for LSB in 1st ALU */
+    ;
+
+  PARTS:
+
+    // A = na ? ~a : a;
+    Not(in=a, out=not_a);
+    Mux(a=not_a, b=a, sel=na, out=A);
+
+    // B = nb ? ~b : b;
+    Not(in=b, out=not_b);
+    Mux(a=not_b, b=b, sel=nb, out=B);
+
+    // op = 0, And:
+    And(a=A, b=B, out=A_and_B);
+
+    // op = 1, Or:
+    Or(a=A, b=B, out=A_or_B);
+
+    // op = 2, Add/Sub
+    FullAdder(a=A, b=B, c=cin, sum=A_plus_B, sum=set, carry=cout);
+
+    // The opcode mux:
+    Mux4Way16(a=A_and_B, b=A_or_B, c=A_plus_B, d=less, sel=op, out=out);
+}
