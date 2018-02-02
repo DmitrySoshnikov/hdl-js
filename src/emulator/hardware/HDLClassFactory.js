@@ -284,16 +284,19 @@ function handlePartArg(
     internalPins.push(internalPinsMap[value.value] = internalPin);
   }
 
-  let constantValue;
-
+  // Constant values: And(a=true, b=false)
+  let constantValue = null;
   if (value.value === 'true' || value.value === '1') {
     constantValue = 1;
   } else if (value.value === 'false' || value.value === '0') {
     constantValue = 0;
   }
 
-  // When main pins change, update all dependent inputs.
-  if (pinInfo.kind === 'input') {
+  // Set always fixed value.
+  if (constantValue !== null) {
+    pin.setValue(constantValue);
+  } else if (pinInfo.kind === 'input') {
+    // When main pins change, update all dependent inputs.
     const sourcePin = (
       inputPinsMap[value.value] ||
       outputPinsMap[value.value] ||
@@ -317,9 +320,6 @@ function handlePartArg(
       createOutputChangeHandler(destPin, pin, name, value)
     );
 
-  // Set always fixed value.
-  } else if (constantValue) {
-    pin.setValue(constantValue);
   }
 }
 
