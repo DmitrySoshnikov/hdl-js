@@ -343,7 +343,7 @@ class Gate extends EventEmitter {
           content = toSignedString(row[name]);
         } else {
           // Normal pin.
-          content = (row[name] >>> 0)
+          content = (formatRadix !== 10 ? row[name] >>> 0 : row[name])
             .toString(formatRadix)
             .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
             .toUpperCase();
