@@ -51,6 +51,11 @@ describe('Pin', () => {
     expect(a16.getSize()).toBe(16);
   });
 
+  it('deafult value', () => {
+    let a = new Pin({name: 'a'});
+    expect(a.getValue()).toBe(0);
+  });
+
   it('values at index', () => {
     expect(a16.getValueAt(0)).toBe(1);
     expect(a16.getValueAt(1)).toBe(0);

@@ -25,7 +25,7 @@ const WORD_SIZE = 16;
  * Emits 'change' event on `setValue`.
  */
 class Pin extends EventEmitter {
-  constructor({name, size = 1, value = null}) {
+  constructor({name, size = 1, value = 0}) {
     super();
 
     this._name = name;
@@ -38,10 +38,7 @@ class Pin extends EventEmitter {
     }
 
     this._size = size;
-
-    if (value !== null) {
-      this.setValue(value);
-    }
+    this.setValue(value);
 
     // There might be more than 11 pins (default in Node).
     this.setMaxListeners(Infinity);
