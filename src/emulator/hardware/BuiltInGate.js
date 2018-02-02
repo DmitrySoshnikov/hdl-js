@@ -68,12 +68,14 @@ class BuiltInGate extends Gate {
    */
   static printTruthTable({
     table = null,
+    columns = [],
     formatRadix,
     formatStringLengh,
     transformValue = null,
   } = {}) {
     super.printTruthTable({
       table: table || BuiltInGate.validateSpec(this.Spec).truthTable,
+      columns,
       formatRadix,
       formatStringLengh,
       transformValue,

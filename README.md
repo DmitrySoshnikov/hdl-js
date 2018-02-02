@@ -560,6 +560,32 @@ Output:
 */
 ```
 
+Using `--columns` option it is possible specifying a _whitelist_ of columns which should be printed. For example, the following prints only columns `a`, and `out`, ignoring `b` column, which would be shown by default:
+
+```
+hdl-js -g And -d --columns a,out
+```
+
+Result:
+
+```
+...
+
+Truth table:
+
+┌───┬─────┐
+│ a │ out │
+├───┼─────┤
+│ 0 │  0  │
+├───┼─────┤
+│ 0 │  0  │
+├───┼─────┤
+│ 1 │  0  │
+├───┼─────┤
+│ 1 │  1  │
+└───┴─────┘
+```
+
 ### Specifying output format
 
 Using `--format` option it is possible to control the format of the input/output values. For example, the truth table of the `And16` gate in binary (default), and hexadecimal formats:

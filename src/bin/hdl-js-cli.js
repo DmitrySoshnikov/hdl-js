@@ -70,6 +70,11 @@ const options = require('yargs')
       requiresArg: true,
       coerce: enforceUnique,
     },
+    'columns': {
+      describe: 'Whitelist of columns (comma-seprated) to show in the table',
+      requiresArg: true,
+      coerce: enforceUnique,
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
@@ -154,7 +159,7 @@ function loadGate(gate) {
 /**
  * Prints specification and truth table of a gate.
  */
-function describeGate(gate, formatRadix, formatStringLengh) {
+function describeGate(gate, formatRadix, formatStringLengh, columns) {
   const {
     run,
   } = options;
@@ -228,6 +233,7 @@ function describeGate(gate, formatRadix, formatStringLengh) {
   const printTable = table => {
     GateClass.printTruthTable({
       table,
+      columns,
       formatRadix,
       formatStringLengh,
     });
@@ -251,8 +257,6 @@ function describeGate(gate, formatRadix, formatStringLengh) {
     } else {
       console.info(colors.bold('Truth table:'), '(generated, random 5 rows)\n');
     }
-  } else {
-    console.info(colors.bold('Truth table:'), '\n');
   }
 
   printTable(truthTable);
@@ -337,15 +341,20 @@ function runSlice(data, index, action) {
 
 function main() {
   const {
-    gate,
-    parse,
-    list,
+    clockRate,
     describe,
     execOnData,
     format = 'bin',
+    gate,
+    list,
+    parse,
     run,
-    clockRate,
   } = options;
+
+  // Whitelist of columns, empty list -- all columns.
+  const columns = options.columns
+    ? options.columns.split(',')
+    : [];
 
   if (clockRate) {
     SystemClock.setRate(clockRate);
@@ -389,7 +398,7 @@ function main() {
   // Describes a gate (built-in or composite).
 
   if (gate && describe) {
-    describeGate(gate, formatRadix, formatStringLengh);
+    describeGate(gate, formatRadix, formatStringLengh, columns);
   }
 
   // ------------------------------------------------------
@@ -415,6 +424,7 @@ function main() {
     const printTable = table => {
       GateClass.printTruthTable({
         table,
+        columns,
         formatRadix,
         formatStringLengh,
         transformValue(value, row, column) {
@@ -424,7 +434,7 @@ function main() {
           ) {
             const pinInfo = GateClass.getPinInfo(column);
 
-            let expected = (data[row][column].expected >>> 0)
+            let expected = (data[row][column] >>> 0)
               .toString(formatRadix)
               .padStart(formatRadix !== 10 ? pinInfo.size : 0, '0')
               .toUpperCase();
@@ -461,8 +471,9 @@ function main() {
 
         conflictingRows[row] = pins;
 
-        console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`, '\n');
+        console.info(`  - row: ${row}, pins: ${pinNames.join(', ')}`);
       });
+      console.info('');
     } else {
       // No conflicts.
       console.info(colors.bold('\nTruth table for data:'), '\n');

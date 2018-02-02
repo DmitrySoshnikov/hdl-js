@@ -264,9 +264,13 @@ class Gate extends EventEmitter {
    *
    * formatRadix is: 2 (bin), 16 (hex), or 10 (dec).
    * formatStringLengh is the max string length of a number in this format.
+   *
+   * If `columns` whitelist is passed, only the columns from this list
+   * are shown.
    */
   static printTruthTable({
     table,
+    columns = [],
     formatRadix = 2,
     formatStringLengh = 16,
     transformValue = null,
@@ -279,6 +283,11 @@ class Gate extends EventEmitter {
       internalPins = [],
     } = spec;
 
+    const columnsMap = {};
+    for (const column of columns) {
+      columnsMap[column] = true;
+    }
+
     const toHeaderColumn = (name) => {
       return {
         content: Pin.toFullName(name),
@@ -286,20 +295,45 @@ class Gate extends EventEmitter {
       };
     };
 
-    const clock = this.isClocked()
+    const clockHeader = this.isClocked()
       ? [Pin.CLOCK]
       : [];
 
+    const whitelistHeader = (list) => {
+      // All columns.
+      if (columns.length === 0) {
+        return list;
+      }
+      // Only whitelist.
+      return list.filter(pin => columnsMap.hasOwnProperty(pin.name || pin));
+    };
+
+    const whitelistColumns = (row) => {
+      // All columns.
+      if (columns.length === 0) {
+        return row;
+      }
+      // Only whitelist.
+      const whitelistRow = {};
+      for (let column in row) {
+        if (columnsMap.hasOwnProperty(column)) {
+          whitelistRow[column] = row[column];
+        }
+      }
+      return whitelistRow;
+    };
+
     const printer = new TablePrinter({
       head: [
-        ...clock,
-        ...inputPins.map(toHeaderColumn),
-        ...internalPins.map(toHeaderColumn),
-        ...outputPins.map(toHeaderColumn),
+        ...whitelistHeader(clockHeader),
+        ...whitelistHeader(inputPins).map(toHeaderColumn),
+        ...whitelistHeader(internalPins).map(toHeaderColumn),
+        ...whitelistHeader(outputPins).map(toHeaderColumn),
       ],
     });
 
     table.forEach((row, index) => {
+      row = whitelistColumns(row);
       const tableRow = Object.keys(row).map(name => {
         const pinInfo = this.getPinInfo(name);
         let content;
