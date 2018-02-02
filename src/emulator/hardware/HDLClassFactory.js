@@ -270,10 +270,19 @@ function handlePartArg(
   const pin = partGateInstance.getPin(name.value);
   const pinInfo = PartGateClass.getPinInfo(name.value);
 
+  // Constant values: And(a=true, b=false)
+  let constantValue = null;
+  if (value.value === 'true' || value.value === '1') {
+    constantValue = 1;
+  } else if (value.value === 'false' || value.value === '0') {
+    constantValue = 0;
+  }
+
   // Create new (internal) pin, which is not part of inputs/outputs.
   const isInternalPin = (
     !inputPinsMap.hasOwnProperty(value.value) &&
-    !outputPinsMap.hasOwnProperty(value.value)
+    !outputPinsMap.hasOwnProperty(value.value) &&
+    constantValue === null
   );
   if (isInternalPin && !internalPinsMap.hasOwnProperty(value.value)) {
     const internalPin = new Pin({
@@ -282,14 +291,6 @@ function handlePartArg(
       value: 0,
     });
     internalPins.push(internalPinsMap[value.value] = internalPin);
-  }
-
-  // Constant values: And(a=true, b=false)
-  let constantValue = null;
-  if (value.value === 'true' || value.value === '1') {
-    constantValue = 1;
-  } else if (value.value === 'false' || value.value === '0') {
-    constantValue = 0;
   }
 
   // Set always fixed value.

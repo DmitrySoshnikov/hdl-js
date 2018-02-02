@@ -227,6 +227,28 @@ describe('HDLClassFactory', () => {
     expect(parts[3]).toBeInstanceOf(Or);
   });
 
+  it('Constant values', () => {
+    const myChip = HDLClassFactory
+      .fromHDL(`
+        CHIP MyChip {
+          IN a;
+          OUT out;
+
+          PARTS:
+
+          Not(in=false, out=not_false);
+          Or(a=a, b=not_false, out=out);
+        }
+      `)
+      .defaultFromSpec();
+
+    myChip
+      .setPinValues({a: 0})
+      .eval();
+
+    expect(myChip.getPinValues()).toEqual({a: 0, not_false: 1, out: 1});
+  });
+
   it('Pin connections', () => {
     const mux = MuxClass.defaultFromSpec();
 
