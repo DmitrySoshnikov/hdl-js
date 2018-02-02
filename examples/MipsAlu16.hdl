@@ -1,0 +1,44 @@
+/**
+ * 16-bit ALU from MIPS architecture.
+ *
+ * Built as a combination of 16 1-bit ALUs.
+ */
+
+CHIP MipsAlu16 {
+
+  IN
+    a[16],    /* 16-bit input */
+    b[16],    /* 16-bit input */
+    na,       /* negate a? */
+    nb,       /* negate b? */
+    cin,      /* carry-in (from previous ALU in the chain) */
+    op[2]     /* opcode: 0 - And, 1 - Or, 2 - Add, 3 - "Less than" */
+  ;
+
+  OUT
+    out[16],  /* 16-bit output */
+    over,     /* overflow? */
+    zero      /* out is zero? */
+  ;
+
+  PARTS:
+
+    MipsAlu(a=a[0],  b=b[0],  na=na, nb=nb, cin=cin,    less=set,   op=op, cout=cout0,  out=out[0]);
+
+    MipsAlu(a=a[1],  b=b[1],  na=na, nb=nb, cin=cout0,  less=false, op=op, cout=cout1,  out=out[1]);
+    MipsAlu(a=a[2],  b=b[2],  na=na, nb=nb, cin=cout1,  less=false, op=op, cout=cout2,  out=out[2]);
+    MipsAlu(a=a[3],  b=b[3],  na=na, nb=nb, cin=cout2,  less=false, op=op, cout=cout3,  out=out[3]);
+    MipsAlu(a=a[4],  b=b[4],  na=na, nb=nb, cin=cout3,  less=false, op=op, cout=cout4,  out=out[4]);
+    MipsAlu(a=a[5],  b=b[5],  na=na, nb=nb, cin=cout4,  less=false, op=op, cout=cout5,  out=out[5]);
+    MipsAlu(a=a[6],  b=b[6],  na=na, nb=nb, cin=cout5,  less=false, op=op, cout=cout6,  out=out[6]);
+    MipsAlu(a=a[7],  b=b[7],  na=na, nb=nb, cin=cout6,  less=false, op=op, cout=cout7,  out=out[7]);
+    MipsAlu(a=a[8],  b=b[8],  na=na, nb=nb, cin=cout7,  less=false, op=op, cout=cout8,  out=out[8]);
+    MipsAlu(a=a[9],  b=b[9],  na=na, nb=nb, cin=cout8,  less=false, op=op, cout=cout9,  out=out[9]);
+    MipsAlu(a=a[10], b=b[10], na=na, nb=nb, cin=cout9,  less=false, op=op, cout=cout10, out=out[10]);
+    MipsAlu(a=a[11], b=b[11], na=na, nb=nb, cin=cout10, less=false, op=op, cout=cout11, out=out[11]);
+    MipsAlu(a=a[12], b=b[12], na=na, nb=nb, cin=cout11, less=false, op=op, cout=cout12, out=out[12]);
+    MipsAlu(a=a[13], b=b[13], na=na, nb=nb, cin=cout12, less=false, op=op, cout=cout13, out=out[13]);
+    MipsAlu(a=a[14], b=b[14], na=na, nb=nb, cin=cout13, less=false, op=op, cout=cout14, out=out[14]);
+
+    MipsAlu(a=a[15], b=b[15], na=na, nb=nb, cin=cout14, less=false, op=op, cout=over, set=set, out=out[15]);
+}
