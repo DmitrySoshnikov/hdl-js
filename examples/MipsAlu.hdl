@@ -41,11 +41,11 @@ CHIP MipsAlu {
 
     // A = na ? ~a : a;
     Not(in=a, out=not_a);
-    Mux(a=not_a, b=a, sel=na, out=A);
+    Mux(a=a, b=not_a, sel=na, out=A);
 
     // B = nb ? ~b : b;
     Not(in=b, out=not_b);
-    Mux(a=not_b, b=b, sel=nb, out=B);
+    Mux(a=b, b=not_b, sel=nb, out=B);
 
     // op = 0, And:
     And(a=A, b=B, out=A_and_B);
