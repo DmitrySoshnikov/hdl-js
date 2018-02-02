@@ -359,7 +359,7 @@ function createOutputChangeHandler(destPin, pin, nameInfo, valueInfo) {
 // Update pin value according to spec: full, index or slice.
 //
 function setPinValue(pin, value, spec) {
-  if (spec.index) {
+  if (spec.hasOwnProperty('index')) {
     pin.setValueAt(spec.index, value);
   } else if (spec.range) {
     pin.setSlice(spec.range.from, spec.range.to, value);
@@ -372,7 +372,7 @@ function setPinValue(pin, value, spec) {
 // Extracts pin value according to spec: full, index or slice.
 //
 function getPinValue(pin, spec) {
-  if (spec.index) {
+  if (spec.hasOwnProperty('index')) {
     return pin.getValueAt(spec.index);
   } else if (spec.range) {
     return pin.getSlice(spec.range.from, spec.range.to);
