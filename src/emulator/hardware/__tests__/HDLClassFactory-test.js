@@ -242,6 +242,13 @@ describe('HDLClassFactory', () => {
       `)
       .defaultFromSpec();
 
+    const spec = myChip.getClass().Spec;
+
+    // `false` constant is not part of internal pins:
+    expect(spec.internalPins).toEqual([
+      {name: 'not_false', size: 1},
+    ]);
+
     myChip
       .setPinValues({a: 0})
       .eval();

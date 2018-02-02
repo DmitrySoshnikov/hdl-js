@@ -146,6 +146,20 @@ function createPinsMap(pins) {
 }
 
 /**
+ * Returns a value corresponding to a constant:
+ * false, true, 0, 1.
+ */
+function getConstantValue(value) {
+  let constantValue = null;
+  if (value.value === 'true' || value.value === '1') {
+    constantValue = 1;
+  } else if (value.value === 'false' || value.value === '0') {
+    constantValue = 0;
+  }
+  return constantValue;
+}
+
+/**
  * Extracts spec info for internal pins,
  * and also create gate classes for parts.
  */
@@ -163,9 +177,12 @@ function analyzeParts(ast, workingDir) {
     part.arguments.forEach(partArg => {
       const {name, value} = partArg;
 
+      const constantValue = getConstantValue(value);
+
       const isInternalPin = (
         !inputPinsMap.hasOwnProperty(value.value) &&
-        !outputPinsMap.hasOwnProperty(value.value)
+        !outputPinsMap.hasOwnProperty(value.value) &&
+        constantValue === null
       );
 
       if (isInternalPin && !internalPinsMap.hasOwnProperty(value.value)) {
@@ -271,12 +288,7 @@ function handlePartArg(
   const pinInfo = PartGateClass.getPinInfo(name.value);
 
   // Constant values: And(a=true, b=false)
-  let constantValue = null;
-  if (value.value === 'true' || value.value === '1') {
-    constantValue = 1;
-  } else if (value.value === 'false' || value.value === '0') {
-    constantValue = 0;
-  }
+  const constantValue = getConstantValue(value);
 
   // Create new (internal) pin, which is not part of inputs/outputs.
   const isInternalPin = (
@@ -284,6 +296,7 @@ function handlePartArg(
     !outputPinsMap.hasOwnProperty(value.value) &&
     constantValue === null
   );
+
   if (isInternalPin && !internalPinsMap.hasOwnProperty(value.value)) {
     const internalPin = new Pin({
       name: value.value,
