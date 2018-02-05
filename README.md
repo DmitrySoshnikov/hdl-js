@@ -1003,6 +1003,24 @@ Truth table for data:
 
 As we can see, if some pins are not passed in the original data, they are defaulted to `0`.
 
+The same data file applied on the `Or` gate, with the corresponding result:
+
+```
+hdl-js --gate Or --exec-on-data ~/my-data.dat
+
+Truth table for data:
+
+┌───┬───┬─────┐
+│ a │ b │ out │
+├───┼───┼─────┤
+│ 1 │ 0 │  1  │
+├───┼───┼─────┤
+│ 1 │ 1 │  1  │
+├───┼───┼─────┤
+│ 0 │ 1 │  1  │
+└───┴───┴─────┘
+```
+
 ### Sequential run
 
 When the `--run` (`-r`) command is passed, it is possible to analyze how the pin values change in time (especially for the clocked gates). This options work with both, `--exec-on-data` (`-e`), and `--describe` (`-d`).
