@@ -145,8 +145,8 @@ Parts
   ;
 
 Builtin
-  : BUILTIN Name ';' {
-      builtins.push($2);
+  : BUILTIN Names ';' {
+      builtins.push(...$2);
     }
   ;
 
