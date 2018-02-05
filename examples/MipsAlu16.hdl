@@ -24,7 +24,6 @@ CHIP MipsAlu16 {
   PARTS:
 
     MipsAlu(a=a[0],  b=b[0],  na=na, nb=nb, cin=cin,    less=set,   op=op, cout=cout0,  out=out[0]);
-
     MipsAlu(a=a[1],  b=b[1],  na=na, nb=nb, cin=cout0,  less=false, op=op, cout=cout1,  out=out[1]);
     MipsAlu(a=a[2],  b=b[2],  na=na, nb=nb, cin=cout1,  less=false, op=op, cout=cout2,  out=out[2]);
     MipsAlu(a=a[3],  b=b[3],  na=na, nb=nb, cin=cout2,  less=false, op=op, cout=cout3,  out=out[3]);
@@ -39,6 +38,6 @@ CHIP MipsAlu16 {
     MipsAlu(a=a[12], b=b[12], na=na, nb=nb, cin=cout11, less=false, op=op, cout=cout12, out=out[12]);
     MipsAlu(a=a[13], b=b[13], na=na, nb=nb, cin=cout12, less=false, op=op, cout=cout13, out=out[13]);
     MipsAlu(a=a[14], b=b[14], na=na, nb=nb, cin=cout13, less=false, op=op, cout=cout14, out=out[14]);
-
     MipsAlu(a=a[15], b=b[15], na=na, nb=nb, cin=cout14, less=false, op=op, cout=over, set=set, out=out[15]);
+    Nor16Way(in=out, out=zero);
 }
