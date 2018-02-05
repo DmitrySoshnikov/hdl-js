@@ -18,8 +18,8 @@ Hardware description language (HDL) parser, and Hardware simulator.
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
-  - [Columns whitelist](#columns-whitelist)
   - [Specifying output format](#specifying-output-format)
+  - [Columns whitelist](#columns-whitelist)
   - [Testing gates on passed data](#testing-gates-on-passed-data)
   - [Pins](#pins)
     - [Pin size and slices](#pin-size-and-slices)
@@ -564,28 +564,6 @@ Output:
 */
 ```
 
-### Columns whitelist
-
-Using the `--columns` (`-c`) option it is possible to specify a _whitelist_ of columns which should be printed.
-
-For example, the resulting list of columns of the [examples/MipsAlu16.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/MipsAlu16.hdl) gate is quite large, and shows a lot of internal pins (such as `cout1`, `cout2`, etc). Often it is desirable to view only needed columns of interest:
-
-```
-hdl-js -g examples/MipsAlu16.hdl -e '[{a: 2, b: 3, op: 2}]' -f dec -c a,b,out
-```
-
-Result (showing result for `2 + 3`):
-
-```
-Truth table for data:
-
-┌───────┬───────┬─────────┐
-│ a[16] │ b[16] │ out[16] │
-├───────┼───────┼─────────┤
-│   2   │   3   │    5    │
-└───────┴───────┴─────────┘
-```
-
 ### Specifying output format
 
 Using `--format` option it is possible to control the format of the input/output values. For example, the truth table of the `And16` gate in binary (default), and hexadecimal formats:
@@ -637,6 +615,28 @@ Hexadecimal output format:
 │ 3CC3  │ 0FF0  │  0CC0   │
 ├───────┼───────┼─────────┤
 │ 1234  │ 9876  │  1034   │
+└───────┴───────┴─────────┘
+```
+
+### Columns whitelist
+
+Using the `--columns` (`-c`) option it is possible to specify a _whitelist_ of columns which should be printed.
+
+For example, the resulting list of columns of the [examples/MipsAlu16.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/MipsAlu16.hdl) gate is quite large, and shows a lot of internal pins (such as `cout1`, `cout2`, etc). Often it is desirable to view only needed columns of interest:
+
+```
+hdl-js -g examples/MipsAlu16.hdl -e '[{a: 2, b: 3, op: 2}]' -f dec -c a,b,out
+```
+
+And the table showing the result for `2 + 3`:
+
+```
+Truth table for data:
+
+┌───────┬───────┬─────────┐
+│ a[16] │ b[16] │ out[16] │
+├───────┼───────┼─────────┤
+│   2   │   3   │    5    │
 └───────┴───────┴─────────┘
 ```
 
