@@ -26,6 +26,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Creating gates from default spec](#creating-gates-from-default-spec)
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
+  - [Data files for execution](#data-files-for-execution)
   - [Sequential run](#sequential-run)
   - [Gate events](#gate-events)
   - [Main chip groups](#main-chip-groups)
@@ -967,6 +968,40 @@ Truth table for data:
 │  FFFF  │  0000   │
 └────────┴─────────┘
 ```
+
+### Data files for execution
+
+The `--exec-on-data` (`-e`) besides accepting a raw string with data, also accepts a _filename_ which contains the actual data in the _extended JSON_ format. It makes it convenient describing testing data in a separate file instead of passing the data each time in the command line.
+
+Example `~/my-data.dat`:
+
+```js
+[
+  {a: 1},
+  {a: 1, b: 1},
+  {b: 1},
+]
+```
+
+Now we can apply this _partial data_ on any gate which accepts with `a` and `b` inputs (for example, `And` gate), and get the calculated results:
+
+```
+hdl-js --gate And --exec-on-data ~/my-data.dat
+
+Truth table for data:
+
+┌───┬───┬─────┐
+│ a │ b │ out │
+├───┼───┼─────┤
+│ 1 │ 0 │  0  │
+├───┼───┼─────┤
+│ 1 │ 1 │  1  │
+├───┼───┼─────┤
+│ 0 │ 1 │  0  │
+└───┴───┴─────┘
+```
+
+As we can see, if some pins are not passed in the original data, they are defaulted to `0`.
 
 ### Sequential run
 

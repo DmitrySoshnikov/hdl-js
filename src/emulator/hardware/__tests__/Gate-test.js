@@ -159,6 +159,24 @@ describe('Gate', () => {
     expect(conflicts.length).toBe(0);
   });
 
+  it('exec on default data', () => {
+    const partialData = [
+      {a: 1},
+      {a: 1, b: 1},
+      {b: 1},
+    ];
+
+    const {result} = require('../builtin-gates/And')
+      .defaultFromSpec()
+      .execOnData(partialData);
+
+    expect(result).toEqual([
+      {a: 1, b: 0, out: 0},
+      {a: 1, b: 1, out: 1},
+      {a: 0, b: 1, out: 0},
+    ]);
+  });
+
   it('get pin info', () => {
     expect(And.getPinInfo('a')).toEqual({kind: 'input', name: 'a'});
     expect(And.getPinInfo('b')).toEqual({kind: 'input', name: 'b'});

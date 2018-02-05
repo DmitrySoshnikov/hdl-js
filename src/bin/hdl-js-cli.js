@@ -95,6 +95,19 @@ const FORMAT_VALUES = {
 };
 
 /**
+ * Loads data in the "Extended JSON" format.
+ *
+ * The `data` is either the actual data-string, or a filename.
+ */
+function loadAndProcessData(data, formatRadix) {
+  const fullPath = path.resolve(data);
+  if (fs.existsSync(fullPath)) {
+    data = fs.readFileSync(fullPath, 'utf-8');
+  }
+  return parseInputData(data, formatRadix);
+}
+
+/**
  * Parse input data.
  */
 function parseInputData(data, formatRadix) {
@@ -415,7 +428,7 @@ function main() {
     const GateClass = loadGate(gate);
     const gateInstance = GateClass.defaultFromSpec();
 
-    const data = parseInputData(execOnData, formatRadix);
+    const data = loadAndProcessData(execOnData, formatRadix);
     const conflictingRows = {};
 
     /**

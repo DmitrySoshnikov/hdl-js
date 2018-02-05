@@ -217,6 +217,9 @@ class Gate extends EventEmitter {
     const conflicts = [];
 
     inputData.forEach((row, index) => {
+      // Always use all input pins: if some pin is not passed, it's set to 0.
+      row = Object.assign({}, this._defaultInputValues, row);
+
       // Evaluate the row.
       this.setPinValues(row);
 
@@ -420,9 +423,14 @@ class Gate extends EventEmitter {
       });
     }
 
-    this._inputPins.forEach(
-      pin => this._namesToPinsMap[pin.getName()] = pin
-    );
+    // All inputs are defaulted to 0. In the `execOnData`, if
+    // some pin is not passed it's set to 0.
+    this._defaultInputValues = {};
+
+    this._inputPins.forEach(pin => {
+      this._namesToPinsMap[pin.getName()] = pin;
+      this._defaultInputValues[pin.getName()] = 0;
+    });
 
     if (this._internalPins) {
       this._internalPins.forEach(
