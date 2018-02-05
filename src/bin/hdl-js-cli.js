@@ -65,13 +65,13 @@ const options = require('yargs')
       describe: 'Runs sequentially the rows from --exec-on-data table',
     },
     'clock-rate': {
-      alias: 'c',
       describe: 'Rate (number of cycles per second) for the System clock',
       requiresArg: true,
       coerce: enforceUnique,
     },
     'columns': {
-      describe: 'Whitelist of columns (comma-seprated) to show in the table',
+      alias: 'c',
+      describe: 'Whitelist of columns (comma-separated) to show in the table',
       requiresArg: true,
       coerce: enforceUnique,
     },

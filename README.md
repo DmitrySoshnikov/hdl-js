@@ -97,7 +97,9 @@ Options:
   --format, -f        Values format (binary, hexadecimal, decimal)
                                                   [choices: "bin", "hex", "dec"]
   --run, -r           Runs sequentially the rows from --exec-on-data table
-  --clock-rate, -c    Rate (number of cycles per second) for the System clock
+  --clock-rate        Rate (number of cycles per second) for the System clock
+  --columns, -c       Whitelist of columns (comma-separated) to show in the
+                      table
 ```
 
 > **NOTE:** the implementation of some built-in chips, and the HDL format is heavily inspired by the wonderful [nand2tetris](http://nand2tetris.org/) course by Noam Nisan and Shimon Schocken.
@@ -561,7 +563,7 @@ Output:
 */
 ```
 
-Using `--columns` option it is possible specifying a _whitelist_ of columns which should be printed. For example, the following prints only columns `a`, and `out`, ignoring `b` column, which would be shown by default:
+Using `--columns` (`-c`) option it is possible specifying a _whitelist_ of columns which should be printed. For example, the following prints only columns `a`, and `out`, ignoring `b` column, which would be shown by default:
 
 ```
 hdl-js -g And -d --columns a,out
@@ -1385,7 +1387,7 @@ tock: -3
 
 #### Clock rate
 
-The `--clock-rate` (`-c`) parameter controls the rate of the System clock. For example, the second run executes operations faster:
+The `--clock-rate` parameter controls the rate of the System clock. For example, the second run executes operations faster:
 
 With default clock rate 1:
 
