@@ -971,7 +971,7 @@ Truth table for data:
 
 ### Data files for execution
 
-The `--exec-on-data` (`-e`) besides accepting a raw string with data, also accepts a _filename_ which contains the actual data in the _extended JSON_ format. It makes it convenient describing testing data in a separate file instead of passing the data each time in the command line.
+The `--exec-on-data` (`-e`) option besides accepting the raw data-strings, also accepts _filenames_ which contain the actual data in the _extended JSON_ format. It allows moving the testing data into a separate file, instead of passing the data each time in the command line.
 
 Example `~/my-data.dat`:
 
@@ -983,7 +983,7 @@ Example `~/my-data.dat`:
 ]
 ```
 
-Now we can apply this _partial data_ on any gate which accepts with `a` and `b` inputs (for example, `And` gate), and get the calculated results:
+Now we can apply this _partial data_ on any gate which works with `a` and `b` inputs (for example, `And` gate), and get the calculated results:
 
 ```
 hdl-js --gate And --exec-on-data ~/my-data.dat
@@ -1001,7 +1001,7 @@ Truth table for data:
 └───┴───┴─────┘
 ```
 
-As we can see, if some pins are not passed in the original data, they are defaulted to `0`.
+As we can see, if some pins are not provided, they are defaulted to `0`.
 
 The same data file applied on the `Or` gate, with the corresponding result:
 
