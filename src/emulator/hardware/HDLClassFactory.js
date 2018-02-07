@@ -67,6 +67,11 @@ const HDLClassFactory = {
    * other gates from it.
    */
   fromAST(ast, workingDir = __dirname) {
+    // Check if the built-in version should be used as a backend.
+    if (shouldUseBuiltinGate(ast)) {
+      return loadBuiltinGate(ast.name);
+    }
+
     const [
       internalPinsSpec,
       partsClasses,
@@ -210,7 +215,24 @@ function loadGate(name, workingDir) {
   if (fs.existsSync(hdlFile)) {
     return HDLClassFactory.fromHDLFile(hdlFile);
   }
+  return loadBuiltinGate(name);
+}
+
+/**
+ * Loads built-in gate by name.
+ */
+function loadBuiltinGate(name) {
   return require('./builtin-gates/' + name);
+}
+
+/**
+ * Whether a built-in backend should be used.
+ */
+function shouldUseBuiltinGate(ast) {
+  if (ast.builtins.length === 0) {
+    return false;
+  }
+  return ast.builtins.find(({value}) => value === ast.name);
 }
 
 /**

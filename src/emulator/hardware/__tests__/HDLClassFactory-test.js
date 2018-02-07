@@ -451,4 +451,16 @@ describe('HDLClassFactory', () => {
     let result = mux.execOnData(fullTruthTable).result;
     expect(result).toEqual(fullTruthTable);
   });
+
+  it('should use built-in backend', () => {
+    const MyAndGate = HDLClassFactory.fromHDL(`
+      CHIP And {
+        IN a, b;
+        OUT out;
+
+        BUILTIN And;
+      }
+    `);
+    expect(MyAndGate).toBe(require('../builtin-gates/And'));
+  });
 });
