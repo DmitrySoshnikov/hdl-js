@@ -7,6 +7,7 @@
 
 const parser = require('./parser');
 const emulator = require('./emulator/hardware');
+const generator = require('./generator');
 
 const {HDLClassFactory} = emulator;
 
@@ -23,6 +24,11 @@ const hdl = {
    * Emulator module exposed.
    */
   emulator,
+
+  /**
+   * Code generator module exposed.
+   */
+  generator,
 
   /**
    * Parses an HDL string, producing an AST.
@@ -63,6 +69,13 @@ const hdl = {
    */
   fromHDL(hdl) {
     return HDLClassFactory.fromHDL(hdl);
+  },
+
+  /**
+   * Generates an HDL code from AST.
+   */
+  generateFromAST(ast) {
+    return generator.generateFromAST(ast);
   },
 };
 

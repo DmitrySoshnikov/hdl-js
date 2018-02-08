@@ -14,7 +14,6 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Format of an HDL file](#format-of-an-hdl-file)
   - [Parsing a file to AST](#parsing-a-file-to-ast)
   - [AST nodes specification](#ast-nodes-specification)
-- [Code generator](#code-generator)
 - [Emulator](#emulator)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
@@ -43,6 +42,9 @@ Hardware description language (HDL) parser, and Hardware simulator.
     - [Viewing composite gate specification](#viewing-composite-gate-specification)
     - [Using custom and built-in gates in implementation](#using-custom-and-built-in-gates-in-implementation)
     - [Loading HDL chips from Node](#loading-hdl-chips-from-node)
+- [Code generator](#code-generator)
+  - [Exporting from AST](#exporting-from-ast)
+  - [Exporting from composite gates](#exporting-from-composite-gates)
 
 ## Installation
 
@@ -148,6 +150,9 @@ The `hdl-js` exposes the following API:
     - `And`
     - `Or`
     - ...
+- `generateFromAST(ast)` -- generates an HDL code from AST; convenient facade for `generator.generateFromAST`
+- [generator](#code-generator) -- the generator module exposed
+
 
 ## Parser
 
@@ -456,14 +461,6 @@ Arguments appear as parts of the [ChipCall](#chipcall-ast-node) node types. An a
   value: Name,
 }
 ```
-
-## Code generator
-
-The _code generator_ module allows exporting _to_ HDL files from gate structures in other forms: from AST, from a composite gate instance, etc.
-
-In general case it's an inverse procedure to parsing. In the simplest case you have a parsed AST, and the code generator can build an HDL code from it.
-
-**WIP:** track [issue #17](https://github.com/DmitrySoshnikov/hdl-js/issues/17).
 
 ## Emulator
 
@@ -1609,3 +1606,82 @@ and
 // {a: 1, b: 1, n: 0, out: 1}
 console.log(and.getPinValues());
 ```
+
+## Code generator
+
+The _code generator_ module allows _exporting to HDL_ files from gate structures in other forms: from AST, from a composite gate instance, etc.
+
+In general case it's an inverse procedure to parsing. In the simplest case you have a parsed AST, and the code generator can build an HDL code from it.
+
+### Exporting from AST
+
+Having an AST of a gate, it is possible to generate an HDL code for it using the `generator` module. It is also possible to do some manipulations and transformations on this AST prior the generation:
+
+```js
+const {
+  parser,
+  generator,
+} = require('hdl-js');
+
+const originalHDL = `
+  CHIP And {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+
+    Nand(a=a, b=b, out=n);
+    Nand(a=n, b=n, out=out);
+  }
+`;
+
+// Obtain the AST.
+const ast = parser.parse(originalHDL);
+
+// Slightly transform, reimplementing the second
+// part as direct `Not` instead of `Nand`:
+
+const {parts} = ast;
+
+// Not(in=n, out=out);
+parts[1] = {
+  type: 'ChipCall',
+  name: 'Not',
+  arguments: [
+    // First argument: `in=n`
+    {
+      type: 'Argument',
+      name: {type: 'Name', value: 'in'},
+      value: {type: 'Name', value: 'n'},
+    },
+    // Take second argument from the original call: `out=out`
+    parts[1].arguments[2],
+  ],
+};
+
+// Finally, generate the HDL code:
+
+const exportedHDL = generator.generateFromAST(ast);
+
+console.log(exportedHDL);
+
+/*
+
+Result:
+
+CHIP And {
+  IN a, b;
+  OUT out;
+
+  PARTS:
+
+  Nand(a=a, b=b, out=n);
+  Not(in=n, out=out);
+}
+
+*/
+```
+
+### Exporting from Composite Gates
+
+**WIP:** track [issue #17](https://github.com/DmitrySoshnikov/hdl-js/issues/17).
