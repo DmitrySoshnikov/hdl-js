@@ -68,7 +68,7 @@ const HDLClassFactory = {
    */
   fromAST(ast, workingDir = __dirname) {
     // Check if the built-in version should be used as a backend.
-    if (shouldUseBuiltinGate(ast)) {
+    if (shouldUseBuiltinGate(ast.name, ast)) {
       return loadBuiltinGate(ast.name);
     }
 
@@ -177,7 +177,7 @@ function analyzeParts(ast, workingDir) {
   const internalPinsMap = {};
 
   ast.parts.forEach(part => {
-    partsClasses.push(loadGate(part.name, workingDir));
+    partsClasses.push(loadGate(part.name, workingDir, ast));
 
     part.arguments.forEach(partArg => {
       const {name, value} = partArg;
@@ -210,11 +210,19 @@ function analyzeParts(ast, workingDir) {
  * Loads part gate: custom (in the current working directory),
  * or, if a gate doesn't existing in this directory, loads the built-in.
  */
-function loadGate(name, workingDir) {
+function loadGate(name, workingDir, ast) {
+  // Explicit override to use a built-in gate for this name.
+  if (shouldUseBuiltinGate(name, ast)) {
+    return loadBuiltinGate(name);
+  }
+
+  // Else, check first if we have an HDL-implementation.
   const hdlFile = path.join(workingDir, name + '.hdl');
   if (fs.existsSync(hdlFile)) {
     return HDLClassFactory.fromHDLFile(hdlFile);
   }
+
+  // Otherwise, load a built-in gate.
   return loadBuiltinGate(name);
 }
 
@@ -228,11 +236,11 @@ function loadBuiltinGate(name) {
 /**
  * Whether a built-in backend should be used.
  */
-function shouldUseBuiltinGate(ast) {
+function shouldUseBuiltinGate(name, ast) {
   if (ast.builtins.length === 0) {
     return false;
   }
-  return ast.builtins.find(({value}) => value === ast.name);
+  return ast.builtins.find(({value}) => value === name);
 }
 
 /**

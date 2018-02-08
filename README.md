@@ -1442,7 +1442,7 @@ While if we look under the hood of the `And` gate _implementation_, we'll see th
 
 > **NOTE:** as in other systems, in hardware chips there might be _multiple implementations_ for the _same interface_. E.g. we could build the `And` chip using `Nor` gates, instead of `Nand`.
 
-How this works? The `Nand` stands for "negative-And" (or "not-And"). And first we feed our own `a` and `b` inputs to the first internal `Nand` chip, and get the "nand-result", saving it to the temporary (internal) pin `n`:
+So how does it work? The `Nand` stands for "negative-And" (or "not-And"). And first we feed our own `a` and `b` inputs to the first internal `Nand` chip, and get the "nand-result", saving it to the temporary (internal) pin `n`:
 
 ```
 Nand(a=a, b=b, out=n);
@@ -1529,7 +1529,7 @@ hdl-js --gate examples/Not16.hdl --describe --run
 
 #### Using custom and built-in gates in implementation
 
-In the example above, we used built-in native `Nand` gate to implement our own version of the `And` gate. However, one you have implemented some custom gate, you are free to use it further as a _building block_ for _even more abstracted chips_.
+In the example above, we used built-in native `Nand` gate to implement our own version of the `And` gate. However, once you have implemented some custom gate, you are free to use it further as a _building block_ for _even more abstracted chips_.
 
 For example, if we look at the [examples/Mux.hdl](https://github.com/DmitrySoshnikov/hdl-js/blob/master/examples/Mux.hdl) file:
 
@@ -1554,6 +1554,39 @@ CHIP Mux {
 ```
 
 Assuming the `Mux.hdl` file is in the same directory as the `And.hdl`, the `And` gate in the implementation is loaded exactly from our local _custom_ implementation. Whereas, the `Not`, and `Or` are loaded from the built-ins. If we remove `And.hdl` from this directory, it will also be loaded from built-ins then.
+
+Sometimes you may need to override local HDL-implementation, and use an explicit built-in gate in your call. For this we can use `BUILTIN` directive, which specifies that a particular chip call (or the whole gate definition) should be loaded from a corresponding built-in gate.
+
+Example of providing the full backend for this chip:
+
+```
+Chip And {
+  IN a, b;
+  OUT out;
+
+  // Delegate fully implementation of this chip
+  // to the built-in `And` chip.
+  BUILTIN And;
+}
+```
+
+Example of overriding just some parts:
+
+```
+Chip Nand {
+  IN a, b;
+  OUT out;
+
+  PARTS:
+
+  And(a=a, b=b, out=a_and_b);
+  Not(in=a_and_b, out=out);
+
+  BUILTIN And;
+}
+```
+
+In the example above the `And` gate in the implementation explicitly marked as a built-in, whereas the `Not` gate will be loaded from local HDL (if it exists). This might be very useful at debugging, when you need to exclude potential issues in you local version of `And` gate, and fall-back to the built-in version. Once you have successfully debugged the problem, you can restore loading `And` from local HDL version.
 
 #### Loading HDL chips from Node
 

@@ -463,4 +463,28 @@ describe('HDLClassFactory', () => {
     `);
     expect(MyAndGate).toBe(require('../builtin-gates/And'));
   });
+
+  it('built-in backend for parts', () => {
+    const Nand = HDLClassFactory.fromHDL(`
+      CHIP Nand {
+        IN a, b;
+        OUT out;
+
+        PARTS:
+
+        And(a=b, b=b, out=a_and_b);
+        Not16(in=a_and_b, out=out);
+
+        BUILTIN And;
+      }
+    `, EXAMPLES_DIR);
+
+    expect(Object.getPrototypeOf(Nand)).toBe(CompositeGate);
+
+    const nand = Nand.defaultFromSpec();
+    const [and, not] = nand.getParts();
+
+    expect(and).toBeInstanceOf(BuiltInGate);
+    expect(not).toBeInstanceOf(CompositeGate);
+  });
 });

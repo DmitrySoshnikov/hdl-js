@@ -100,7 +100,7 @@ function subscriptListToProp(values, prop) {
 %%
 
 Chip
-  : CHIP Identifer '{' Sections '}' {
+  : CHIP ChipName '{' Sections '}' {
       $$ = {
         type: 'Chip',
         name: $2,
@@ -207,7 +207,15 @@ SubscriptValue
 
 Identifer
   : ID
-  | CHIP
+  | Keyword
+  ;
+
+ChipName
+  : ID
+  ;
+
+Keyword
+  : CHIP
   | IN
   | OUT
   | PARTS
@@ -224,7 +232,7 @@ ChipCalls
   ;
 
 ChipCall
-  : Identifer '(' ArgsList ')' ';' {
+  : ChipName '(' ArgsList ')' ';' {
       $$ = {
         type: 'ChipCall',
         name: $1,
