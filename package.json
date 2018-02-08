@@ -1,6 +1,6 @@
 {
   "name": "hdl-js",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "license": "MIT",
   "description": "Hardware definition language (HDL) and Hardware simulator",
   "repository": "DmitrySoshnikov/hdl-js",
