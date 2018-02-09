@@ -70,7 +70,7 @@ class MipsAlu extends BuiltInGate {
         break;
       }
       case 0b11: {
-        // TODO:
+        // TODO: Not sure what 'less' is for yet, this is just a placeholder for eslint
         this.getOutputPins()[0].setValue(less);
         break;
       }
