@@ -18,7 +18,7 @@ const TRUTH_TABLE = [
   {a: 0, b: 0, na: 0, nb: 0, less: 0, cin: 1, op: 0b10, out: 1, cout: 0, set: 0 },
 
   // Sub
-  {a: 1, b: 1, na: 0, nb: 1, less: 0, cin: 1, op: 0b10, out: 0, cout: 0, set: 0 },
+  {a: 1, b: 1, na: 0, nb: 1, less: 0, cin: 1, op: 0b10, out: 0, cout: 1, set: 0 },
 
   // And
   {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b00, out: 1, cout: 0, set: 0 },
