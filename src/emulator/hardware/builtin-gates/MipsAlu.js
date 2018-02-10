@@ -49,12 +49,13 @@ class MipsAlu extends BuiltInGate {
    *
    */
   eval() {
-    const [ a, b, na, nb, less, cin, op ] = this.getInputPins().map(p => p.getValue());
+    const [a, b, na, nb, less, cin, op]
+      = this.getInputPins().map(pin => pin.getValue());
 
     const A = na ? +!a : a;
     const B = nb ? +!b : b;
 
-    switch(op) {
+    switch (op) {
       case 0b00: {
         this.getOutputPins()[0].setValue(A & B); 
         break;
@@ -70,7 +71,6 @@ class MipsAlu extends BuiltInGate {
         break;
       }
       case 0b11: {
-        // TODO: Not sure what 'less' is for yet, this is just a placeholder for eslint
         this.getOutputPins()[0].setValue(less);
         break;
       }
@@ -80,10 +80,27 @@ class MipsAlu extends BuiltInGate {
 }
 
 /**
- * Specification of the `And` gate.
+ * Specification of the `MipsAlu` gate.
  */
 MipsAlu.Spec = {
-  description: 'Implements bitwise 1-bit And & operation.',
+  description:
+
+`1-bit Mips Alu.
+
+Implements 1-bit MIPS ALU chip.
+
+The actual ALU operation is controlled by the 2-bit "op" input, which takes the following values:
+
+- 0 - AND
+- 1 - OR
+- 2 - ADD
+- 3 - propagate "less" input
+
+Other operations can be achieved by manipulating different inputs, and the "op" code.
+For example, to do a subtraction operation "a - b", we need to set cin = 1, and nb = 1.
+
+Setting inputs "na" and "nb" negates the inputs "a" and "b" before performing the operation.
+`,
   inputPins: ['a', 'b', 'na', 'nb', 'less', 'cin', 'op'],
   outputPins: ['out', 'cout', 'set'],
   truthTable: TRUTH_TABLE,
