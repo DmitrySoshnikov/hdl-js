@@ -52,8 +52,8 @@ class MipsAlu extends BuiltInGate {
     const [a, b, na, nb, less, cin, op]
       = this.getInputPins().map(pin => pin.getValue());
 
-    const A = na ? +!a : a;
-    const B = nb ? +!b : b;
+    const A = na ? 1 - a : a;
+    const B = nb ? 1 - b : b;
 
     switch (op) {
       case 0b00: {
@@ -67,7 +67,7 @@ class MipsAlu extends BuiltInGate {
       case 0b10: {
         const sum = A + B + cin;
         this.getOutputPins()[0].setValue(sum % 2); 
-        this.getOutputPins()[1].setValue(Math.floor(sum / 2)); 
+        this.getOutputPins()[1].setValue(Math.trunc(sum / 2)); 
         break;
       }
       case 0b11: {
