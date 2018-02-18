@@ -23,6 +23,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Pins](#pins)
     - [Pin size and ranges](#pin-size-and-ranges)
     - [Pin events](#pin-events)
+    - [Connecting pins together](#connecting-pins-together)
   - [Creating gates from default spec](#creating-gates-from-default-spec)
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
@@ -810,6 +811,62 @@ p1 changed from 0 to 255.
 
 */
 ```
+
+#### Connecting pins together
+
+A pin can be a _value source_ for another pin. By connecting (output of) one pin to the (input of) another pin, we can automate handling of the `'change'` event of the destination pin:
+
+```js
+...
+
+const a = new Pin({name: 'a', size: 16});
+const b = new Pin({name: 'b', size: 16});
+
+// Connect `a` to `b`. The `b` pin now listens
+// to the 'change' event of the `a` pin:
+
+a.connectTo(b);
+
+a.setValue(15);
+console.log(b.getValue()); // 15
+
+// Disconnect:
+a.disconnectFrom(b);
+
+a.setValue(20);
+console.log(b.getValue()); // still, 15
+```
+
+It is also possible to provide a _specification_ for value updates, which may include updates for indices and ranges:
+
+```js
+...
+
+// Auto-connect to: b[2] = a[3]
+
+a.connectTo(b, {
+  sourceSpec: {index: 3},
+  destinationSpec: {index: 2},
+});
+
+a.setValueAt(3, 1);
+console.log(b.getValueAt(2)); // 1
+
+// Disconnect:
+a.disconnectFrom(b);
+
+// Connect for range: b[4..7] = a[0..3]
+
+a.connectTo(b, {
+  sourceSpec: {range: {from: 0, 3}},
+  destinationSpec: {range: {from: 4, 7}},
+});
+
+a.setRange(0, 3, 0b1010);
+console.log(b.getRange(4, 7)); // 0b1010;
+```
+
+> **NOTE:** the pin connections are used when creating [composite gates from HDL](#building-chips-in-hdl).
 
 ### Creating gates from default spec
 
