@@ -46,8 +46,8 @@ class Pin extends EventEmitter {
     // The pins which listen to 'change' event of this pin.
     this._listeningPinsMap = new Map();
 
-    // The pins this pin listens to.
-    this._listensToPins = new Set();
+    // The pin which is connected to this pin, and provides source value.
+    this._sourcePin = null;
   }
 
   /**
@@ -158,7 +158,7 @@ class Pin extends EventEmitter {
     const litener = () => pinValueSetter(thisPinValueGetter());
 
     this._listeningPinsMap.set(pin, litener);
-    pin._listensToPins.add(this);
+    pin._sourcePin = this;
 
     this.on('change', litener);
     return this;
@@ -175,11 +175,20 @@ class Pin extends EventEmitter {
     }
 
     this._listeningPinsMap.delete(pin);
-    pin._listensToPins.delete(this);
+    pin._sourcePin = null;
 
 
     this.removeListener('change', listener);
     return this;
+  }
+
+  /**
+   * Returns the pin which is a source value provider
+   * for this pin. Usually the source is set via `connectTo`
+   * method.
+   */
+  getSourcePin() {
+    return this._sourcePin;
   }
 
   /**

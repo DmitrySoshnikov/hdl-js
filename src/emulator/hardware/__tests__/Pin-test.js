@@ -252,4 +252,18 @@ describe('Pin', () => {
     expect(b.getValue()).toBe(0b11111010);
   });
 
+  it('getSourcePin', () => {
+    const a = new Pin({name: 'a', size: 16});
+    const b = new Pin({name: 'b', size: 16});
+
+    expect(b.getSourcePin()).toBe(null);
+
+    a.connectTo(b);
+    expect(b.getSourcePin()).toBe(a);
+
+
+    a.disconnectFrom(b);
+    expect(b.getSourcePin()).toBe(null);
+  });
+
 });
