@@ -21,7 +21,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Columns whitelist](#columns-whitelist)
   - [Testing gates on passed data](#testing-gates-on-passed-data)
   - [Pins](#pins)
-    - [Pin size and slices](#pin-size-and-slices)
+    - [Pin size and ranges](#pin-size-and-ranges)
     - [Pin events](#pin-events)
   - [Creating gates from default spec](#creating-gates-from-default-spec)
   - [Exec on set of data](#exec-on-set-of-data)
@@ -740,7 +740,7 @@ console.log(p1.getValue()); // 255
 
 Usually when creating a gate instance, explicit usage of the `Pin` class can be omitted (they are created automatically behind the scene), however, it is possible to get a needed pin using `getPin(name)` method on a gate. Then one can get a value of the pin, or subscribe to its `'change'` event.
 
-#### Pin size and slices
+#### Pin size and ranges
 
 A pin can be of a needed size. For example, in HDL:
 
@@ -750,14 +750,14 @@ IN sel[3];
 
 tells that the maximum value of the `sel` pin is 3 bits (`0b111`), or _"3 wires"_.
 
-Individual bits in HDL can be accessed with direct indices (as in the `sel[2]`), or using _slice_ notation (as with the `sel[0..1])`:
+Individual bits in HDL can be accessed with direct indices (as in the `sel[2]`), or using _range_ notation (as with the `sel[0..1])`:
 
 ```
 Mux4Way16(..., sel=sel[0..1], ...)
 Mux16(..., sel=sel[2], ...);
 ```
 
-In JS, the individual bits can be manipulated using `setValueAt`, `getSlice`, and other methods:
+In JS, the individual bits can be manipulated using `setValueAt`, `getRange`, and other methods:
 
 ```js
 ...
@@ -776,7 +776,7 @@ p1.setValueAt(1, 0);
 console.log(p1.getValueAt(1)); // 0
 
 console.log(p1.getValue()); // 0b101, i.e. 5
-console.log(p1.getSlice(0, 1)); // first 2 bits: 0b01
+console.log(p1.getRange(0, 1)); // first 2 bits: 0b01
 ```
 
 #### Pin events
@@ -785,7 +785,7 @@ All `Pin` instances emit the following events:
 
 - `change(newValue, oldValue, fromIndex, toIndex)` - an event emitted whenever a pin changes its value.
 
-If the `fromIndex` is passed, this means a specific bit was updated, e.g. `a[2]`. If both, `fromIndex`, and `toIndex` are passed, this means a _slice_ was updated, e.g. `a[1..3]`. Otherwise, the whole value was updated.
+If the `fromIndex` is passed, this means a specific bit was updated, e.g. `a[2]`. If both, `fromIndex`, and `toIndex` are passed, this means a _range_ was updated, e.g. `a[1..3]`. Otherwise, the whole value was updated.
 
 ```js
 ...

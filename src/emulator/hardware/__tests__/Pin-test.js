@@ -87,39 +87,39 @@ describe('Pin', () => {
     expect(a16.getValue()).toBe(0b0101010101010101);
   });
 
-  it('returns slices', () => {
-    // Get slice 0..7:
-    expect(a16.getSlice(0, 7)).toBe(0b01010101);
+  it('returns ranges', () => {
+    // Get range 0..7:
+    expect(a16.getRange(0, 7)).toBe(0b01010101);
 
-    // Get slice 8..15:
-    expect(a16.getSlice(8, 15)).toBe(0b01010101);
+    // Get range 8..15:
+    expect(a16.getRange(8, 15)).toBe(0b01010101);
 
-    // Get slice 3..5:
-    expect(a16.getSlice(3, 5)).toBe(0b010);
+    // Get range 3..5:
+    expect(a16.getRange(3, 5)).toBe(0b010);
 
-    // Get slice 0..15:
-    expect(a16.getSlice(0, 15)).toBe(0b0101010101010101);
+    // Get range 0..15:
+    expect(a16.getRange(0, 15)).toBe(0b0101010101010101);
   });
 
-  it('set slice', () => {
+  it('set range', () => {
     const a = new Pin({
       name: 'a',
       size: 5,
       value: 0b10101,
     });
 
-    a.setSlice(1, 3, 0b101);
+    a.setRange(1, 3, 0b101);
 
-    // Slice: a[1..3] = 0b101
-    expect(a.getSlice(1, 3)).toBe(0b101);
+    // Range: a[1..3] = 0b101
+    expect(a.getRange(1, 3)).toBe(0b101);
     expect(a.getValue()).toBe(0b11011);
 
     // The whole value: a[0..4] = a = 0b01010
-    a.setSlice(0, 4, 0b01010);
+    a.setRange(0, 4, 0b01010);
     expect(a.getValue()).toBe(0b01010);
 
     // One bit: a[0..0] = a[0] = 0b1
-    a.setSlice(0, 0, 0b1);
+    a.setRange(0, 0, 0b1);
     expect(a.getValue()).toBe(0b01011);
   });
 
@@ -130,8 +130,8 @@ describe('Pin', () => {
     expect(() => a16.getValueAt(31)).toThrow();
     expect(() => a16.getValueAt(-1)).toThrow();
 
-    expect(() => a16.getSlice(0, 31)).toThrow();
-    expect(() => a16.getSlice(-1, 15)).toThrow();
+    expect(() => a16.getRange(0, 31)).toThrow();
+    expect(() => a16.getRange(-1, 15)).toThrow();
   });
 
   it('set value', () => {
@@ -175,6 +175,81 @@ describe('Pin', () => {
     expect(_old).toBe(0b111);
     expect(_new).toBe(0b101);
     expect(_index).toBe(1);
+  });
+
+  it('connectTo: simple value', () => {
+    const a = new Pin({name: 'a', size: 16});
+    const b = new Pin({name: 'b', size: 16});
+
+    // `b` receives value from `a`:
+    a.connectTo(b);
+
+    a.setValue(15);
+    expect(b.getValue()).toBe(15);
+
+    // `b` doesn't receive value anymore:
+    a.disconnectFrom(b);
+
+    a.setValue(20);
+    expect(b.getValue()).toBe(15);
+  });
+
+  it('connectTo: index', () => {
+    const a = new Pin({name: 'a', size: 16});
+    const b = new Pin({name: 'b', size: 16});
+
+    // `b[1]` receives value from `a[2]`:
+    a.connectTo(b, {
+      sourceSpec: {index: 2},
+      destinationSpec: {index: 1},
+    });
+
+    // Original `b` value.
+    b.setValue(0b101);
+
+    a.setValue(0b100);
+    expect(b.getValueAt(1)).toBe(1);
+    expect(b.getValue()).toBe(0b111);
+
+    a.setValueAt(2, 0);
+    expect(b.getValueAt(1)).toBe(0);
+    expect(b.getValue()).toBe(0b101);
+
+    // `b` doesn't receive value anymore:
+    a.disconnectFrom(b);
+
+    a.setValueAt(2, 1);
+    expect(b.getValueAt(1)).toBe(0);
+    expect(b.getValue()).toBe(0b101);
+  });
+
+  it('connectTo: range', () => {
+    const a = new Pin({name: 'a', size: 16});
+    const b = new Pin({name: 'b', size: 16});
+
+    // `b[0..3]` receives value from `a[4..7]`:
+    a.connectTo(b, {
+      sourceSpec: {range: {from: 4, to: 7}},
+      destinationSpec: {range: {from: 0, to: 3}},
+    });
+
+    // Original `b` value.
+    b.setValue(0b11110000);
+
+    a.setValue(0b11110000);
+    expect(b.getRange(0, 3)).toBe(0b1111);
+    expect(b.getValue()).toBe(0b11111111);
+
+    a.setRange(4, 7, 0b1010);
+    expect(b.getRange(0, 3)).toBe(0b1010);
+    expect(b.getValue()).toBe(0b11111010);
+
+    // `b` doesn't receive value anymore:
+    a.disconnectFrom(b);
+
+    a.setRange(4, 7, 0b1111);
+    expect(b.getRange(0, 3)).toBe(0b1010);
+    expect(b.getValue()).toBe(0b11111010);
   });
 
 });

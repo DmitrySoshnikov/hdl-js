@@ -42,6 +42,12 @@ class Pin extends EventEmitter {
 
     // There might be more than 11 pins (default in Node).
     this.setMaxListeners(Infinity);
+
+    // The pins which listen to 'change' event of this pin.
+    this._listeningPinsMap = new Map();
+
+    // The pins this pin listens to.
+    this._listensToPins = new Set();
   }
 
   /**
@@ -104,33 +110,76 @@ class Pin extends EventEmitter {
   }
 
   /**
-   * Returns slice (sub-bus) of this bus.
+   * Returns range (sub-bus) of this bus.
    */
-  getSlice(from, to) {
+  getRange(from, to) {
     this._checkIndex(from);
     this._checkIndex(to);
     return (this._value >> from) & ((1 << (to + 1 - from)) - 1);
   }
 
   /**
-   * Sets a value of a slice.
+   * Sets a value of a range.
    *
    * Value: 0b1010
-   * Slice: 0b101
+   * Range: 0b101
    * From: 0
    * To: 2
    *
    * Result: 0b1101
    */
-  setSlice(from, to, slice) {
+  setRange(from, to, range) {
     this._checkIndex(from);
     this._checkIndex(to);
 
     const oldValue = this._value;
     const mask = ((1 << (to + 1 - from)) - 1) << from;
-    this._value = (oldValue & ~mask) | ((slice << from) & mask);
+    this._value = (oldValue & ~mask) | ((range << from) & mask);
 
     this.emit('change', this._value, oldValue, from, to);
+  }
+
+  /**
+   * Connects this pin to another one. The other pin
+   * then listens to the 'change' event of this pin.
+   *
+   * If the specs are passed, the values are updated according
+   * to these specs. E.g. {index: 3} spec updates a[3] bit,
+   * and {range: {from: 1, to: 3}} updates a[1..3].
+   */
+  connectTo(pin, {sourceSpec = {}, destinationSpec = {}} = {}) {
+    if (this._listeningPinsMap.has(pin)) {
+      return;
+    }
+
+    const thisPinValueGetter = createPinValueGetter(this, sourceSpec);
+    const pinValueSetter = createPinValueSetter(pin, destinationSpec);
+
+    const litener = () => pinValueSetter(thisPinValueGetter());
+
+    this._listeningPinsMap.set(pin, litener);
+    pin._listensToPins.add(this);
+
+    this.on('change', litener);
+    return this;
+  }
+
+  /**
+   * Unplugs this pin from other pin.
+   */
+  disconnectFrom(pin) {
+    const listener = this._listeningPinsMap.get(pin);
+
+    if (!listener) {
+      return;
+    }
+
+    this._listeningPinsMap.delete(pin);
+    pin._listensToPins.delete(this);
+
+
+    this.removeListener('change', listener);
+    return this;
   }
 
   /**
@@ -163,6 +212,31 @@ class Pin extends EventEmitter {
       );
     }
   }
+}
+
+// ----------------------------------------------------------------
+// Updates pin value according to spec: full, index or range.
+//
+function createPinValueSetter(pin, spec) {
+  if (spec.hasOwnProperty('index')) {
+    return value => pin.setValueAt(spec.index, value);
+  } else if (spec.range) {
+    return value => pin.setRange(spec.range.from, spec.range.to, value);
+  } else {
+    return value => pin.setValue(value);
+  }
+}
+
+// ----------------------------------------------------------------
+// Extracts pin value according to spec: full, index or range.
+//
+function createPinValueGetter(pin, spec) {
+  if (spec.hasOwnProperty('index')) {
+    return () => pin.getValueAt(spec.index);
+  } else if (spec.range) {
+    return () => pin.getRange(spec.range.from, spec.range.to);
+  }
+  return () => pin.getValue();
 }
 
 /**

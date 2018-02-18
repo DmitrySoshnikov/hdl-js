@@ -381,7 +381,7 @@ describe('HDLClassFactory', () => {
     expect(myChip.getPin('out').getValue()).toBe(0b0010);
   });
 
-  it('slice input/output', () => {
+  it('range input/output', () => {
     const MyChip = HDLClassFactory.fromHDL(`
       CHIP MyChip {
         IN a[4];

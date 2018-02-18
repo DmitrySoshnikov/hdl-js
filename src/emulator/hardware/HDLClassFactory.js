@@ -346,10 +346,10 @@ function handlePartArg(
       outputPinsMap[value.value] ||
       internalPinsMap[value.value]
     );
-    sourcePin.on(
-      'change',
-      createInputChangeHandler(pin, sourcePin, name, value)
-    );
+    sourcePin.connectTo(pin, {
+      sourceSpec: value,
+      destinationSpec: name,
+    });
   }
 
   // When the output of the part pin changes,
@@ -359,55 +359,11 @@ function handlePartArg(
       internalPinsMap[value.value] ||
       outputPinsMap[value.value]
     );
-    pin.on(
-      'change',
-      createOutputChangeHandler(destPin, pin, name, value)
-    );
-
+    pin.connectTo(destPin, {
+      sourceSpec: name,
+      destinationSpec: value,
+    });
   }
-}
-
-// ----------------------------------------------------------------
-// Change handler for inputs.
-//
-function createInputChangeHandler(pin, sourcePin, nameInfo, valueInfo) {
-  return () => {
-    setPinValue(pin, getPinValue(sourcePin, valueInfo), nameInfo);
-  };
-}
-
-// ----------------------------------------------------------------
-// Change handler for outputs.
-//
-function createOutputChangeHandler(destPin, pin, nameInfo, valueInfo) {
-  return () => {
-    setPinValue(destPin, getPinValue(pin, nameInfo), valueInfo);
-  };
-}
-
-// ----------------------------------------------------------------
-// Update pin value according to spec: full, index or slice.
-//
-function setPinValue(pin, value, spec) {
-  if (spec.hasOwnProperty('index')) {
-    pin.setValueAt(spec.index, value);
-  } else if (spec.range) {
-    pin.setSlice(spec.range.from, spec.range.to, value);
-  } else {
-    pin.setValue(value);
-  }
-}
-
-// ----------------------------------------------------------------
-// Extracts pin value according to spec: full, index or slice.
-//
-function getPinValue(pin, spec) {
-  if (spec.hasOwnProperty('index')) {
-    return pin.getValueAt(spec.index);
-  } else if (spec.range) {
-    return pin.getSlice(spec.range.from, spec.range.to);
-  }
-  return pin.getValue();
 }
 
 module.exports = HDLClassFactory;
