@@ -1741,4 +1741,117 @@ CHIP And {
 
 ### Exporting from Composite Gates
 
-**WIP:** track [issue #17](https://github.com/DmitrySoshnikov/hdl-js/issues/17).
+Composite gates are usually created in the _declarative style_ [using HDL](#building-chips-in-hdl) syntax. Alternatively, one may need to create a composite gate directly in the _imperative style_, i.e. manually creating pins, connecting them together, etc.
+
+In the example below we manually create a composite gate, and export it to HDL file:
+
+> **NOTE**: the _preferred way_ of creating composite gates is still using declarative HDL notation. Use manual imperative style only in unusual programmatic cases.
+
+```js
+const hdl = require('hdl-js');
+
+const {
+  generator,
+  emulator: {
+    CompositeGate,
+    Pin,
+    BuiltInGates: {
+      And,
+      Not,
+    },
+  },
+} = hdl;
+
+/*
+
+We create manually (imperatively) a composite gate, corresponding
+to the following declarative definition in HDL:
+
+CHIP MyGate {
+  IN x[16], y[16];
+  OUT out[16];
+
+  PARTS:
+
+  And(a=x[0], b=y[0], out=temp);
+  Not(in=temp, out=out[1]);
+}
+
+*/
+
+// Inputs:
+const x = new Pin({name: 'x', size: 16});
+const y = new Pin({name: 'y', size: 16});
+
+// Outputs:
+const out = new Pin({name: 'out', size: 16});
+
+// Internal pins:
+const temp = new Pin({name: 'temp'});
+
+// Parts:
+const and = And.defaultFromSpec();
+const not = Not.defaultFromSpec();
+
+// Now connect needed pins to each other,
+// creating a connection graph:
+
+// ----------------------------------
+// And(a=x[0], b=y[0], out=temp);
+
+// a=a[0]
+x.connectTo(and.getPin('a'), {
+  sourceSpec: {index: 0},
+});
+
+// b=y[0]
+y.connectTo(and.getPin('b'), {
+  sourceSpec: {index: 0},
+});
+
+// out=temp
+and.getPin('out').connectTo(temp);
+
+// ----------------------------------
+// Not(in=temp, out=out[1]);
+
+// in=temp
+temp.connectTo(not.getPin('in'));
+
+// out=out[1]
+not.getPin('out').connectTo(out, {
+  destinationSpec: {index: 1},
+});
+
+// Create our gate instance:
+const myGate = new CompositeGate({
+  name: 'myGate',
+  inputPins: [x, y],
+  outputPins: [out],
+  internalPins: [temp],
+  parts: [and, not],
+});
+
+// Finally, export this composite gate to an AST
+// structure, and generate HDL code:
+
+const hdlCode = generator.generateFromAST(myGate.toAST());
+
+console.log(hdlCode);
+
+/*
+
+Result:
+
+CHIP MyGate {
+  IN x[16], y[16];
+  OUT out[16];
+
+  PARTS:
+
+  And(a=x[0], b=y[0], out=temp);
+  Not(in=temp, out=out[1]);
+}
+
+*/
+```

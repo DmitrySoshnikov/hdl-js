@@ -266,4 +266,23 @@ describe('Pin', () => {
     expect(b.getSourcePin()).toBe(null);
   });
 
+  it('connectTo: connect info', () => {
+    const a = new Pin({name: 'a', size: 16});
+    const b = new Pin({name: 'b', size: 16});
+
+    const sourceSpec = {index: 2};
+    const destinationSpec = {index: 1};
+
+    a.connectTo(b, {
+      sourceSpec,
+      destinationSpec,
+    });
+
+    const connectInfo = a.getListeningPinsMap().get(b);
+
+    expect(typeof connectInfo.listener).toBe('function');
+    expect(connectInfo.sourceSpec).toBe(sourceSpec);
+    expect(connectInfo.destinationSpec).toBe(destinationSpec);
+  });
+
 });

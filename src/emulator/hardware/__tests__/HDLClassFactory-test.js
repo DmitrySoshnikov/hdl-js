@@ -61,17 +61,18 @@ describe('HDLClassFactory', () => {
   });
 
   it('fromAST', () => {
+    const ast = parser.parse(
+      fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
+    );
+
     const and = HDLClassFactory
-      .fromAST(
-        parser.parse(
-          fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
-        )
-      )
+      .fromAST(ast)
       .defaultFromSpec();
 
     and.setPinValues({a: 1, b: 1});
     and.eval();
     expect(and.getPin('out').getValue()).toBe(1);
+    expect(and.toAST()).toBe(ast);
   });
 
   it('fromHDLFile cache', () => {

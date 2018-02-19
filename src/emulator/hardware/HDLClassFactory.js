@@ -101,6 +101,7 @@ const HDLClassFactory = {
         super(Object.assign(options, {
           name: ast.name,
           parts,
+          ast,
         }));
       }
     };

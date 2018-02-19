@@ -155,12 +155,18 @@ class Pin extends EventEmitter {
     const thisPinValueGetter = createPinValueGetter(this, sourceSpec);
     const pinValueSetter = createPinValueSetter(pin, destinationSpec);
 
-    const litener = () => pinValueSetter(thisPinValueGetter());
+    const listener = () => pinValueSetter(thisPinValueGetter());
 
-    this._listeningPinsMap.set(pin, litener);
+    const connectInfo = {
+      listener,
+      sourceSpec,
+      destinationSpec,
+    };
+
+    this._listeningPinsMap.set(pin, connectInfo);
     pin._sourcePin = this;
 
-    this.on('change', litener);
+    this.on('change', listener);
     return this;
   }
 
@@ -168,18 +174,26 @@ class Pin extends EventEmitter {
    * Unplugs this pin from other pin.
    */
   disconnectFrom(pin) {
-    const listener = this._listeningPinsMap.get(pin);
-
-    if (!listener) {
+    if (!this._listeningPinsMap.has(pin)) {
       return;
     }
+
+    const {listener} = this._listeningPinsMap.get(pin);
 
     this._listeningPinsMap.delete(pin);
     pin._sourcePin = null;
 
-
     this.removeListener('change', listener);
     return this;
+  }
+
+  /**
+   * Returns listening pins map. The key is a pin, the
+   * value is a ConnectionInfo, which includes the listener
+   * function, and connection properties (index, range, etc).
+   */
+  getListeningPinsMap() {
+    return this._listeningPinsMap;
   }
 
   /**
