@@ -143,7 +143,7 @@ module.exports = {
    *
    * options: {indent = 2}
    */
-  generateFromAST(node, options) {
+  fromAST(node, options) {
     const hdl = reformat(gen(node), options);
     return [
       `/**`,
@@ -151,5 +151,14 @@ module.exports = {
       ` */`,
       hdl,
     ].join('\n');
+  },
+
+  /**
+   * Generates an HDL code from a CompositeGate instance.
+   *
+   * options: see `generateFromAST`.
+   */
+  fromCompositeGate(compositeGate, options) {
+    return this.fromAST(compositeGate.toAST(), options);
   },
 };

@@ -72,10 +72,17 @@ const hdl = {
   },
 
   /**
-   * Generates an HDL code from AST.
+   * Generates an HDL code from an AST.
    */
-  generateFromAST(ast) {
-    return generator.generateFromAST(ast);
+  generateFromAST(ast, options) {
+    return generator.generateFromAST(ast, options);
+  },
+
+  /**
+   * Generates an HDL from a CompositeGate instance.
+   */
+  generateFromCompositeGate(compositeGate, options) {
+    return generator.fromCompositeGate(compositeGate, options);
   },
 };
 

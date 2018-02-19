@@ -388,7 +388,7 @@ describe('CompositeGate', () => {
     });
 
     // Check generated HDL code:
-    const generatedHDLCode = generator.generateFromAST(myGate.toAST());
+    const generatedHDLCode = generator.fromCompositeGate(myGate);
 
     const expectedHDLCode =
 `/**

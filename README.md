@@ -151,7 +151,8 @@ The `hdl-js` exposes the following API:
     - `And`
     - `Or`
     - ...
-- `generateFromAST(ast)` -- generates an HDL code from AST; convenient facade for `generator.generateFromAST`
+- `generateFromAST(ast)` -- generates an HDL code from AST; convenient facade for `generator.fromAST`
+- `generateFromCompositeGate(gate)` -- generates an HDL code from a composite gate instance; convenient facade for `generator.fromCompositeGate`
 - [generator](#code-generator) -- the generator module exposed
 
 
@@ -1718,7 +1719,7 @@ parts[1] = {
 
 // Finally, generate the HDL code:
 
-const exportedHDL = generator.generateFromAST(ast);
+const exportedHDL = generator.fromAST(ast);
 
 console.log(exportedHDL);
 
@@ -1835,7 +1836,7 @@ const myGate = new CompositeGate({
 // Finally, export this composite gate to an AST
 // structure, and generate HDL code:
 
-const hdlCode = generator.generateFromAST(myGate.toAST());
+const hdlCode = generator.fromCompositeGate(myGate);
 
 console.log(hdlCode);
 
