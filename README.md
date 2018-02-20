@@ -366,9 +366,9 @@ This is the top-level `"Chip"` node, and has the following properties:
   parts: [ChipCall, ...],
 
   /**
-   * If present, contains the name of a built-in chip.
+   * If present, contains the names of the built-in chips used in this gate.
    */
-  builtins: [Name],
+  builtins: [Name, ...],
 
   /**
    * If present, shows the list of clocked inputs/outputs.
@@ -1800,7 +1800,7 @@ const not = Not.defaultFromSpec();
 // ----------------------------------
 // And(a=x[0], b=y[0], out=temp);
 
-// a=a[0]
+// a=x[0]
 x.connectTo(and.getPin('a'), {
   sourceSpec: {index: 0},
 });
