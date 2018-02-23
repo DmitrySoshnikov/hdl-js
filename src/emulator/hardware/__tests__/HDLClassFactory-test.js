@@ -488,4 +488,32 @@ describe('HDLClassFactory', () => {
     expect(and).toBeInstanceOf(BuiltInGate);
     expect(not).toBeInstanceOf(CompositeGate);
   });
+
+  it('virtualDirectory', () => {
+    const virtualDirectory = {
+      And: fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8'),
+    };
+
+    HDLClassFactory.setVirtualDirectory(virtualDirectory);
+
+    expect(HDLClassFactory.fromHDL(virtualDirectory.And))
+      .toBe(HDLClassFactory.fromHDL(virtualDirectory.And));
+
+    // Reset back:
+    HDLClassFactory.setVirtualDirectory(null);
+  });
+
+  it('loadGate', () => {
+    const virtualDirectory = {
+      And: fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8'),
+    };
+
+    HDLClassFactory.setVirtualDirectory(virtualDirectory);
+
+    expect(HDLClassFactory.loadGate('And'))
+      .toBe(HDLClassFactory.loadGate('And'));
+
+    // Reset back:
+    HDLClassFactory.setVirtualDirectory(null);
+  });
 });

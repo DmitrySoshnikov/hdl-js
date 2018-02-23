@@ -22,6 +22,12 @@ const fileNamesToGateClasses = {};
 const hdlCodeToGateClasses = {};
 
 /**
+ * Virtual directory when no access to filesystem
+ */
+let virtualDirectory = null;
+let virtualDirectoryGateClasses = {};
+
+/**
  * This factory creates a gate class from the parsed HDL.
  * The resulting class inherits from the `CompositeGate`.
  */
@@ -122,7 +128,49 @@ const HDLClassFactory = {
     };
 
     return GateClass;
-  }
+  },
+
+  /**
+   * Sets virtual directory.
+   *
+   * It's a JS object from gate name to source code.
+   */
+  setVirtualDirectory(directory) {
+    virtualDirectory = directory;
+    virtualDirectoryGateClasses = {};
+    return this;
+  },
+
+  /**
+   * Loads part gate: custom (in the current working directory),
+   * or, if a gate doesn't exist in this directory, loads the built-in.
+   */
+  loadGate(name, workingDir = __dirname, ast = null) {
+    // Explicit override to use a built-in gate for this name.
+    if (ast && shouldUseBuiltinGate(name, ast)) {
+      return loadBuiltinGate(name);
+    }
+
+    // If virtual directory is set, use it:
+    if (virtualDirectory && virtualDirectory.hasOwnProperty(name)) {
+      if (!virtualDirectoryGateClasses.hasOwnProperty(name)) {
+        virtualDirectoryGateClasses[name] = HDLClassFactory.fromHDL(
+          virtualDirectory[name],
+          workingDir
+        );
+      }
+      return virtualDirectoryGateClasses[name];
+    } else {
+      // Else, check first if we have an HDL-implementation.
+      const hdlFile = path.join(workingDir, name + '.hdl');
+      if (fs.existsSync(hdlFile)) {
+        return HDLClassFactory.fromHDLFile(hdlFile);
+      }
+    }
+
+    // Otherwise, load a built-in gate.
+    return loadBuiltinGate(name);
+  },
 };
 
 /**
@@ -178,7 +226,7 @@ function analyzeParts(ast, workingDir) {
   const internalPinsMap = {};
 
   ast.parts.forEach(part => {
-    partsClasses.push(loadGate(part.name, workingDir, ast));
+    partsClasses.push(HDLClassFactory.loadGate(part.name, workingDir, ast));
 
     part.arguments.forEach(partArg => {
       const {name, value} = partArg;
@@ -205,26 +253,6 @@ function analyzeParts(ast, workingDir) {
     internalPinsSpec,
     partsClasses,
   ];
-}
-
-/**
- * Loads part gate: custom (in the current working directory),
- * or, if a gate doesn't existing in this directory, loads the built-in.
- */
-function loadGate(name, workingDir, ast) {
-  // Explicit override to use a built-in gate for this name.
-  if (shouldUseBuiltinGate(name, ast)) {
-    return loadBuiltinGate(name);
-  }
-
-  // Else, check first if we have an HDL-implementation.
-  const hdlFile = path.join(workingDir, name + '.hdl');
-  if (fs.existsSync(hdlFile)) {
-    return HDLClassFactory.fromHDLFile(hdlFile);
-  }
-
-  // Otherwise, load a built-in gate.
-  return loadBuiltinGate(name);
 }
 
 /**

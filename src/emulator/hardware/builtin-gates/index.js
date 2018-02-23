@@ -5,20 +5,51 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-
 /**
- * A map of all built-in gates.
+ * A map from gate name to gate class.
  */
 const BuiltInGates = {};
 
-const builtinGates = fs.readdirSync(__dirname)
-  .filter(file => /^[A-Z]/.test(file));
-
-for (const gate of builtinGates) {
-  const gateName = path.basename(gate, '.js');
-  BuiltInGates[gateName] = require('./' + gateName);
-}
+/**
+ * A list of exposed built-in gates.
+ */
+[
+  'ARegister',
+  'Add16',
+  'And',
+  'And16',
+  'Bit',
+  'DFF',
+  'DMux',
+  'DMux4Way',
+  'DMux8Way',
+  'DRegister',
+  'FullAdder',
+  'HalfAdder',
+  'Inc16',
+  'MipsAlu',
+  'Mux',
+  'Mux16',
+  'Mux4Way16',
+  'Mux8Way16',
+  'Nand',
+  'Nor',
+  'Nor16Way',
+  'Not',
+  'Not16',
+  'Or',
+  'Or16',
+  'Or8Way',
+  'PC',
+  'RAM',
+  'RAM16K',
+  'RAM4K',
+  'RAM512',
+  'RAM64',
+  'RAM8',
+  'Register',
+  'Xor',
+]
+  .forEach(gate => BuiltInGates[gate] = require('./' + gate));
 
 module.exports = BuiltInGates;
