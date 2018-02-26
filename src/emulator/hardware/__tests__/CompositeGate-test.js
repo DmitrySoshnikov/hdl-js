@@ -5,12 +5,11 @@
 
 'use strict';
 
-const Gate = require('../Gate');
 const CompositeGate = require('../CompositeGate');
 const generator = require('../../../generator');
 const Pin = require('../Pin');
 
-class MyGate extends Gate {}
+class MyGate extends CompositeGate {}
 
 describe('CompositeGate', () => {
 
@@ -89,7 +88,7 @@ describe('CompositeGate', () => {
     expect(halfAdder.getPin('carry').getValue()).toBe(1);
   });
 
-  it.only('toAST', () => {
+  it('toAST', () => {
     const And = require('../builtin-gates/And');
     const And16 = require('../builtin-gates/And16');
 
@@ -407,6 +406,49 @@ CHIP MyGate {
 
     expect(generatedHDLCode).toBe(expectedHDLCode);
 
+  });
+
+  it('generateTruthTable: simple', () => {
+    const and = require('../HDLClassFactory').fromHDL(`
+      CHIP And {
+        IN a, b;
+        OUT out;
+
+        PARTS:
+
+        Nand(a=a, b=b, out=n);
+        Nand(a=n, b=n, out=out);
+      }
+    `).defaultFromSpec();
+
+    expect(and.generateTruthTable()).toEqual([
+      {a: 0, b: 0, n: 1, out: 0},
+      {a: 0, b: 1, n: 1, out: 0},
+      {a: 1, b: 0, n: 1, out: 0},
+      {a: 1, b: 1, n: 0, out: 1},
+    ]);
+  });
+
+  it('generateTruthTable: complex', () => {
+    const and = require('../HDLClassFactory').fromHDL(`
+      CHIP And {
+        IN a[2], b[2];
+        OUT out[2];
+
+        PARTS:
+
+        And(a=a[0], b=b[0], out=out[0]);
+        And(a=a[1], b=b[1], out=out[1]);
+      }
+    `).defaultFromSpec();
+
+    const generatedTT = and.generateTruthTable();
+    expect(generatedTT.length).toBe(5);
+
+    const {result: actualTT, conflicts} = and.execOnData(generatedTT);
+
+    expect(actualTT).toEqual(generatedTT);
+    expect(conflicts.length).toBe(0);
   });
 
 });

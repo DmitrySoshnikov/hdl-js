@@ -105,6 +105,55 @@ class CompositeGate extends Gate {
   }
 
   /**
+   * Generates a (random) truth table for this gate.
+   */
+  generateTruthTable() {
+    const GateClass = this.getClass();
+    const {inputPins} = GateClass.Spec;
+
+    const isSimple = inputPins.every(input => {
+      return typeof input === 'string' || input.size === 1;
+    });
+
+    const inputData = [];
+
+    // For simple tables generate all permutations.
+    if (isSimple) {
+      // Number of rows.
+      const n = Math.pow(2, inputPins.length);
+      for (let i = 0; i < n; i++) {
+        const row = {};
+        // Use 2-radix to get a binary number, and get `0`s, and `1`s
+        // for the table from it.
+        i.toString(2)
+          .padStart(inputPins.length, '0')
+          .split('')
+          .forEach((bit, idx) => {
+            const key = typeof inputPins[idx] === 'string'
+              ? inputPins[idx]
+              : inputPins[idx].name;
+            row[key] = Number(bit);
+          });
+        inputData.push(row);
+      }
+    } else {
+      // Else, generate random input numbers for 5 rows.
+      for (let i = 0; i < 5; i++) {
+        const row = {};
+        inputPins.forEach(input => {
+          const size = input.size || 1;
+          const name = typeof input === 'string' ? input : input.name;
+          row[name] = randomNumberInRange(0, Math.pow(2, size) - 1);
+        });
+        inputData.push(row);
+      }
+    }
+
+    const {result} = this.execOnData(inputData);
+    return result;
+  }
+
+  /**
    * Transforms this composite gate instance to the AST format.
    * The AST then can be fed to the code generator, and be
    * exported to an HDL file.
@@ -199,6 +248,13 @@ class CompositeGate extends Gate {
       clocked: [],
     });
   }
+}
+
+/**
+ * Returns a random integer number in range.
+ */
+function randomNumberInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 module.exports = CompositeGate;
