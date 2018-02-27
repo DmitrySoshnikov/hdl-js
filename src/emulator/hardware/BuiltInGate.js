@@ -61,7 +61,10 @@ class BuiltInGate extends Gate {
   static getHDLCode() {
     if (!this._hdlCode) {
       const spec = this.Spec;
-      const docBlock = spec.description.split('\n').map(line => ` * ${line}`);
+      const docBlock = spec.description
+        .split('\n')
+        .map(line => ` * ${line}`)
+        .join('\n');
 
       const inputs = spec.inputPins.map(pin => Pin.toFullName(pin)).join(', ');
 
