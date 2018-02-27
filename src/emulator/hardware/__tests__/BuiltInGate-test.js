@@ -78,4 +78,41 @@ CHIP And16 {
 
     expect(And16.getHDLCode()).toBe(expectedHDLCode);
   });
+
+
+  it('generateTruthTable: simple', () => {
+    const and = require('../builtin-gates/And').defaultFromSpec();
+
+    expect(and.generateTruthTable()).toEqual([
+      {a: 0, b: 0, out: 0},
+      {a: 0, b: 1, out: 0},
+      {a: 1, b: 0, out: 0},
+      {a: 1, b: 1, out: 1},
+    ]);
+  });
+
+  it('generateTruthTable: complex', () => {
+    const and16 = require('../builtin-gates/And16').defaultFromSpec();
+
+    const generatedTT = and16.generateTruthTable();
+    expect(generatedTT.length).toBe(5);
+
+    const {result: actualTT, conflicts} = and16.execOnData(generatedTT);
+
+    expect(actualTT).toEqual(generatedTT);
+    expect(conflicts.length).toBe(0);
+  });
+
+  it('generateTruthTable: enforceRandom', () => {
+    const and = require('../builtin-gates/And').defaultFromSpec();
+
+    const generatedTT = and.generateTruthTable({enforceRandom: true});
+    expect(generatedTT.length).toBe(5);
+
+    const {result: actualTT, conflicts} = and.execOnData(generatedTT);
+
+    expect(actualTT).toEqual(generatedTT);
+    expect(conflicts.length).toBe(0);
+  });
+
 });
