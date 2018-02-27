@@ -6,6 +6,7 @@
 'use strict';
 
 const Gate = require('./Gate');
+const Pin = require('./Pin');
 
 /**
  * Base class for all builtin gates.
@@ -36,22 +37,49 @@ class BuiltInGate extends Gate {
     if (pins.length !== spec[kind].length) {
       throw new Error(
         `"${this._name}" gate: expect ${spec[kind].length} ${kind} ` +
-        `(${spec[kind].join(', ')}), got ${pins.length}.`
+          `(${spec[kind].join(', ')}), got ${pins.length}.`
       );
     }
 
     // Check that for sized-pins, a `Pin` is passed.
     spec[kind].forEach((pinName, index) => {
-      const size = typeof pinName === 'string'
-        ? null
-        : pinName.size;
+      const size = typeof pinName === 'string' ? null : pinName.size;
       if (size && pins[index].getSize() !== size) {
         throw new TypeError(
           `"${this._name}" gate: expect gate #${index} from ${kind} to have ` +
-          `size ${size}, ${pins[index].getSize()} is given.`
+            `size ${size}, ${pins[index].getSize()} is given.`
         );
       }
     });
+  }
+
+  /**
+   * Returns HDL code for this built-in gate.
+   *
+   * Describes inputs/outputs with the BUILTIN <Name> part.
+   */
+  static getHDLCode() {
+    if (!this._hdlCode) {
+      const spec = this.Spec;
+      const docBlock = spec.description.split('\n').map(line => ` * ${line}`);
+
+      const inputs = spec.inputPins.map(pin => Pin.toFullName(pin)).join(', ');
+
+      const outputs = spec.outputPins
+        .map(pin => Pin.toFullName(pin))
+        .join(', ');
+
+      this._hdlCode = `/**
+${docBlock}
+ */
+CHIP ${this.name} {
+  IN ${inputs};
+  OUT ${outputs};
+
+  BUILTIN ${this.name};
+}`;
+    }
+    return this._hdlCode;
   }
 
   static validateSpec(spec) {

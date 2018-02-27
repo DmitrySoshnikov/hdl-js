@@ -9,7 +9,6 @@ const BuiltInGate = require('../BuiltInGate');
 const Pin = require('../Pin');
 
 describe('BuiltInGate', () => {
-
   it('BuiltInGate interface', () => {
     // Inputs.
     const a = new Pin({name: 'a', value: 1});
@@ -64,4 +63,19 @@ describe('BuiltInGate', () => {
     expect(not16.getPin('out').getSize()).toBe(16);
   });
 
+  it('getHDLCode', () => {
+    const And16 = require('../builtin-gates/And16');
+
+    const expectedHDLCode = `/**
+ * Implements bitwise 16-bit And & operation.
+ */
+CHIP And16 {
+  IN a[16], b[16];
+  OUT out[16];
+
+  BUILTIN And16;
+}`;
+
+    expect(And16.getHDLCode()).toBe(expectedHDLCode);
+  });
 });
