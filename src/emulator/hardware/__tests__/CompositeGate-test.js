@@ -451,4 +451,26 @@ CHIP MyGate {
     expect(conflicts.length).toBe(0);
   });
 
+  it('generateTruthTable: enforceRandom', () => {
+    const and = require('../HDLClassFactory').fromHDL(`
+      CHIP And {
+        IN a, b;
+        OUT out;
+
+        PARTS:
+
+        Nand(a=a, b=b, out=n);
+        Nand(a=n, b=n, out=out);
+      }
+    `).defaultFromSpec();
+
+    const generatedTT = and.generateTruthTable({enforceRandom: true});
+    expect(generatedTT.length).toBe(5);
+
+    const {result: actualTT, conflicts} = and.execOnData(generatedTT);
+
+    expect(actualTT).toEqual(generatedTT);
+    expect(conflicts.length).toBe(0);
+  });
+
 });

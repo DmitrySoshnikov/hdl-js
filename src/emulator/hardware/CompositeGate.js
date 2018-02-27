@@ -107,7 +107,7 @@ class CompositeGate extends Gate {
   /**
    * Generates a (random) truth table for this gate.
    */
-  generateTruthTable() {
+  generateTruthTable({enforceRandom = false} = {}) {
     const GateClass = this.getClass();
     const {inputPins} = GateClass.Spec;
 
@@ -118,7 +118,7 @@ class CompositeGate extends Gate {
     const inputData = [];
 
     // For simple tables generate all permutations.
-    if (isSimple) {
+    if (isSimple && !enforceRandom) {
       // Number of rows.
       const n = Math.pow(2, inputPins.length);
       for (let i = 0; i < n; i++) {
