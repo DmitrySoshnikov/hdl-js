@@ -513,6 +513,9 @@ describe('HDLClassFactory', () => {
     expect(HDLClassFactory.loadGate('And'))
       .toBe(HDLClassFactory.loadGate('And'));
 
+    expect(Object.getPrototypeOf(HDLClassFactory.loadGate('Nand')))
+      .toBe(BuiltInGate);
+
     // Reset back:
     HDLClassFactory.setVirtualDirectory(null);
   });

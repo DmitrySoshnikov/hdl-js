@@ -152,26 +152,33 @@ const HDLClassFactory = {
     }
 
     // If virtual directory is set, use it:
-    if (virtualDirectory && virtualDirectory.hasOwnProperty(name)) {
-      if (!virtualDirectoryGateClasses.hasOwnProperty(name)) {
-        virtualDirectoryGateClasses[name] = HDLClassFactory.fromHDL(
-          virtualDirectory[name],
-          workingDir
-        );
-      }
-      return virtualDirectoryGateClasses[name];
-    } else {
-      // Else, check first if we have an HDL-implementation.
-      const hdlFile = path.join(workingDir, name + '.hdl');
-      if (fs.existsSync(hdlFile)) {
-        return HDLClassFactory.fromHDLFile(hdlFile);
-      }
+    if (virtualDirectory) {
+      return loadVirtualGate(name, workingDir);
+    }
+
+    // Else, check first if we have an HDL-implementation.
+    const hdlFile = path.join(workingDir, name + '.hdl');
+    if (fs.existsSync(hdlFile)) {
+      return HDLClassFactory.fromHDLFile(hdlFile);
     }
 
     // Otherwise, load a built-in gate.
     return loadBuiltinGate(name);
   },
 };
+
+function loadVirtualGate(name, workingDir) {
+  if (!virtualDirectory.hasOwnProperty(name)) {
+    return loadBuiltinGate(name);
+  }
+
+  if (!virtualDirectoryGateClasses.hasOwnProperty(name)) {
+    virtualDirectoryGateClasses[name] =
+      HDLClassFactory.fromHDL(virtualDirectory[name], workingDir);
+  }
+
+  return virtualDirectoryGateClasses[name];
+}
 
 /**
  * Creates pins from AST data.
