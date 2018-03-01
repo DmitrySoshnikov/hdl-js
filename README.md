@@ -65,7 +65,7 @@ The [Hardware Emulator](#emulator) module is exposed as a UI tool, where you can
 <a href="http://dmitrysoshnikov.com/hdl-hardware-simulator/">Try it out here!</a>
 
 <p align="center">
-  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/03/hdl-hardward-simulator-screen.png" alt="Hardware simulator UI tool" width="700" />
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/03/hdl-hardward-simulator-screen-1024x518.png" alt="Hardware simulator UI tool" width="700" />
 <p/>
 
 ## Development
