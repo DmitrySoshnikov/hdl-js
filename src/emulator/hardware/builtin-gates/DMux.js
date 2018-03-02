@@ -35,6 +35,8 @@ class DMux extends BuiltInGate {
  * Specification of the `DMux` gate.
  */
 DMux.Spec = {
+  name: 'DMux',
+
   description: [
     'Implements 1-bit demultiplexer (DMux) gate.',
     '',

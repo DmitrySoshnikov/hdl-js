@@ -64,6 +64,8 @@ class Mux4Way16 extends BuiltInGate {
  * Specification of the `Mux4Way16` gate.
  */
 Mux4Way16.Spec = {
+  name: 'Mux4Way16',
+
   description: [
     '4-way 16-bit multiplexor gate.',
     '',

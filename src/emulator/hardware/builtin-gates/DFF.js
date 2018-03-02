@@ -57,6 +57,8 @@ class DFF extends BuiltInGate {
  * Specification of the `DFF` gate.
  */
 DFF.Spec = {
+  name: 'DFF',
+
   description: [
     'DFF (Data/Delay Flip-Flop) chip.',
     '',

@@ -54,6 +54,8 @@ class RAM8 extends RAM {
  * Specification of the `RAM8` gate.
  */
 RAM8.Spec = {
+  name: 'RAM8',
+
   description: [
     'Memory chip consisting of 8 16-bit registers.',
     '',

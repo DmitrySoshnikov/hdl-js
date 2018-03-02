@@ -40,6 +40,8 @@ class Mux extends BuiltInGate {
  * Specification of the `Mux` gate.
  */
 Mux.Spec = {
+  name: 'Mux',
+
   description: [
     'Implements 1-bit 2-way multiplexor (Mux) gate.',
     '',

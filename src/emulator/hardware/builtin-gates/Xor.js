@@ -36,6 +36,7 @@ class Xor extends BuiltInGate {
  * Specification of the `Xor` gate.
  */
 Xor.Spec = {
+  name: 'Xor',
   description: 'Implements bitwise 1-bit Xor ^ operation.',
   inputPins: ['a', 'b'],
   outputPins: ['out'],

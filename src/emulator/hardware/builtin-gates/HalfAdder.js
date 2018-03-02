@@ -40,6 +40,8 @@ class HalfAdder extends BuiltInGate {
  * Specification of the `HalfAdder` gate.
  */
 HalfAdder.Spec = {
+  name: 'HalfAdder',
+
   description: [
     'Implements 2-bits adder (half-adder) gate.',
     '',

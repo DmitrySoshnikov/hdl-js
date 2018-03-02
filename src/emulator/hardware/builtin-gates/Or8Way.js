@@ -45,9 +45,11 @@ class Or8Way extends BuiltInGate {
 }
 
 /**
- * Specification of the `Or16` gate.
+ * Specification of the `Or8Way` gate.
  */
 Or8Way.Spec = {
+  name: 'Or8Way',
+
   description: 'Or | of 8 inputs into 1 output.',
 
   inputPins: [

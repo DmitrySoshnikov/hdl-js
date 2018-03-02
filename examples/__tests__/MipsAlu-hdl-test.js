@@ -14,6 +14,8 @@ describe('MipsAlu.hdl', () => {
     const spec = And.Spec;
 
     expect(spec).toEqual({
+      name: 'MipsAlu',
+
       description: `Compiled from HDL composite Gate class "MipsAlu".`,
 
       inputPins: [

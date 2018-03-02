@@ -32,6 +32,7 @@ class Not extends BuiltInGate {
  * Specification of the `Not` gate.
  */
 Not.Spec = {
+  name: 'Not',
   description: 'Implements bitwise 1-bit Not ~ operation.',
   inputPins: ['in'],
   outputPins: ['out'],

@@ -75,6 +75,8 @@ class Register extends BuiltInGate {
  * Specification of the `Register` gate.
  */
 Register.Spec = {
+  name: 'Register',
+
   description: [
     '16-bit memory register.',
     '',

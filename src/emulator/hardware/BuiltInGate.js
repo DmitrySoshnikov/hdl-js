@@ -75,11 +75,11 @@ class BuiltInGate extends Gate {
       this._hdlCode = `/**
 ${docBlock}
  */
-CHIP ${this.name} {
+CHIP ${spec.name} {
   IN ${inputs};
   OUT ${outputs};
 
-  BUILTIN ${this.name};
+  BUILTIN ${spec.name};
 }`;
     }
     return this._hdlCode;
@@ -87,6 +87,7 @@ CHIP ${this.name} {
 
   static validateSpec(spec) {
     return super.validateSpec(spec, [
+      'name',
       'description',
       'inputPins',
       'outputPins',

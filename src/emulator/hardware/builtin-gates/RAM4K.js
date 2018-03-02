@@ -54,6 +54,8 @@ class RAM4K extends RAM {
  * Specification of the `RAM4K` gate.
  */
 RAM4K.Spec = {
+  name: 'RAM4K',
+
   description: [
     'Memory chip consisting of 4K 16-bit registers.',
     '',

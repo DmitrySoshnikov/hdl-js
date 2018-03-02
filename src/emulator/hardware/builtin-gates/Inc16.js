@@ -46,6 +46,8 @@ class Inc16 extends BuiltInGate {
  * Specification of the `Inc16` gate.
  */
 Inc16.Spec = {
+  name: 'Inc16',
+
   description: 'Adds the constant 1 to the input.',
 
   inputPins: [

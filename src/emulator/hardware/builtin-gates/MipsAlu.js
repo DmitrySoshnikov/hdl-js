@@ -57,17 +57,17 @@ class MipsAlu extends BuiltInGate {
 
     switch (op) {
       case 0b00: {
-        this.getOutputPins()[0].setValue(A & B); 
+        this.getOutputPins()[0].setValue(A & B);
         break;
       }
       case 0b01: {
-        this.getOutputPins()[0].setValue(A | B); 
+        this.getOutputPins()[0].setValue(A | B);
         break;
       }
       case 0b10: {
         const sum = A + B + cin;
-        this.getOutputPins()[0].setValue(sum % 2); 
-        this.getOutputPins()[1].setValue(Math.trunc(sum / 2)); 
+        this.getOutputPins()[0].setValue(sum % 2);
+        this.getOutputPins()[1].setValue(Math.trunc(sum / 2));
         break;
       }
       case 0b11: {
@@ -83,6 +83,8 @@ class MipsAlu extends BuiltInGate {
  * Specification of the `MipsAlu` gate.
  */
 MipsAlu.Spec = {
+  name: 'MipsAlu',
+
   description:
 
 `1-bit Mips Alu.

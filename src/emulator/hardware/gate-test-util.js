@@ -36,6 +36,8 @@ function testTruthTable(table, gate) {
 function autoTestGate(GateClass) {
   const spec = GateClass.Spec;
 
+  expect(spec.name).toBe(GateClass.name);
+
   const createPins = pinNames => {
     return pinNames.map(pinName => {
       let name, size = 1;

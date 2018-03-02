@@ -72,6 +72,8 @@ class DMux8Way extends BuiltInGate {
  * Specification of the `DMux8Way` gate.
  */
 DMux8Way.Spec = {
+  name: 'DMux8Way',
+
   description: [
     '1 bit 8-way demultiplexor.',
     '',

@@ -17,6 +17,8 @@ class ARegister extends Register {}
  * Specification of the `ARegister` gate.
  */
 ARegister.Spec = {
+  name: 'ARegister',
+
   description:
 
 `16-bit A (Address) register.

@@ -50,6 +50,8 @@ class Not16 extends BuiltInGate {
  * Specification of the `Not16` gate.
  */
 Not16.Spec = {
+  name: 'Not16',
+
   description: 'Implements bitwise 16-bit Not ~ operation.',
 
   inputPins: [

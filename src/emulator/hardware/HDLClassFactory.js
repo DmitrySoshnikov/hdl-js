@@ -120,6 +120,7 @@ const HDLClassFactory = {
     };
 
     GateClass.Spec = {
+      name: ast.name,
       description: `Compiled from HDL composite Gate class "${ast.name}".`,
       inputPins: ast.inputs.map(pinsToGateSpec),
       outputPins: ast.outputs.map(pinsToGateSpec),

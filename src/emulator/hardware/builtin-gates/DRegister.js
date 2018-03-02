@@ -17,6 +17,8 @@ class DRegister extends Register {}
  * Specification of the `DRegister` gate.
  */
 DRegister.Spec = {
+  name: 'DRegister',
+
   description:
 
 `16-bit D (Data) register.

@@ -41,6 +41,8 @@ class Nand extends BuiltInGate {
  * Specification of the `Nand` gate.
  */
 Nand.Spec = {
+  name: 'Nand',
+
   description: [
     'Implements bitwise 1-bit Nand (negative-And) gate.',
     '',

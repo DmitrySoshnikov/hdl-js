@@ -54,6 +54,8 @@ class RAM512 extends RAM {
  * Specification of the `RAM512` gate.
  */
 RAM512.Spec = {
+  name: 'RAM512',
+
   description: [
     'Memory chip consisting of 512 16-bit registers.',
     '',

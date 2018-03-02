@@ -49,6 +49,8 @@ class FullAdder extends BuiltInGate {
  * Specification of the `FullAdder` gate.
  */
 FullAdder.Spec = {
+  name: 'FullAdder',
+
   description: [
     'Implements 3-bits adder (full-adder) gate.',
     '',

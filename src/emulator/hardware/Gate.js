@@ -42,7 +42,7 @@ class Gate extends EventEmitter {
 
     // Infer name from the class if not passed explicitly.
     if (!name) {
-      name = this.getClass().name;
+      name = this.getClass().Spec.name;
     }
 
     this._name = name;
@@ -374,7 +374,7 @@ class Gate extends EventEmitter {
 
   static validateSpec(
     spec,
-    specProps = ['inputPins', 'outputPins']
+    specProps = ['name', 'inputPins', 'outputPins']
   ) {
     if (!spec) {
       throw new Error(`All gates should implement "Spec" property.`);

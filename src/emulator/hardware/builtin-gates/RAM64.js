@@ -54,6 +54,8 @@ class RAM64 extends RAM {
  * Specification of the `RAM64` gate.
  */
 RAM64.Spec = {
+  name: 'RAM64',
+
   description: [
     'Memory chip consisting of 64 16-bit registers.',
     '',

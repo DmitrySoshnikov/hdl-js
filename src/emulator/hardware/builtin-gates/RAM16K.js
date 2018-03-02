@@ -54,6 +54,8 @@ class RAM16K extends RAM {
  * Specification of the `RAM16K` gate.
  */
 RAM16K.Spec = {
+  name: 'RAM16K',
+
   description: [
     'Memory chip consisting of 16K 16-bit registers.',
     '',

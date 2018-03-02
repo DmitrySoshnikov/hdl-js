@@ -11,6 +11,10 @@ const Pin = require('../Pin');
 
 class MyGate extends CompositeGate {}
 
+MyGate.Spec = {
+  name: 'MyGate',
+};
+
 describe('CompositeGate', () => {
 
   it('HalfAdder', () => {

@@ -50,6 +50,7 @@ describe('Gate', () => {
     }
 
     And.Spec = {
+      name: 'And',
       inputPins: ['a', 'b'],
       outputPins: ['out'],
     };
@@ -287,6 +288,10 @@ describe('Gate', () => {
       }
     }
 
+    MyGate.Spec = {
+      name: 'MyGate',
+    };
+
     const gate = new MyGate({
       inputPins: ['in'],
       outputPins: ['out'],
@@ -337,6 +342,7 @@ describe('Gate', () => {
     }
 
     And.Spec = {
+      name: 'And',
       inputPins: ['a', 'b'],
       outputPins: ['out'],
     };
@@ -366,6 +372,8 @@ describe('Gate', () => {
     }
 
     Not16.Spec = {
+      name: 'Not16',
+
       inputPins: [
         {name: 'in', size: 16},
       ],
@@ -384,7 +392,7 @@ describe('Gate', () => {
     expect(not16.getPin('out').getSize()).toBe(16);
   });
 
-  it.only('gate events', () => {
+  it('gate events', () => {
     let state = 0;
     let output = [];
 
@@ -406,6 +414,10 @@ describe('Gate', () => {
         this.getOutputPins()[0].setValue(state);
       }
     }
+
+    MyGate.Spec = {
+      name: 'MyGate',
+    };
 
     const gate = new MyGate({
       inputPins: ['in'],

@@ -73,6 +73,8 @@ class Bit extends BuiltInGate {
  * Specification of the `Bit` gate.
  */
 Bit.Spec = {
+  name: 'Bit',
+
   description: [
     '1 bit memory register.',
     '',

@@ -55,6 +55,8 @@ class Mux16 extends BuiltInGate {
  * Specification of the `Mux16` gate.
  */
 Mux16.Spec = {
+  name: 'Mux16',
+
   description: 'Implements bitwise 16-bit And & operation.',
 
   inputPins: [

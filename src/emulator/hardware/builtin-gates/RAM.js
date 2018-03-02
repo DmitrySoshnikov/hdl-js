@@ -127,6 +127,8 @@ class RAM extends BuiltInGate {
  * Specification of the `RAM` gate.
  */
 RAM.Spec = {
+  name: 'RAM',
+
   description: [
     'Abstract memory chip of a variable size (default 8).',
     '',

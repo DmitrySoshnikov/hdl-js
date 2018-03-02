@@ -58,9 +58,11 @@ class DMux4Way extends BuiltInGate {
 }
 
 /**
- * Specification of the `DMux` gate.
+ * Specification of the `DMux4Way` gate.
  */
 DMux4Way.Spec = {
+  name: 'DMux4Way',
+
   description: [
     '1 bit 4-way demultiplexor.',
     '',

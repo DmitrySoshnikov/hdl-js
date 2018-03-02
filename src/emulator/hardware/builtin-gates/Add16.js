@@ -49,6 +49,8 @@ class Add16 extends BuiltInGate {
  * Specification of the `Add16` gate.
  */
 Add16.Spec = {
+  name: 'Add16',
+
   description: 'A 16-bit integer adder: out = int16(a + b)',
 
   inputPins: [

@@ -45,9 +45,11 @@ class Nor16Way extends BuiltInGate {
 }
 
 /**
- * Specification of the `Nor16` gate.
+ * Specification of the `Nor16Way` gate.
  */
 Nor16Way.Spec = {
+  name: 'Nor16Way',
+
   description: 'Nor of 16 inputs into 1 output.',
 
   inputPins: [

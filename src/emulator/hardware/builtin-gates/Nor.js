@@ -41,6 +41,8 @@ class Nor extends BuiltInGate {
  * Specification of the `Nor` gate.
  */
 Nor.Spec = {
+  name: 'Nor',
+
   description: [
     'Implements bitwise 1-bit Nor (negative-Or) gate.',
     '',

@@ -102,6 +102,8 @@ class PC extends BuiltInGate {
  * Specification of the `PC` gate.
  */
 PC.Spec = {
+  name: 'PC',
+
   description:
 `
 A 16-bit counter with load and reset controls.

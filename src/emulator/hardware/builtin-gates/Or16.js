@@ -53,6 +53,8 @@ class Or16 extends BuiltInGate {
  * Specification of the `Or16` gate.
  */
 Or16.Spec = {
+  name: 'Or16',
+
   description: 'Implements bitwise 16-bit Or | operation.',
 
   inputPins: [

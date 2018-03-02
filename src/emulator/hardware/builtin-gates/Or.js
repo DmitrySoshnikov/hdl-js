@@ -36,6 +36,7 @@ class Or extends BuiltInGate {
  * Specification of the `Or` gate.
  */
 Or.Spec = {
+  name: 'Or',
   description: 'Implements bitwise 1-bit Or | operation.',
   inputPins: ['a', 'b'],
   outputPins: ['out'],
