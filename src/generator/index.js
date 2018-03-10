@@ -72,17 +72,19 @@ function genClocked(clocked) {
  */
 const generator = {
   Chip(node) {
-    return `
+    return (
+      `
       CHIP ${node.name} {
         ${genInputs(node.inputs)}
         ${genOutputs(node.outputs)}` +
-
-        // Optional parts:
-        genParts(node.parts) +
-        genBuiltins(node.builtins) +
-        genClocked(node.clocked) + `
+      // Optional parts:
+      genParts(node.parts) +
+      genBuiltins(node.builtins) +
+      genClocked(node.clocked) +
+      `
       }
-    `;
+    `
+    );
   },
 
   Name(node) {
@@ -108,16 +110,18 @@ const generator = {
   },
 
   ChipCall(node) {
-    const args = node.arguments
-      .map(gen)
-      .join(', ');
+    const args = node.arguments.map(gen).join(', ');
 
     return `${node.name}(${args})`;
   },
 
   Argument(node) {
     return `${gen(node.name)}=${gen(node.value)}`;
-  }
+  },
+
+  Constant(node) {
+    return node.raw;
+  },
 };
 
 /**

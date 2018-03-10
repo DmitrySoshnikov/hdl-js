@@ -19,6 +19,7 @@ describe('generator-from-ast', () => {
       '',
       '  Nand(a=a, b=b[1], out[3]=n);',
       '  MyGate(a[0..7]=a[1], b=b[8..15], out[3]=n);',
+      '  Const(a=1, b=0, c=true, d=false, e=15, out[3]=n);',
       '',
       '  BUILTIN Nand, MyGate;',
       '',
