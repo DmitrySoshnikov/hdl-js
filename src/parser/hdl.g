@@ -250,11 +250,44 @@ ArgsList
   ;
 
 Arg
-  : Name '=' Name {
+  : Name '=' Value {
       $$ = {
         type: 'Argument',
         name: subscriptToProp($1, 'index'),
         value: subscriptToProp($3, 'index'),
       }
+    }
+  ;
+
+Value
+  : Constant
+  | Name {
+      let constName = null;
+      if ($1.value === 'true') {
+        constName = 1;
+      } else if ($1.value === 'false') {
+        constName = 0;
+      }
+
+      if (constName !== null) {
+        $$ = {
+          type: 'Constant',
+          value: constName,
+          raw: $1.value,
+        }
+      } else {
+        // Other name:
+        $$ = $1;
+      }
+    }
+  ;
+
+Constant
+  : NUMBER {
+      $$ = {
+        type: 'Constant',
+        value: Number($1),
+        raw: $1,
+      };
     }
   ;

@@ -7,7 +7,6 @@ Hardware description language (HDL) parser, and Hardware simulator.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Online tool](#online-tool)
 - [Development](#development)
 - [Usage as a CLI](#usage-as-a-cli)
 - [Usage from Node](#usage-from-node)
@@ -16,6 +15,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Parsing a file to AST](#parsing-a-file-to-ast)
   - [AST nodes specification](#ast-nodes-specification)
 - [Emulator](#emulator)
+  - [Online tool](#online-tool)
   - [Built-in gates](#built-in-gates)
   - [Viewing gate specification](#viewing-gate-specification)
   - [Specifying output format](#specifying-output-format)
@@ -57,16 +57,6 @@ npm install -g hdl-js
 
 hdl-js --help
 ```
-
-## Online tool
-
-The [Hardware Emulator](#emulator) module is exposed as a UI tool, where you can design your chips in HDL, introspect built-in gates, and check the gate evaluation result.
-
-<a href="http://dmitrysoshnikov.com/hdl-hardware-simulator/" target="_blank">Try it out here!</a>
-
-<p align="center">
-  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/03/hdl-hardward-simulator-screen-1024x518.png" alt="Hardware simulator UI tool" />
-<p/>
 
 ## Development
 
@@ -471,13 +461,43 @@ Arguments appear as parts of the [ChipCall](#chipcall-ast-node) node types. An a
   /**
    * The value of the argument.
    */
-  value: Name,
+  value: Constant | Name,
+}
+```
+
+#### `Constant` AST node
+
+Constants can be used as _input_ values for pins. These are _numbers_, and two special names, `false`, and `true`, which correspond respectively to `0`, and `1` values.
+
+```js
+{
+  type: 'Constant',
+
+  /**
+   * The number value of the constant.
+   */
+  value: NUMBER,
+
+  /**
+   * The value as it appears in the source code.
+   */
+  raw: 'true' | 'false' | NUMBER
 }
 ```
 
 ## Emulator
 
 [Hardware emulator](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware) module simulates and tests logic gates and chips implemented in the HDL, and also provides canonical implementation of the [built-in chips](https://github.com/DmitrySoshnikov/hdl-js/tree/master/src/emulator/hardware/builtin-gates).
+
+### Online tool
+
+The emulator module is exposed as a UI tool, where you can design chips in HDL, introspect built-in gates, and check the results of gates evaluation.
+
+<a href="http://dmitrysoshnikov.com/hdl-hardware-simulator/" target="_blank">Try it out here!</a>
+
+<p align="center">
+  <img src="http://dmitrysoshnikov.com/wp-content/uploads/2018/03/hdl-hardward-simulator-screen-1024x518.png" alt="Hardware simulator UI tool" />
+<p/>
 
 ### Built-in gates
 

@@ -212,13 +212,10 @@ function createPinsMap(pins) {
  * false, true, 0, 1.
  */
 function getConstantValue(value) {
-  let constantValue = null;
-  if (value.value === 'true' || value.value === '1') {
-    constantValue = 1;
-  } else if (value.value === 'false' || value.value === '0') {
-    constantValue = 0;
+  if (value.type !== 'Constant') {
+    return null;
   }
-  return constantValue;
+  return value.value;
 }
 
 /**

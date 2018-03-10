@@ -6,9 +6,7 @@
 const parser = require('..');
 
 describe('hdl-parser', () => {
-
   it('basic chip', () => {
-
     const exampleHDL = `
       CHIP Custom {
         IN a, b[4];
@@ -44,7 +42,7 @@ describe('hdl-parser', () => {
         {
           type: 'Name',
           value: 'out2',
-        }
+        },
       ],
       parts: [
         {
@@ -162,42 +160,42 @@ describe('hdl-parser', () => {
         {
           type: 'Name',
           value: 'in',
-          size: 16
+          size: 16,
         },
         {
           type: 'Name',
-          value: 'load'
+          value: 'load',
         },
         {
           type: 'Name',
           value: 'address',
-          size: 6
-        }
+          size: 6,
+        },
       ],
       outputs: [
         {
           type: 'Name',
           value: 'out',
-          size: 16
-        }
+          size: 16,
+        },
       ],
       parts: [],
       builtins: [
         {
           type: 'Name',
-          value: 'RAM64'
-        }
+          value: 'RAM64',
+        },
       ],
       clocked: [
         {
           type: 'Name',
-          value: 'in'
+          value: 'in',
         },
         {
           type: 'Name',
-          value: 'load'
-        }
-      ]
+          value: 'load',
+        },
+      ],
     });
   });
 
@@ -207,4 +205,114 @@ describe('hdl-parser', () => {
     expect(ast.name).toBe('And');
   });
 
+  it('constants', () => {
+    const ast = parser.parse(`
+      CHIP MyChip {
+        IN a;
+        OUT z;
+
+        PARTS:
+
+        Other(a=1, b=0, c=true, d=false, e=15, out=z);
+      }
+    `);
+
+    expect(ast).toEqual({
+      type: 'Chip',
+      name: 'MyChip',
+      inputs: [
+        {
+          type: 'Name',
+          value: 'a',
+        },
+      ],
+      outputs: [
+        {
+          type: 'Name',
+          value: 'z',
+        },
+      ],
+      parts: [
+        {
+          type: 'ChipCall',
+          name: 'Other',
+          arguments: [
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'a',
+              },
+              value: {
+                type: 'Constant',
+                value: 1,
+                raw: '1',
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'b',
+              },
+              value: {
+                type: 'Constant',
+                value: 0,
+                raw: '0',
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'c',
+              },
+              value: {
+                type: 'Constant',
+                value: 1,
+                raw: 'true',
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'd',
+              },
+              value: {
+                type: 'Constant',
+                value: 0,
+                raw: 'false',
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'e',
+              },
+              value: {
+                type: 'Constant',
+                value: 15,
+                raw: '15',
+              },
+            },
+            {
+              type: 'Argument',
+              name: {
+                type: 'Name',
+                value: 'out',
+              },
+              value: {
+                type: 'Name',
+                value: 'z',
+              },
+            },
+          ],
+        },
+      ],
+      builtins: [],
+      clocked: [],
+    });
+  });
 });
