@@ -50,7 +50,7 @@ Hardware description language (HDL) parser, and Hardware simulator.
 
 ## Installation
 
-The parser can be installed as an [npm module](https://www.npmjs.com/package/hdl-js):
+The `hdl-js` tool can be installed as an [npm module](https://www.npmjs.com/package/hdl-js):
 
 ```
 npm install -g hdl-js
