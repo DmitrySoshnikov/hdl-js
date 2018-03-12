@@ -17,16 +17,24 @@ if (watchMode) {
 console.info(colors.bold(`Building${watchMsg}...\n`));
 
 // ----------------------------------------------------------
-// Rebuild parser.
+// Rebuild HDL parser.
 
-console.info(colors.bold('[1/3] Generating parser module...\n'));
+console.info(colors.bold('[1/4] Generating HDL parser module...'));
 
 shell.exec(`node node_modules/syntax-cli/bin/syntax -g src/parser/hdl.g -o src/parser/generated/hdl-parser.js -m lalr1 --loc`);
+
+
+// ----------------------------------------------------------
+// Rebuild Script parser.
+
+console.info(colors.bold('[2/4] Generating Script parser module...'));
+
+shell.exec(`node node_modules/syntax-cli/bin/syntax -g src/emulator/hardware/scripting/script-parser.g -o src/emulator/hardware/scripting/generated/script-parser-gen.js -m lalr1 --loc`);
 
 // ----------------------------------------------------------
 // Git hooks.
 
-console.info(colors.bold('[2/3] Installing Git hooks...\n'));
+console.info(colors.bold('[3/4] Installing Git hooks...\n'));
 
 // Setup pre-commit hook.
 console.info('  - pre-commit: .git/hooks/pre-commit');
@@ -43,7 +51,7 @@ if (!shell.test('-f', '.git/hooks/pre-push')) {
 // ----------------------------------------------------------
 // Transform code for older Node versions.
 
-console.info(colors.bold('[3/3] Transpiling JS code...\n'));
+console.info(colors.bold('[4/4] Transpiling JS code...\n'));
 
 shell.exec(`"node_modules/.bin/babel" ${process.argv[2] || ''} src/ --out-dir dist/ --ignore __tests__`);
 
