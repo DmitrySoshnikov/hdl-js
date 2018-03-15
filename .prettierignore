@@ -1,2 +1,3 @@
-src/parser/generated/regexp-tree.js
+src/parser/generated/hdl-parser.js
+src/emulator/hardware/scripting/generated/script-parser-gen.js
 dist/
