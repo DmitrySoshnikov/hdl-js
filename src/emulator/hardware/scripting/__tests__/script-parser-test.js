@@ -101,7 +101,7 @@ describe('script-parser', () => {
           terminator: ',',
         },
         {
-          type: 'SimulatorCommand',
+          type: 'ControllerCommand',
           name: 'output',
           arguments: [],
           terminator: ';',
@@ -143,7 +143,7 @@ describe('script-parser', () => {
           terminator: ',',
         },
         {
-          type: 'SimulatorCommand',
+          type: 'ControllerCommand',
           name: 'output',
           arguments: [],
           terminator: ';',
@@ -185,7 +185,7 @@ describe('script-parser', () => {
           terminator: ',',
         },
         {
-          type: 'SimulatorCommand',
+          type: 'ControllerCommand',
           name: 'output',
           arguments: [],
           terminator: ';',
@@ -227,7 +227,7 @@ describe('script-parser', () => {
           terminator: ',',
         },
         {
-          type: 'SimulatorCommand',
+          type: 'ControllerCommand',
           name: 'output',
           arguments: [],
           terminator: ';',
@@ -394,17 +394,14 @@ describe('script-parser', () => {
           terminator: ',',
         },
         {
-          type: 'SimulatorCommand',
+          type: 'ControllerCommand',
           name: 'output',
           arguments: [],
           terminator: ';',
         },
         {
           type: 'ControllerCommand',
-          name: {
-            type: 'Name',
-            value: 'repeat',
-          },
+          name: 'repeat',
           times: {
             type: 'Value',
             value: 5,

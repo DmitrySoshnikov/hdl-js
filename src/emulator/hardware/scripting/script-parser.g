@@ -41,6 +41,7 @@
 'clear-breakpoints'           return 'CLEAR_BREAKPOINTS'
 'repeat'                      return 'REPEAT'
 'while'                       return 'WHILE'
+'output'                      return 'OUTPUT'
 
 \b%(B|X|D)\d+                 return 'FORMATTED_NUMBER'
 ('-'?)\d+                     return 'NUMBER'
@@ -221,13 +222,14 @@ ControllerCommandName
   | CLEAR_ECHO
   | BREAKPOINT
   | CLEAR_BREAKPOINTS
+  | OUTPUT
   ;
 
 RepeatCommand
   : REPEAT Argument Block {
       $$ = {
         type: 'ControllerCommand',
-        name: parseName($1),
+        name: $1,
         times: parseValue($2),
         commands: $3,
       }
