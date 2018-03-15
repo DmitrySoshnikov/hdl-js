@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Prettier
+
+jsfiles=$(git diff HEAD --name-only --diff-filter=ACM "*.js" | tr '\n' ' ')
+
+if [ ! -z "$jsfiles" ]
+then
+  # Prettify all staged .js files
+  echo "$jsfiles" | xargs ./node_modules/.bin/prettier --write
+
+  # Add back the modified/prettified files to staging
+  echo "$jsfiles" | xargs git add
+fi
+
 # Pre-commit validaitons:
 
 npm test
