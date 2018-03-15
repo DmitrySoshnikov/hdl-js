@@ -82,7 +82,8 @@ class ScriptInterpreter {
    * Executes the full script.
    */
   exec() {
-    return this.eval(this._ast);
+    this.eval(this._ast);
+    return this;
   }
 
   /**
@@ -99,13 +100,15 @@ class ScriptInterpreter {
         shouldBreak = true;
       }
     }
+    return this;
   }
 
   /**
    * Executes next command within step (until `,` terminator).
    */
   nextCommand(container = this._ast) {
-    return this.eval(container.commands[this._pc++]);
+    this.eval(container.commands[this._pc++]);
+    return this;
   }
 
   eval(node) {
