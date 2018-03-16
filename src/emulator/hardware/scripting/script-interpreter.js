@@ -76,6 +76,12 @@ class ScriptInterpreter {
      * Format of the output columns.
      */
     this._outputListMap = null;
+
+    /**
+     * Current container to evaluate commands.
+     * Containainers are: Script, bodies of the while, and repeat loops.
+     */
+    this._container = this._ast;
   }
 
   /**
@@ -89,14 +95,14 @@ class ScriptInterpreter {
   /**
    * Executes next full step (until the `;` terminator).
    */
-  nextStep(container = this._ast) {
+  nextStep() {
     let shouldBreak = false;
-    while (this._hasMoreCommands(container)) {
-      this.nextCommand(container);
+    while (this._hasMoreCommands(this._container)) {
+      this.nextCommand();
       if (shouldBreak) {
         break;
       }
-      if (this._isLastCommandInStep(container)) {
+      if (this._isLastCommandInStep()) {
         shouldBreak = true;
       }
     }
@@ -106,8 +112,8 @@ class ScriptInterpreter {
   /**
    * Executes next command within step (until `,` terminator).
    */
-  nextCommand(container = this._ast) {
-    this.eval(container.commands[this._pc++]);
+  nextCommand() {
+    this.eval(this._container.commands[this._pc++]);
     return this;
   }
 
@@ -116,17 +122,23 @@ class ScriptInterpreter {
   }
 
   Script(node) {
-    while (this._hasMoreCommands(node)) {
-      this.nextCommand(node);
+    this._container = node;
+    this._pc = 0;
+
+    while (this._hasMoreCommands()) {
+      this.nextStep();
     }
   }
 
-  _hasMoreCommands(container = this._ast) {
-    return this._pc < container.commands.length;
+  _hasMoreCommands() {
+    return this._pc < this._container.commands.length;
   }
 
-  _isLastCommandInStep(container = this._ast) {
-    return container.commands[this._pc].terminator === ';';
+  _isLastCommandInStep() {
+    if (!this._hasMoreCommands()) {
+      return true;
+    }
+    return this._container.commands[this._pc].terminator === ';';
   }
 
   ControllerCommand(node) {
@@ -168,7 +180,7 @@ class ScriptInterpreter {
   SimulatorCommand(node) {
     switch (node.name) {
       case 'set':
-        this._evalSet(node);
+        this._setPinValue(node.arguments[0], node.arguments[1]);
         break;
       case 'eval':
         this._gate.eval();
@@ -205,12 +217,6 @@ class ScriptInterpreter {
     });
   }
 
-  _evalSet(node) {
-    const pinName = node.arguments[0].value;
-    const value = node.arguments[1].value;
-    this._gate.getPin(pinName).setValue(value);
-  }
-
   _evalOutput() {
     this._printHeader();
 
@@ -234,6 +240,20 @@ class ScriptInterpreter {
     this._printLine(line.join(''));
   }
 
+  _centerHeaderColumn(columnInfo) {
+    const {right, middle, left, column} = columnInfo;
+    const totalLength = right + middle + left;
+
+    if (column.length < totalLength) {
+      const len = totalLength - column.length;
+      const remain = len % 2 == 0 ? '' : ' ';
+      const pads = ' '.repeat(parseInt(len / 2));
+      return pads + column + pads + remain;
+    }
+
+    return column;
+  }
+
   _printHeader() {
     // Header is printed only once.
     if (this._headerPrinted) {
@@ -243,10 +263,10 @@ class ScriptInterpreter {
     const line = ['|'];
 
     for (let column in this._outputListMap) {
-      const {right, middle, left} = this._outputListMap[column];
-      const totalLength = right + middle + left;
-      const pad = Math.floor((totalLength - column.length) / 2);
-      line.push(' '.repeat(pad), column, ' '.repeat(pad), '|');
+      const centerColumn = this._centerHeaderColumn(
+        this._outputListMap[column]
+      );
+      line.push(centerColumn, '|');
     }
 
     this._printLine(line.join(''));
@@ -262,15 +282,90 @@ class ScriptInterpreter {
   }
 
   _evalWhile(node) {
+    const savedContainer = this._container;
+    const savedPC = this._pc;
+
+    this._container = node;
+    this._pc = 0;
+
     while (this.eval(node.condition)) {
-      node.commands.forEach(command => this.eval(command));
+      while (this._hasMoreCommands()) {
+        this.nextStep();
+      }
+    }
+
+    this._container = savedContainer;
+    this._pc = savedPC;
+  }
+
+  RelationalExpression(node) {
+    const left = this._getPinValue(node.left);
+    const right = this._getConditionValue(node.right);
+
+    switch (node.operator) {
+      case '=':
+        return left === right;
+      case '<>':
+        return left !== right;
+      case '<=':
+        return left <= right;
+      case '>=':
+        return left >= right;
+      case '<':
+        return left < right;
+      case '>':
+        return left >= right;
+      default:
+        throw TypeError(`Unrecognized condition operator: "${node.operator}".`);
     }
   }
 
-  _evalRepeat(node) {
-    for (let i = 0; i < node.times.value; i++) {
-      node.commands.forEach(command => this.eval(command));
+  _getPinValue(node) {
+    const pin = this._gate.getPin(node.value);
+
+    // a[1]
+    if (node.index) {
+      return pin.getValueAt(node.index);
     }
+
+    // a
+    return pin.getValue();
+  }
+
+  _setPinValue(node, value) {
+    const pin = this._gate.getPin(node.value);
+
+    // a[1]
+    if (node.index) {
+      return pin.setValueAt(node.index, value.value);
+    }
+
+    // a
+    return pin.setValue(value.value);
+  }
+
+  _getConditionValue(node) {
+    if (node.type === 'Name') {
+      return this._getPinValue(node);
+    }
+    return node.value;
+  }
+
+  _evalRepeat(node) {
+    const savedContainer = this._container;
+    const savedPC = this._pc;
+
+    this._container = node;
+
+    for (let i = 0; i < node.times.value; i++) {
+      this._pc = 0;
+      while (this._hasMoreCommands()) {
+        this.nextStep();
+      }
+    }
+
+    this._container = savedContainer;
+    this._pc = savedPC;
   }
 }
 
