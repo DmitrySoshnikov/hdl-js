@@ -121,4 +121,48 @@ describe('script-interpreter', () => {
     const actualOut = fs.readFileSync(workingDirectory + '/And.out', 'utf-8');
     expect(actualOut).toBe(expectedOut);
   });
+
+  it('virtual directory', () => {
+    const virtualDirectory = {
+      // Gate file:
+      'MyGate.hdl': `
+        CHIP MyAnd {
+          IN x, y;
+          OUT z;
+
+          PARTS:
+
+          Nand(a=x, b=y, out=n);
+          Nand(a=n, b=n, out=z);
+        }
+      `,
+
+      // Script file:
+      'MyGate.tst': `
+        load MyGate.hdl,
+        output-file MyGate.out,
+        compare-to MyGate.cmp,
+        output-list x%B3.1.3 y%B3.1.3 n%B3.1.3 z%B3.1.3;
+
+        set x 1, set y 0, eval, output;
+        set x 1, set y 1, eval, output;
+      `,
+
+      'MyGate.cmp': [
+        '|   x   |   y   |   n   |   z   |',
+        '|   1   |   0   |   1   |   0   |',
+        '|   1   |   1   |   0   |   1   |',
+        '',
+      ].join('\n'),
+    };
+
+    const script = new ScriptInterpreter({
+      script: virtualDirectory['MyGate.tst'],
+      workingDirectory: virtualDirectory,
+    });
+
+    script.exec();
+
+    expect(virtualDirectory['MyGate.out']).toBe(virtualDirectory['MyGate.cmp']);
+  });
 });

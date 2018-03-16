@@ -48,6 +48,15 @@ class ScriptInterpreter {
     }
 
     /**
+     * Whether the working directory is virtual.
+     */
+    this._isVirtualDirectory = typeof workingDirectory === 'object';
+
+    if (this._isVirtualDirectory) {
+      HDLClassFactory.setVirtualDirectory(this._workingDirectory);
+    }
+
+    /**
      * Parsed AST to evaluate.
      */
     this._ast = scriptParser.parse(this._script);
@@ -82,6 +91,13 @@ class ScriptInterpreter {
      * Containainers are: Script, bodies of the while, and repeat loops.
      */
     this._container = this._ast;
+  }
+
+  /**
+   * Returns gate.
+   */
+  getGate() {
+    return this._gate;
   }
 
   /**
@@ -200,12 +216,20 @@ class ScriptInterpreter {
   }
 
   _initOutputFile(node) {
-    if (node.arguments[0] === 'console') {
-      this._outputFile = node.arguments[0];
+    const outputFile = node.arguments[0];
+
+    if (outputFile === 'console') {
+      this._outputFile = outputFile;
       return;
     }
 
-    this._outputFile = this._workingDirectory + '/' + node.arguments[0];
+    if (this._isVirtualDirectory) {
+      this._outputFile = outputFile;
+      this._workingDirectory[outputFile] = '';
+      return;
+    }
+
+    this._outputFile = this._workingDirectory + '/' + outputFile;
     fs.writeFileSync(this._outputFile, '', 'utf-8');
   }
 
@@ -278,6 +302,12 @@ class ScriptInterpreter {
       console.info(line);
       return;
     }
+
+    if (this._isVirtualDirectory) {
+      this._workingDirectory[this._outputFile] += line + '\n';
+      return;
+    }
+
     fs.appendFileSync(this._outputFile, line + '\n', 'utf-8');
   }
 
@@ -314,7 +344,7 @@ class ScriptInterpreter {
       case '<':
         return left < right;
       case '>':
-        return left >= right;
+        return left > right;
       default:
         throw TypeError(`Unrecognized condition operator: "${node.operator}".`);
     }

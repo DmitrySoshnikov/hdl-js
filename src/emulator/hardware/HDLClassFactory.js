@@ -78,10 +78,7 @@ const HDLClassFactory = {
       return loadBuiltinGate(ast.name);
     }
 
-    const [
-      internalPinsSpec,
-      partsClasses,
-    ] = analyzeParts(ast, workingDir);
+    const [internalPinsSpec, partsClasses] = analyzeParts(ast, workingDir);
 
     // Gate class, corresponding to the HDL file.
     const GateClass = class extends CompositeGate {
@@ -104,11 +101,13 @@ const HDLClassFactory = {
         // Create instances used in PARTS implementation.
         const parts = instantiateParts(ast, options, partsClasses);
 
-        super(Object.assign(options, {
-          name: ast.name,
-          parts,
-          ast,
-        }));
+        super(
+          Object.assign(options, {
+            name: ast.name,
+            parts,
+            ast,
+          })
+        );
       }
     };
 
@@ -169,13 +168,18 @@ const HDLClassFactory = {
 };
 
 function loadVirtualGate(name, workingDir) {
-  if (!virtualDirectory.hasOwnProperty(name)) {
+  if (
+    !virtualDirectory.hasOwnProperty(name) &&
+    !virtualDirectory.hasOwnProperty(name + '.hdl')
+  ) {
     return loadBuiltinGate(name);
   }
 
   if (!virtualDirectoryGateClasses.hasOwnProperty(name)) {
-    virtualDirectoryGateClasses[name] =
-      HDLClassFactory.fromHDL(virtualDirectory[name], workingDir);
+    virtualDirectoryGateClasses[name] = HDLClassFactory.fromHDL(
+      virtualDirectory[name] || virtualDirectory[name + '.hdl'],
+      workingDir
+    );
   }
 
   return virtualDirectoryGateClasses[name];
@@ -185,10 +189,13 @@ function loadVirtualGate(name, workingDir) {
  * Creates pins from AST data.
  */
 function createPins(pinsData) {
-  const pins = pinsData.map(pinSpec => new Pin({
-    name: pinSpec.value,
-    size: pinSpec.size || 1,
-  }));
+  const pins = pinsData.map(
+    pinSpec =>
+      new Pin({
+        name: pinSpec.value,
+        size: pinSpec.size || 1,
+      })
+  );
   return pins;
 }
 
@@ -199,9 +206,7 @@ function createPins(pinsData) {
 function createPinsMap(pins) {
   const pinsMap = {};
   pins.forEach(pin => {
-    const name = pin instanceof Pin
-      ? pin.getName()
-      : pin.value;
+    const name = pin instanceof Pin ? pin.getName() : pin.value;
     pinsMap[name] = pin;
   });
   return pinsMap;
@@ -238,26 +243,22 @@ function analyzeParts(ast, workingDir) {
 
       const constantValue = getConstantValue(value);
 
-      const isInternalPin = (
+      const isInternalPin =
         !inputPinsMap.hasOwnProperty(value.value) &&
         !outputPinsMap.hasOwnProperty(value.value) &&
-        constantValue === null
-      );
+        constantValue === null;
 
       if (isInternalPin && !internalPinsMap.hasOwnProperty(value.value)) {
         const pinSpec = {
           name: value.value,
           size: getInternalPinSize(name),
         };
-        internalPinsSpec.push(internalPinsMap[value.value] = pinSpec);
+        internalPinsSpec.push((internalPinsMap[value.value] = pinSpec));
       }
     });
   });
 
-  return [
-    internalPinsSpec,
-    partsClasses,
-  ];
+  return [internalPinsSpec, partsClasses];
 }
 
 /**
@@ -282,11 +283,7 @@ function shouldUseBuiltinGate(name, ast) {
  * These may include built-in, and custom classes from HDL.
  */
 function instantiateParts(ast, options, partsClasses) {
-  const {
-    inputPins,
-    outputPins,
-    internalPins,
-  } = options;
+  const {inputPins, outputPins, internalPins} = options;
 
   const inputPinsMap = createPinsMap(inputPins);
   const outputPinsMap = createPinsMap(outputPins);
@@ -355,11 +352,10 @@ function handlePartArg(
   const constantValue = getConstantValue(value);
 
   // Create new (internal) pin, which is not part of inputs/outputs.
-  const isInternalPin = (
+  const isInternalPin =
     !inputPinsMap.hasOwnProperty(value.value) &&
     !outputPinsMap.hasOwnProperty(value.value) &&
-    constantValue === null
-  );
+    constantValue === null;
 
   if (isInternalPin && !internalPinsMap.hasOwnProperty(value.value)) {
     const internalPin = new Pin({
@@ -367,7 +363,7 @@ function handlePartArg(
       size: getInternalPinSize(name),
       value: 0,
     });
-    internalPins.push(internalPinsMap[value.value] = internalPin);
+    internalPins.push((internalPinsMap[value.value] = internalPin));
   }
 
   // Set always fixed value.
@@ -375,24 +371,18 @@ function handlePartArg(
     pin.setValue(constantValue);
   } else if (pinInfo.kind === 'input') {
     // When main pins change, update all dependent inputs.
-    const sourcePin = (
+    const sourcePin =
       inputPinsMap[value.value] ||
       outputPinsMap[value.value] ||
-      internalPinsMap[value.value]
-    );
+      internalPinsMap[value.value];
     sourcePin.connectTo(pin, {
       sourceSpec: value,
       destinationSpec: name,
     });
-  }
-
-  // When the output of the part pin changes,
-  // update outer pins: main out or internal pins.
-  else if (pinInfo.kind === 'output') {
-    const destPin = (
-      internalPinsMap[value.value] ||
-      outputPinsMap[value.value]
-    );
+  } else if (pinInfo.kind === 'output') {
+    // When the output of the part pin changes,
+    // update outer pins: main out or internal pins.
+    const destPin = internalPinsMap[value.value] || outputPinsMap[value.value];
     pin.connectTo(destPin, {
       sourceSpec: name,
       destinationSpec: value,
