@@ -8,6 +8,7 @@
 const fs = require('fs');
 const HDLClassFactory = require('../HDLClassFactory');
 const path = require('path');
+const Pin = require('../Pin');
 const scriptParser = require('./script-parser');
 const {SystemClock} = require('../Clock');
 
@@ -247,16 +248,33 @@ class ScriptInterpreter {
     const line = ['|'];
 
     for (let column in this._outputListMap) {
-      const {right, left, format} = this._outputListMap[column];
+      const {right, middle, left, format} = this._outputListMap[column];
       const radix = formatRadix[format];
 
-      const pinInfo = this._gate.getClass().getPinInfo(column);
-      const value = this._gate.getPin(column).getValue();
+      const actualPinColumn = column === 'time' ? Pin.CLOCK : column;
 
-      const content = (radix !== 10 ? value >>> 0 : value)
-        .toString(radix)
-        .padStart(radix !== 10 ? pinInfo.size : 0, '0')
-        .toUpperCase();
+      const pinInfo = this._gate.getClass().getPinInfo(actualPinColumn);
+      const value = this._gate.getPin(actualPinColumn).getValue();
+
+      let content;
+
+      // Special case for `time` column, which is an alias
+      // for the `$clock`. The `time` uses string representation,
+      // e.g. '1' string for negative, and '1+' for positive, while
+      // `$clock` uses -1 for negative, and +1 for positive.
+      if (column === 'time') {
+        content = value >= 0 ? `${value}+` : `${Math.abs(value)}`;
+        content = content.padEnd(middle, ' ');
+      } else if (format === 'S') {
+        // Explicit string format.
+        content = `${value}`.padEnd(middle, ' ');
+      } else {
+        content = (radix !== 10 ? value >>> 0 : value)
+          .toString(radix)
+          .padStart(radix !== 10 ? pinInfo.size : 0, '0')
+          .padStart(radix === 10 ? middle : 0, ' ')
+          .toUpperCase();
+      }
 
       line.push(' '.repeat(right), content, ' '.repeat(left), '|');
     }

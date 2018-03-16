@@ -31,21 +31,12 @@
 '>'                           return 'GREATER'
 '='                           return 'EQUAL'
 
-'load'                        return 'LOAD'
-'output-file'                 return 'OUTPUT_FILE'
-'compare-to'                  return 'COMPARE_TO'
-'output-list'                 return 'OUTPUT_LIST'
-'echo'                        return 'ECHO'
-'clear-echo'                  return 'CLEAR_ECHO'
-'breakpoint'                  return 'BREAKPOINT'
-'clear-breakpoints'           return 'CLEAR_BREAKPOINTS'
 'repeat'                      return 'REPEAT'
 'while'                       return 'WHILE'
-'output'                      return 'OUTPUT'
 
 \b%(B|X|D)\d+                 return 'FORMATTED_NUMBER'
 ('-'?)\d+                     return 'NUMBER'
-[\w\.%\[\]]+                  return 'REF_VAL'
+[\w\.%\[\]\-]+                return 'REF_VAL'
 
 /lex
 
@@ -97,6 +88,23 @@ function parseValue(rawValue) {
     raw: rawValue,
   };
 }
+
+/**
+ * Controller commands.
+ */
+const controllerCommands = new Set([
+  'load',
+  'output-file',
+  'compare-to',
+  'output-list',
+  'echo',
+  'clear-echo',
+  'breakpoint',
+  'clear-breakpoints',
+  'repeat',
+  'while',
+  'output',
+]);
 
 /**
  * Parses controller command arguments.
@@ -153,21 +161,32 @@ CommandList
   ;
 
 Command
-  : SimulatorCommand
-  | ControllerCommand
+  : SimpleCommand
+  | RepeatCommand
+  | WhileCommand
   ;
 
-SimulatorCommand
+SimpleCommand
   : REF_VAL OptArguments COMMAND_TERMINATOR {
-      if ($1 === 'set') {
-        $2[0] = parseName($2[0]);
-        $2[1] = parseValue($2[1]);
-      }
-      $$ = {
-        type: 'SimulatorCommand',
-        name: $1,
-        arguments: $2,
-        terminator: $3,
+      if (controllerCommands.has($1)) {
+        $$ = {
+          type: 'ControllerCommand',
+          name: $1,
+          arguments: parseControllerCommandArgs($2),
+          terminator: $3
+        };
+      } else {
+        // Simulator command:
+        if ($1 === 'set') {
+          $2[0] = parseName($2[0]);
+          $2[1] = parseValue($2[1]);
+        }
+        $$ = {
+          type: 'SimulatorCommand',
+          name: $1,
+          arguments: $2,
+          terminator: $3,
+        };
       }
     }
   ;
@@ -190,39 +209,7 @@ Argument
   : NUMBER
   | FORMATTED_NUMBER
   | REF_VAL
-  | LOAD
-  | REPEAT
-  | WHILE
   | STRING
-  ;
-
-ControllerCommand
-  : SimpleControllerCommand
-  | RepeatCommand
-  | WhileCommand
-  ;
-
-SimpleControllerCommand
-  : ControllerCommandName OptArguments COMMAND_TERMINATOR {
-      $$ = {
-        type: 'ControllerCommand',
-        name: $1,
-        arguments: parseControllerCommandArgs($2),
-        terminator: $3
-      }
-    }
-  ;
-
-ControllerCommandName
-  : LOAD
-  | OUTPUT_FILE
-  | COMPARE_TO
-  | OUTPUT_LIST
-  | ECHO
-  | CLEAR_ECHO
-  | BREAKPOINT
-  | CLEAR_BREAKPOINTS
-  | OUTPUT
   ;
 
 RepeatCommand
