@@ -1114,7 +1114,7 @@ Truth table for data:
 
 The `--exec-on-data` [described above](#validating-passed-data-on-gate-logic) provides only _basic functionality_ for gates testing: you just define expected result in the _declarative_ form, and let the gate execute on data.
 
-For advanced gates testing, we can use _scripting_, which is an _imperative_ approach for validating chips logic.
+For an _advanced_ gates testing, we can use _scripting_, which is an _imperative_ approach for validating chips logic.
 
 > **NOTE**: the scripts format is compatible with the [nand2tetris](http://nand2tetris.org/) course.
 
@@ -1122,7 +1122,7 @@ The script files have a simple syntax, support different simulator commands (suc
 
 #### Executing scripts
 
-Script files usually have `.tst` extension, and automatically load needed chips. As the script executes the gate's logic, it validates the outputs with the data from the specified _compare file_, which usually has `.cmp` extension. As a side effect script execution produces the `.out` file.
+Script files usually have `.tst` extension, and automatically load needed chips. As a script executes, it validates the outputs with the specified _compare file_ (which usually has `.cmp` extension). As a side effect script produces the `.out` file.
 
 For example, the [And.tst](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.tst) script has corresponding [And.cmp](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.cmp), and produces [And.out](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.out) as the result.
 
@@ -1155,7 +1155,7 @@ eval,
 output;
 ```
 
-We can execute this script using the `--script` (`-s`) option:
+We can execute it using the `--script` (`-s`) option:
 
 ```
 hdl-js --script src/emulator/hardware/scripting/examples/And.tst
@@ -1191,7 +1191,7 @@ Error executing the script:
      3 |   0   |   1   |   0   |
 ```
 
-In the example above the testing data itself was invalid. Usually though you'll have correct testing data, and in case of invalid gates logic, will receive report about errors in the specific parts.
+In the example above the testing data itself is invalid. Usually though you'll have a correct testing data, and in case of an invalid gate logic, will receive a report on errors in the specific parts.
 
 #### Script controller commands
 
@@ -1237,7 +1237,7 @@ while RAM[1] <> %B101 {
 
 #### Script emulator commands
 
-The emulator commands operates on a loaded gate, and include:
+The emulator commands operate on a loaded gate, and include:
 
 - `set <name> <value>` -- sets a value of a needed pin or name
 - `eval` -- evaluates the logic on currently set pins
