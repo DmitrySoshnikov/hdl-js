@@ -5,12 +5,11 @@
 
 'use strict';
 
-const ScriptInterpreter = require('../script-interpreter');
+const ScriptInterpreter = require('../ScriptInterpreter');
 const fs = require('fs');
 const os = require('os');
 
 const EXAMPLES_DIR = __dirname + '/../examples';
-const workingDirectory = os.tmpdir();
 
 const expectedAndOut = [
   '|   a   |   b   |  out  |',
@@ -25,19 +24,17 @@ describe('script-interpreter', () => {
   it('full run', () => {
     const script = new ScriptInterpreter({
       file: EXAMPLES_DIR + '/And.tst',
-      workingDirectory,
     });
 
     script.exec();
 
-    const actualOut = fs.readFileSync(workingDirectory + '/And.out', 'utf-8');
+    const actualOut = fs.readFileSync(EXAMPLES_DIR + '/And.out', 'utf-8');
     expect(actualOut).toBe(expectedAndOut);
   });
 
   it('nextStep', () => {
     const script = new ScriptInterpreter({
       file: EXAMPLES_DIR + '/And.tst',
-      workingDirectory,
     });
 
     // Total And.tst has 5 steps (groups of commands):
@@ -45,14 +42,13 @@ describe('script-interpreter', () => {
       script.nextStep();
     }
 
-    const actualOut = fs.readFileSync(workingDirectory + '/And.out', 'utf-8');
+    const actualOut = fs.readFileSync(EXAMPLES_DIR + '/And.out', 'utf-8');
     expect(actualOut).toBe(expectedAndOut);
   });
 
   it('nextCommand', () => {
     const script = new ScriptInterpreter({
       file: EXAMPLES_DIR + '/And.tst',
-      workingDirectory,
     });
 
     // Total And.tst has 20 commands:
@@ -60,11 +56,13 @@ describe('script-interpreter', () => {
       script.nextCommand();
     }
 
-    const actualOut = fs.readFileSync(workingDirectory + '/And.out', 'utf-8');
+    const actualOut = fs.readFileSync(EXAMPLES_DIR + '/And.out', 'utf-8');
     expect(actualOut).toBe(expectedAndOut);
   });
 
   it('repeat', () => {
+    const workingDirectory = os.tmpdir();
+
     const script = new ScriptInterpreter({
       script: `
         load And,
@@ -95,6 +93,8 @@ describe('script-interpreter', () => {
   });
 
   it('while', () => {
+    const workingDirectory = os.tmpdir();
+
     const script = new ScriptInterpreter({
       script: `
         load And16,
@@ -169,7 +169,6 @@ describe('script-interpreter', () => {
   it('time column', () => {
     const script = new ScriptInterpreter({
       file: EXAMPLES_DIR + '/PC.tst',
-      workingDirectory,
     });
 
     script.exec();
@@ -178,7 +177,7 @@ describe('script-interpreter', () => {
       .readFileSync(EXAMPLES_DIR + '/PC.cmp', 'utf-8')
       .replace(/\r\n/g, '\n');
 
-    const actualOut = fs.readFileSync(workingDirectory + '/PC.out', 'utf-8');
+    const actualOut = fs.readFileSync(EXAMPLES_DIR + '/PC.out', 'utf-8');
 
     expect(actualOut).toBe(expectedOut);
   });

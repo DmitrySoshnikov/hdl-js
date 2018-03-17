@@ -29,6 +29,10 @@ Hardware description language (HDL) parser, and Hardware simulator.
   - [Exec on set of data](#exec-on-set-of-data)
   - [Validating passed data on gate logic](#validating-passed-data-on-gate-logic)
   - [Data files for execution](#data-files-for-execution)
+  - [Gates scripting](#gates-scripting)
+    - [Executing scripts](#executing-scripts)
+    - [Script controller commands](#script-controller-commands)
+    - [Script emulator commands](#script-emulator-commands)
   - [Sequential run](#sequential-run)
   - [Gate events](#gate-events)
   - [Main chip groups](#main-chip-groups)
@@ -1104,6 +1108,148 @@ Truth table for data:
 ├───┼───┼─────┤
 │ 0 │ 1 │  1  │
 └───┴───┴─────┘
+```
+
+### Gates scripting
+
+The `--exec-on-data` [described above](#validating-passed-data-on-gate-logic) provides only _basic functionality_ for gates testing: you just define expected result in the _declarative_ form, and let the gate execute on data.
+
+For advanced gates testing, we can use _scripting_, which is an _imperative_ approach for validating chips logic.
+
+> **NOTE**: the scripts format is compatible with the [nand2tetris](http://nand2tetris.org/) course.
+
+The script files have a simple syntax, support different simulator commands (such as `eval`, `tick`, `tock`, etc), and also looping constructs like `while`, and `repeat`.
+
+#### Executing scripts
+
+Script files usually have `.tst` extension, and automatically load needed chips. As the script executes the gate's logic, it validates the outputs with the data from the specified _compare file_, which usually has `.cmp` extension. As a side effect script execution produces the `.out` file.
+
+For example, the [And.tst](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.tst) script has corresponding [And.cmp](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.cmp), and produces [And.out](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.out) as the result.
+
+Having the `And.tst`:
+
+```
+load And.hdl,
+output-file And.out,
+compare-to And.cmp,
+output-list a%B3.1.3 b%B3.1.3 out%B3.1.3;
+
+set a 0,
+set b 0,
+eval,
+output;
+
+set a 0,
+set b 1,
+eval,
+output;
+
+set a 1,
+set b 0,
+eval,
+output;
+
+set a 1,
+set b 1,
+eval,
+output;
+```
+
+We can execute this script using the `--script` (`-s`) option:
+
+```
+hdl-js --script src/emulator/hardware/scripting/examples/And.tst
+```
+
+Output:
+
+```
+✓ Script executed successfully!
+```
+
+If we have an error in the expected [And.cmp](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/scripting/examples/And.cmp) data, say on line 3:
+
+```
+|   0   |   1   |   1   |
+```
+
+We'll get the following report:
+
+```
+Error executing the script:
+
+   Expected on line 3 of src/emulator/hardware/scripting/examples/And.cmp:
+
+     1 |   a   |   b   |  out  |
+       |  ...
+     3 |   0   |   1   |   1   |
+
+   Received:
+
+     1 |   a   |   b   |  out  |
+       |  ...
+     3 |   0   |   1   |   0   |
+```
+
+In the example above the testing data itself was invalid. Usually though you'll have correct testing data, and in case of invalid gates logic, will receive report about errors in the specific parts.
+
+#### Script controller commands
+
+All script commands are divided into _Controller commands_, and _Emulator commands_. The former control the scripts execution, the later operates on the loaded chip.
+
+The basic controller commands are:
+
+- `load <gate-name>` -- loads needed gate (built-in, or from an hdl-file)
+- `output-file <out-file>` -- file created as a side effect of execution
+- `compare-to <compare-file>` -- file to compare to
+- `output-list <columns-format>` -- format of the table columns in the output file, supports `B` (binary), `X` (hexadecimal), `D` (decimal), and `S` (string) columns
+- `echo <string>` -- prints a string
+- `output` -- prints a line to the output file with the current values on gate pins
+
+Example of a script header with the basic controller commands:
+
+```
+load And.hdl,
+output-file And.out,
+compare-to And.cmp,
+output-list a%B3.1.3 b%B3.1.3 out%B3.1.3;
+```
+
+The `output-list` contains 3 columns (`a`, `b`, and `out`), each in binary (`B`) format, with needed padding on left, middle, and right.
+
+Looping controller commands are:
+
+- `repeat <times> { <commands> }` -- execute a loop needed amount of times
+- `while <condition> { <commands> }` -- a while loop executes until the condition is met
+
+Examples:
+
+```
+repeat 5 {
+  tick, tock;
+}
+
+while RAM[1] <> %B101 {
+  set RAM[1] 5,
+  ticktock;
+}
+```
+
+#### Script emulator commands
+
+The emulator commands operates on a loaded gate, and include:
+
+- `set <name> <value>` -- sets a value of a needed pin or name
+- `eval` -- evaluates the logic on currently set pins
+- `tick`, `tock`, `ticktock` -- executes appropriate events on the [System clock](#clock)
+
+Example for the `And.hdl`:
+
+```
+set a 0,
+set b 0,
+eval,
+output;
 ```
 
 ### Sequential run

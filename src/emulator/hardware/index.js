@@ -12,6 +12,7 @@ const CompositeGate = require('./CompositeGate');
 const Gate = require('./Gate');
 const HDLClassFactory = require('./HDLClassFactory');
 const Pin = require('./Pin');
+const ScriptInterpreter = require('./scripting/ScriptInterpreter');
 
 /**
  * Simulates hardware chips (gates) evaluation.
@@ -51,6 +52,11 @@ const HardwareEmulator = {
    * Expose a map of all built-in gates.
    */
   BuiltInGates,
+
+  /**
+   * Script interpreter module.
+   */
+  ScriptInterpreter,
 };
 
 module.exports = HardwareEmulator;

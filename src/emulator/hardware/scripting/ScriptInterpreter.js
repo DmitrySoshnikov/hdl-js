@@ -13,6 +13,7 @@ const scriptParser = require('./script-parser');
 const {SystemClock} = require('../Clock');
 
 const {toSignedString} = require('../../../util/numbers');
+const {centerString} = require('../../../util/string-util');
 
 /**
  * Number format.
@@ -27,13 +28,25 @@ const formatRadix = {
  * Evaluates a script code, testing gates logic.
  */
 class ScriptInterpreter {
-  constructor({script, file, workingDirectory = __dirname}) {
+  constructor({script, file, workingDirectory}) {
+    /**
+     * Working directory to load files.
+     */
+    this._workingDirectory = workingDirectory;
+    this._isVirtualDirectory = typeof workingDirectory === 'object';
+
     /**
      * Script from a file.
      */
     if (file) {
       this._script = fs.readFileSync(file, 'utf-8');
-      this._workingDirectory = path.dirname(file);
+      if (!this._workingDirectory) {
+        this._workingDirectory = path.dirname(file);
+      }
+    }
+
+    if (!this._workingDirectory) {
+      this._workingDirectory = __dirname;
     }
 
     /**
@@ -42,18 +55,6 @@ class ScriptInterpreter {
     if (script) {
       this._script = script;
     }
-
-    /**
-     * Working directory to load files.
-     */
-    if (workingDirectory) {
-      this._workingDirectory = workingDirectory;
-    }
-
-    /**
-     * Whether the working directory is virtual.
-     */
-    this._isVirtualDirectory = typeof workingDirectory === 'object';
 
     if (this._isVirtualDirectory) {
       HDLClassFactory.setVirtualDirectory(this._workingDirectory);
@@ -83,6 +84,8 @@ class ScriptInterpreter {
      * Compare file.
      */
     this._compareTo = null;
+    this._compareToLines = null;
+    this._actualLines = [];
 
     /**
      * Format of the output columns.
@@ -171,7 +174,7 @@ class ScriptInterpreter {
         this._initOutputFile(node);
         break;
       case 'compare-to':
-        this._compareTo = node.arguments[0];
+        this._createCompareTo(node);
         break;
       case 'output-list':
         this._createOutputListMap(node.arguments);
@@ -216,6 +219,17 @@ class ScriptInterpreter {
       default:
         throw TypeError(`Unrecognized simulator command: "${node.name}".`);
     }
+  }
+
+  _createCompareTo(node) {
+    if (this._isVirtualDirectory) {
+      this._compareTo = node.arguments[0];
+    } else {
+      this._compareTo = this._workingDirectory + '/' + node.arguments[0];
+    }
+    this._compareToLines = this._readFileContents(this._compareTo).split(
+      /\r?\n/
+    );
   }
 
   _initOutputFile(node) {
@@ -289,15 +303,7 @@ class ScriptInterpreter {
   _centerHeaderColumn(columnInfo) {
     const {right, middle, left, column} = columnInfo;
     const totalLength = right + middle + left;
-
-    if (column.length < totalLength) {
-      const len = totalLength - column.length;
-      const remain = len % 2 == 0 ? '' : ' ';
-      const pads = ' '.repeat(parseInt(len / 2));
-      return pads + column + pads + remain;
-    }
-
-    return column;
+    return centerString(column, totalLength);
   }
 
   _printHeader() {
@@ -320,6 +326,23 @@ class ScriptInterpreter {
   }
 
   _printLine(line) {
+    if (this._compareTo) {
+      this._actualLines.push(line);
+      const compareIdx = this._actualLines.length - 1;
+      const header = this._compareToLines[0];
+      const expected = this._compareToLines[compareIdx];
+      const actual = this._actualLines[compareIdx];
+      if (expected !== actual) {
+        throw new ScriptError({
+          header,
+          actual,
+          expected,
+          line: compareIdx + 1,
+          compareTo: this._compareTo,
+        });
+      }
+    }
+
     if (this._outputFile === 'console') {
       console.info(line);
       return;
@@ -331,6 +354,13 @@ class ScriptInterpreter {
     }
 
     fs.appendFileSync(this._outputFile, line + '\n', 'utf-8');
+  }
+
+  _readFileContents(file) {
+    if (this._isVirtualDirectory) {
+      return this._workingDirectory[file];
+    }
+    return fs.readFileSync(file, 'utf-8');
   }
 
   _evalWhile(node) {
@@ -418,6 +448,13 @@ class ScriptInterpreter {
 
     this._container = savedContainer;
     this._pc = savedPC;
+  }
+}
+
+class ScriptError extends Error {
+  constructor(errorData) {
+    super('Script comparison error.');
+    this.errorData = errorData;
   }
 }
 

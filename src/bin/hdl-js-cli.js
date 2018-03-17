@@ -14,12 +14,12 @@ const vm = require('vm');
 const {
   BuiltInGate,
   HDLClassFactory,
-  Clock: {
-    SystemClock,
-  },
+  Clock: {SystemClock},
+  ScriptInterpreter,
 } = hdl.emulator;
 
 const {int16} = require('../util/numbers');
+const {centerString} = require('../util/string-util');
 
 function enforceUnique(v) {
   return Array.isArray(v) ? v[v.length - 1] : v;
@@ -44,11 +44,12 @@ const options = require('yargs')
     },
     describe: {
       alias: 'd',
-      describe: 'Prints gate\'s specification',
+      describe: "Prints gate's specification",
     },
     'exec-on-data': {
       alias: 'e',
-      describe: 'Evaluates gate\'s logic on passed data; ' +
+      describe:
+        "Evaluates gate's logic on passed data; " +
         'validates outputs if passed',
       requiresArg: true,
       coerce: enforceUnique,
@@ -69,16 +70,23 @@ const options = require('yargs')
       requiresArg: true,
       coerce: enforceUnique,
     },
-    'columns': {
+    columns: {
       alias: 'c',
       describe: 'Whitelist of columns (comma-separated) to show in the table',
       requiresArg: true,
       coerce: enforceUnique,
     },
+    script: {
+      alias: 's',
+      describe:
+        'Run testing script, which automatically loads a gate, ' +
+        'tests the logic, and compares the results.',
+      requiresArg: true,
+      coerce: enforceUnique,
+    },
   })
   .alias('help', 'h')
-  .alias('version', 'v')
-  .argv;
+  .alias('version', 'v').argv;
 
 /**
  * Directory with all built-in gates.
@@ -141,7 +149,8 @@ function processInputValue(value, formatRadix) {
  * Lists built-in gates.
  */
 function listBuiltInGates() {
-  const builtinGates = fs.readdirSync(BUILTINS_DIR)
+  const builtinGates = fs
+    .readdirSync(BUILTINS_DIR)
     .filter(file => /^[A-Z]/.test(file))
     .map(file => '  - ' + path.basename(file, '.js'));
 
@@ -173,9 +182,7 @@ function loadGate(gate) {
  * Prints specification and truth table of a gate.
  */
 function describeGate(gate, formatRadix, formatStringLengh, columns) {
-  const {
-    run,
-  } = options;
+  const {run} = options;
 
   const GateClass = loadGate(gate);
   const isBuiltIn = Object.getPrototypeOf(GateClass) === BuiltInGate;
@@ -184,22 +191,21 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
   console.info('');
   console.info(
     (isBuiltIn ? 'BuiltIn ' : 'Custom ') +
-    colors.bold(`"${GateClass.name}"`) + ' gate:'
+      colors.bold(`"${GateClass.name}"`) +
+      ' gate:'
   );
 
-  const toFullName = (name) => {
-    const isSimple = (
-      typeof name === 'string' ||
-      name.size === 1
-    );
-    return name = isSimple
+  const toFullName = name => {
+    const isSimple = typeof name === 'string' || name.size === 1;
+    return (name = isSimple
       ? `  - ${name.name || name}`
-      : `  - ${name.name}[${name.size}]`;
+      : `  - ${name.name}[${name.size}]`);
   };
 
   // Description:
 
-  const description = spec.description.split('\n')
+  const description = spec.description
+    .split('\n')
     .map(line => '  ' + line)
     .join('\n');
 
@@ -207,9 +213,7 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
 
   // Input pins:
 
-  const inputPins = spec.inputPins
-    .map(input => toFullName(input))
-    .join('\n');
+  const inputPins = spec.inputPins.map(input => toFullName(input)).join('\n');
 
   console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
 
@@ -238,9 +242,7 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
   // Compiled gates from HDL don't provide static canonical
   // truth table, so we calculate it for 5 rows on random data.
   if (isCustomTable) {
-    truthTable = GateClass
-      .defaultFromSpec()
-      .generateTruthTable();
+    truthTable = GateClass.defaultFromSpec().generateTruthTable();
   } else {
     console.info(colors.bold('Truth table:'), '\n');
   }
@@ -307,12 +309,62 @@ function main() {
     list,
     parse,
     run,
+    script,
   } = options;
 
+  // ------------------------------------------------------
+  // Script execution.
+
+  if (script) {
+    try {
+      new ScriptInterpreter({
+        file: script,
+        workingDirectory: path.dirname(script),
+      }).exec();
+      console.info(colors.green('\n\u2713 Script executed successfully!\n'));
+    } catch (e) {
+      const {header, actual, expected, line, compareTo} = e.errorData;
+
+      console.info(colors.red('\nError executing the script:\n'));
+
+      const pad2 = '  ';
+      const pad4 = '    ';
+
+      const firstColumnLength = header.slice(1).indexOf('|');
+      const firstLinePad = '1'.padStart(line.toString().length, ' ');
+      const maxLinePad = ' '.repeat(line.toString().length);
+
+      console.info(
+        pad2,
+        colors.bold('Expected'),
+        'on line',
+        colors.bold(line),
+        'of',
+        colors.bold(compareTo) + ':\n'
+      );
+      console.info(pad4, firstLinePad, colors.green(header));
+      if (line != 2) {
+        console.info(
+          pad4,
+          maxLinePad + ' |' + centerString('...', firstColumnLength)
+        );
+      }
+      console.info(pad4, line, colors.green(expected), '\n');
+
+      console.info(pad2, colors.bold('Received:\n'));
+      console.info(pad4, firstLinePad, colors.red(header));
+      if (line != 2) {
+        console.info(
+          pad4,
+          maxLinePad + ' |' + centerString('...', firstColumnLength)
+        );
+      }
+      console.info(pad4, line, colors.red(actual), '\n');
+    }
+  }
+
   // Whitelist of columns, empty list -- all columns.
-  const columns = options.columns
-    ? options.columns.split(',')
-    : [];
+  const columns = options.columns ? options.columns.split(',') : [];
 
   if (clockRate) {
     SystemClock.setRate(clockRate);
@@ -324,14 +376,14 @@ function main() {
   if (gate && !describe && !execOnData) {
     console.info(
       `\nHint: pass ${colors.bold('--describe')} option to see ` +
-      `${colors.bold('"' + gate + '"')} gate specification.\n`
+        `${colors.bold('"' + gate + '"')} gate specification.\n`
     );
   }
 
   if (describe && !gate) {
     console.info(
       `\nHint: pass ${colors.bold('--gate')} option to see ` +
-      `the specification of a built-in or custom gate.\n`
+        `the specification of a built-in or custom gate.\n`
     );
   }
 
@@ -366,7 +418,7 @@ function main() {
     if (!gate) {
       console.info(
         `\nHint: pass ${colors.bold('--gate')} option to execute ` +
-        `gate logic on the passed data.\n`
+          `gate logic on the passed data.\n`
       );
       return;
     }
@@ -404,7 +456,7 @@ function main() {
             return colors.red(expected) + ' / ' + colors.green(value);
           }
           return value;
-        }
+        },
       });
     };
 
@@ -418,9 +470,7 @@ function main() {
 
     if (conflicts.length) {
       console.info(
-        colors.red(colors.bold(
-          `\nFound ${conflicts.length} conflicts in:\n`
-        ))
+        colors.red(colors.bold(`\nFound ${conflicts.length} conflicts in:\n`))
       );
 
       conflicts.forEach(conflict => {
