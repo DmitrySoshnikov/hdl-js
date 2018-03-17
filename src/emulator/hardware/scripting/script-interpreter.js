@@ -12,6 +12,8 @@ const Pin = require('../Pin');
 const scriptParser = require('./script-parser');
 const {SystemClock} = require('../Clock');
 
+const {toSignedString} = require('../../../util/numbers');
+
 /**
  * Number format.
  */
@@ -265,6 +267,8 @@ class ScriptInterpreter {
       if (column === 'time') {
         content = value >= 0 ? `${value}+` : `${Math.abs(value)}`;
         content = content.padEnd(middle, ' ');
+      } else if (column === Pin.CLOCK) {
+        content = toSignedString(value).padEnd(middle, ' ');
       } else if (format === 'S') {
         // Explicit string format.
         content = `${value}`.padEnd(middle, ' ');

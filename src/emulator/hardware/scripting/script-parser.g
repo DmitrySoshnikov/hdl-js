@@ -36,7 +36,7 @@
 
 \b%(B|X|D)\d+                 return 'FORMATTED_NUMBER'
 ('-'?)\d+                     return 'NUMBER'
-[\w\.%\[\]\-]+                return 'REF_VAL'
+[\w\.%\[\]\-$]+               return 'REF_VAL'
 
 /lex
 

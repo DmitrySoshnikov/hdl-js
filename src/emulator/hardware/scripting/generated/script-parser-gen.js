@@ -186,7 +186,7 @@ const lexRules = [[/^\/\/.*/, function() { /* skip comments */ }],
 [/^while/, function() { return 'WHILE' }],
 [/^\b(B|X|D)\d+/, function() { return 'FORMATTED_NUMBER' }],
 [/^(-?)\d+/, function() { return 'NUMBER' }],
-[/^[\w\.%\[\]\-]+/, function() { return 'REF_VAL' }],
+[/^[\w\.%\[\]\-$]+/, function() { return 'REF_VAL' }],
 [/^\{/, function() { return "'{'"; }],
 [/^\}/, function() { return "'}'"; }]];
 const lexRulesByConditions = {"INITIAL":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]};
