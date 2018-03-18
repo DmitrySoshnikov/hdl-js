@@ -297,6 +297,10 @@ class ScriptInterpreter {
           .padStart(radix !== 10 ? pinInfo.size : 0, '0')
           .padStart(radix === 10 ? middle : 0, ' ')
           .toUpperCase();
+
+        if (content.length > middle) {
+          content = content.slice(-middle);
+        }
       }
 
       line.push(' '.repeat(right), content, ' '.repeat(left), '|');
