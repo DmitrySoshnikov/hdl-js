@@ -80,6 +80,9 @@ const HDLClassFactory = {
 
     const [internalPinsSpec, partsClasses] = analyzeParts(ast, workingDir);
 
+    // Out chip is clocked if any of the part chips is clocked.
+    const _isClocked = partsClasses.some(partClass => partClass.isClocked());
+
     // Gate class, corresponding to the HDL file.
     const GateClass = class extends CompositeGate {
       constructor(options = {}) {
@@ -108,6 +111,10 @@ const HDLClassFactory = {
             ast,
           })
         );
+      }
+
+      static isClocked() {
+        return _isClocked;
       }
     };
 

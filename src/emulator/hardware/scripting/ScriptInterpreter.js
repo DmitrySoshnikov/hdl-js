@@ -166,9 +166,7 @@ class ScriptInterpreter {
   ControllerCommand(node) {
     switch (node.name) {
       case 'load':
-        this._gate = HDLClassFactory.loadGate(
-          node.arguments[0].replace('.hdl', '')
-        ).defaultFromSpec();
+        this._loadGate(node);
         break;
       case 'output-file':
         this._initOutputFile(node);
@@ -219,6 +217,13 @@ class ScriptInterpreter {
       default:
         throw TypeError(`Unrecognized simulator command: "${node.name}".`);
     }
+  }
+
+  _loadGate(node) {
+    this._gate = HDLClassFactory.loadGate(
+      node.arguments[0].replace('.hdl', ''),
+      this._workingDirectory
+    ).defaultFromSpec();
   }
 
   _createCompareTo(node) {

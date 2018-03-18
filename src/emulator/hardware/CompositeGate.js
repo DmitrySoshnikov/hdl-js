@@ -78,13 +78,13 @@ class CompositeGate extends Gate {
    */
   clockUp() {
     if (!this.getClass().isClocked()) {
-      throw new TypeError(
-        `Gate#clockUp: "${this._name}" is not clocked.`
-      );
+      throw new TypeError(`Gate#clockUp: "${this._name}" is not clocked.`);
     }
 
     for (const part of this._parts) {
-      part.tick();
+      if (part.getClass().isClocked()) {
+        part.tick();
+      }
     }
   }
 
@@ -94,13 +94,13 @@ class CompositeGate extends Gate {
    */
   clockDown() {
     if (!this.getClass().isClocked()) {
-      throw new TypeError(
-        `Gate#clockDown: "${this._name}" is not clocked.`
-      );
+      throw new TypeError(`Gate#clockDown: "${this._name}" is not clocked.`);
     }
 
     for (const part of this._parts) {
-      part.tock();
+      if (part.getClass().isClocked()) {
+        part.tock();
+      }
     }
   }
 
@@ -120,7 +120,7 @@ class CompositeGate extends Gate {
     const pinToNode = pin => {
       const nameNode = {
         type: 'Name',
-        value: pin.getName()
+        value: pin.getName(),
       };
 
       if (pin.getSize() !== 1) {
@@ -140,19 +140,26 @@ class CompositeGate extends Gate {
 
       // a, b:
       part.getInputPins().forEach(pin => {
-        const connectInfo = pin.getSourcePin()
+        const connectInfo = pin
+          .getSourcePin()
           .getListeningPinsMap()
           .get(pin);
 
-        const name = Object.assign({
-          type: 'Name',
-          value: pin.getName(),
-        }, connectInfo.destinationSpec);
+        const name = Object.assign(
+          {
+            type: 'Name',
+            value: pin.getName(),
+          },
+          connectInfo.destinationSpec
+        );
 
-        const value = Object.assign({
-          type: 'Name',
-          value: pin.getSourcePin().getName(),
-        }, connectInfo.sourceSpec);
+        const value = Object.assign(
+          {
+            type: 'Name',
+            value: pin.getSourcePin().getName(),
+          },
+          connectInfo.sourceSpec
+        );
 
         callArguments.push({
           type: 'Argument',
@@ -164,15 +171,21 @@ class CompositeGate extends Gate {
       // Several pins can listen to the output pins:
       part.getOutputPins().forEach(pin => {
         for (const [destPin, connectInfo] of pin.getListeningPinsMap()) {
-          const name = Object.assign({
-            type: 'Name',
-            value: pin.getName(),
-          }, connectInfo.sourceSpec);
+          const name = Object.assign(
+            {
+              type: 'Name',
+              value: pin.getName(),
+            },
+            connectInfo.sourceSpec
+          );
 
-          const value = Object.assign({
-            type: 'Name',
-            value: destPin.getName(),
-          }, connectInfo.destinationSpec);
+          const value = Object.assign(
+            {
+              type: 'Name',
+              value: destPin.getName(),
+            },
+            connectInfo.destinationSpec
+          );
 
           callArguments.push({
             type: 'Argument',

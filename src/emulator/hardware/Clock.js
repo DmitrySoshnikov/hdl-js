@@ -7,9 +7,7 @@
 
 const EventEmitter = require('events');
 
-const {
-  isNegativeZero,
-} = require('../../util/numbers');
+const {isNegativeZero} = require('../../util/numbers');
 
 /**
  * The system clock is used to synchronize handling of all
@@ -27,14 +25,10 @@ const {
  * cycles per second, measured in Hz (default is 1Hz -- 1 cycle per second).
  */
 class Clock extends EventEmitter {
-
   /**
    * Creates a clock instance.
    */
-  constructor({
-    rate = 1,
-    value = -0,
-  } = {}) {
+  constructor({rate = 1, value = -0} = {}) {
     super();
     this.setRate(rate);
     this.setValue(value);
@@ -42,6 +36,9 @@ class Clock extends EventEmitter {
     // Tracks the halfs in a cycle, to emit full 'cycle' event
     // from tick, followed by tock.
     this._halfs = 0;
+
+    // There might be more than 11 (default in Node) listeners of the clock.
+    this.setMaxListeners(Infinity);
   }
 
   /**
