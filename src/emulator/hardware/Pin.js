@@ -33,7 +33,7 @@ class Pin extends EventEmitter {
     if (size < 1 || size > WORD_SIZE) {
       throw new Error(
         `Invalid "size" for ${name} pin, should be ` +
-        `in 1-${WORD_SIZE} range.`
+          `in 1-${WORD_SIZE} range.`
       );
     }
 
@@ -92,11 +92,14 @@ class Pin extends EventEmitter {
 
     // Set 1.
     if (value === 1) {
-      this._value |= (1 << index);
+      this._value |= 1 << index;
     } else {
       // Set 0 ("clear").
       this._value &= ~(1 << index);
     }
+
+    // Always adjust to int16 on individual bits set
+    this._value = int16(this._value);
 
     this.emit('change', this._value, oldValue, index);
   }
@@ -219,9 +222,7 @@ class Pin extends EventEmitter {
       return name;
     }
 
-    return name.size > 1
-      ? `${name.name}[${name.size}]`
-      : name.name;
+    return name.size > 1 ? `${name.name}[${name.size}]` : name.name;
   }
 
   /**
@@ -231,7 +232,7 @@ class Pin extends EventEmitter {
     if (index < 0 || index > this._size - 1) {
       throw new TypeError(
         `Pin "${this.getName()}": out of bounds index ${index}, ` +
-        `while the size is ${this._size}.`
+          `while the size is ${this._size}.`
       );
     }
   }
