@@ -97,6 +97,9 @@ class ScriptInterpreter {
      * Containainers are: Script, bodies of the while, and repeat loops.
      */
     this._container = this._ast;
+
+    // Reset System clock on each script run:
+    SystemClock.reset();
   }
 
   /**
