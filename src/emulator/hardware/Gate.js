@@ -11,11 +11,7 @@ const TablePrinter = require('../../table-printer');
 
 const {SystemClock} = require('./Clock');
 
-const {
-  int16,
-  isNegativeZero,
-  toSignedString,
-} = require('../../util/numbers');
+const {int16, isNegativeZero, toSignedString} = require('../../util/numbers');
 
 /**
  * Abstract gate class, base for `BuiltInGate`, and `CompositeGate`.
@@ -23,22 +19,11 @@ const {
  * Emits events for `eval`, `clockUp`, and `clockDown`.
  */
 class Gate extends EventEmitter {
-
   /**
    * Creates a gate instance with the given name.
    */
-  constructor(options = null) {
+  constructor({name = null, inputPins, outputPins, manualClock = false}) {
     super();
-
-    if (!options) {
-      return this.getClass().defaultFromSpec();
-    }
-
-    let {
-      name = null,
-      inputPins = [],
-      outputPins = [],
-    } = options;
 
     // Infer name from the class if not passed explicitly.
     if (!name) {
@@ -58,8 +43,9 @@ class Gate extends EventEmitter {
     // Extra user-initialization code:
     this.init();
 
-    // Subscribe to the clock events for clocked gates.
-    if (this.getClass().isClocked()) {
+    // Subscribe to the clock events for clocked gates, unless
+    // `manualClock` is set (for part gates used in composite gates).
+    if (this.getClass().isClocked() && !manualClock) {
       SystemClock.on('tick', () => this.tick());
       SystemClock.on('tock', () => this.tock());
       SystemClock.on('change', value => {
@@ -80,11 +66,8 @@ class Gate extends EventEmitter {
   /**
    * Creates an default instance of this gate from the spec.
    */
-  static defaultFromSpec() {
-    const {
-      inputPins,
-      outputPins,
-    } = this.validateSpec(this.Spec);
+  static defaultFromSpec(extraOptions = {}) {
+    const {inputPins, outputPins} = this.validateSpec(this.Spec);
 
     const toPin = name => {
       return typeof name === 'string'
@@ -92,10 +75,15 @@ class Gate extends EventEmitter {
         : new Pin({name: name.name, size: name.size});
     };
 
-    return new this({
-      inputPins: inputPins.map(toPin),
-      outputPins: outputPins.map(toPin),
-    });
+    return new this(
+      Object.assign(
+        {
+          inputPins: inputPins.map(toPin),
+          outputPins: outputPins.map(toPin),
+        },
+        extraOptions
+      )
+    );
   }
 
   /**
@@ -140,16 +128,12 @@ class Gate extends EventEmitter {
         [Pin.CLOCK]: {
           kind: 'special',
           name: Pin.CLOCK,
-        }
+        },
       };
 
       const spec = this.validateSpec(this.Spec);
 
-      const {
-        inputPins,
-        outputPins,
-        internalPins,
-      } = spec;
+      const {inputPins, outputPins, internalPins} = spec;
 
       const processPins = (pins, kind) => {
         for (const pin of pins) {
@@ -171,9 +155,7 @@ class Gate extends EventEmitter {
     }
 
     if (!this._pinsInfoMap.hasOwnProperty(name)) {
-      throw new Error(
-        `Pin "${name}" is not in Spec of "${this.name}" gate.`
-      );
+      throw new Error(`Pin "${name}" is not in Spec of "${this.name}" gate.`);
     }
 
     return this._pinsInfoMap[name];
@@ -280,29 +262,23 @@ class Gate extends EventEmitter {
   }) {
     const spec = this.validateSpec(this.Spec);
 
-    const {
-      inputPins,
-      outputPins,
-      internalPins = [],
-    } = spec;
+    const {inputPins, outputPins, internalPins = []} = spec;
 
     const columnsMap = {};
     for (const column of columns) {
       columnsMap[column] = true;
     }
 
-    const toHeaderColumn = (name) => {
+    const toHeaderColumn = name => {
       return {
         content: Pin.toFullName(name),
         hAlign: 'center',
       };
     };
 
-    const clockHeader = this.isClocked()
-      ? [Pin.CLOCK]
-      : [];
+    const clockHeader = this.isClocked() ? [Pin.CLOCK] : [];
 
-    const whitelistHeader = (list) => {
+    const whitelistHeader = list => {
       // All columns.
       if (columns.length === 0) {
         return list;
@@ -311,7 +287,7 @@ class Gate extends EventEmitter {
       return list.filter(pin => columnsMap.hasOwnProperty(pin.name || pin));
     };
 
-    const whitelistColumns = (row) => {
+    const whitelistColumns = row => {
       // All columns.
       if (columns.length === 0) {
         return row;
@@ -372,10 +348,7 @@ class Gate extends EventEmitter {
     console.info('');
   }
 
-  static validateSpec(
-    spec,
-    specProps = ['name', 'inputPins', 'outputPins']
-  ) {
+  static validateSpec(spec, specProps = ['name', 'inputPins', 'outputPins']) {
     if (!spec) {
       throw new Error(`All gates should implement "Spec" property.`);
     }
@@ -384,7 +357,7 @@ class Gate extends EventEmitter {
       if (!spec.hasOwnProperty(prop)) {
         throw new Error(
           `"${this.name}" gate: "Spec" should impelment` +
-          `all properties: ${specProps.join(', ')}.`
+            `all properties: ${specProps.join(', ')}.`
         );
       }
     });
@@ -413,13 +386,15 @@ class Gate extends EventEmitter {
         const row = {};
         // Use 2-radix to get a binary number, and get `0`s, and `1`s
         // for the table from it.
-        i.toString(2)
+        i
+          .toString(2)
           .padStart(inputPins.length, '0')
           .split('')
           .forEach((bit, idx) => {
-            const key = typeof inputPins[idx] === 'string'
-              ? inputPins[idx]
-              : inputPins[idx].name;
+            const key =
+              typeof inputPins[idx] === 'string'
+                ? inputPins[idx]
+                : inputPins[idx].name;
             row[key] = Number(bit);
           });
         inputData.push(row);
@@ -451,9 +426,7 @@ class Gate extends EventEmitter {
         return pin;
       }
 
-      const spec = typeof pin === 'string'
-        ? {name: pin}
-        : pin;
+      const spec = typeof pin === 'string' ? {name: pin} : pin;
 
       return new Pin(spec);
     });
@@ -483,12 +456,12 @@ class Gate extends EventEmitter {
 
     if (this._internalPins) {
       this._internalPins.forEach(
-        pin => this._namesToPinsMap[pin.getName()] = pin
+        pin => (this._namesToPinsMap[pin.getName()] = pin)
       );
     }
 
     this._outputPins.forEach(
-      pin => this._namesToPinsMap[pin.getName()] = pin
+      pin => (this._namesToPinsMap[pin.getName()] = pin)
     );
   }
 
@@ -507,8 +480,8 @@ class Gate extends EventEmitter {
    */
   clockUp() {
     throw new Error(
-      'Abstract method `Gate#clockUp` should be implemented '+
-      'in a concrete class.'
+      'Abstract method `Gate#clockUp` should be implemented ' +
+        'in a concrete class.'
     );
   }
 
@@ -517,8 +490,8 @@ class Gate extends EventEmitter {
    */
   clockDown() {
     throw new Error(
-      'Abstract method `Gate#clockDown` should be implemented '+
-      'in a concrete class.'
+      'Abstract method `Gate#clockDown` should be implemented ' +
+        'in a concrete class.'
     );
   }
 
@@ -575,8 +548,8 @@ class Gate extends EventEmitter {
    */
   static isClocked() {
     throw new Error(
-      'Abstract static method `Gate.isClocked` should be implemented '+
-      'in a concrete class.'
+      'Abstract static method `Gate.isClocked` should be implemented ' +
+        'in a concrete class.'
     );
   }
 
@@ -589,7 +562,7 @@ class Gate extends EventEmitter {
    */
   tick() {
     this.eval();
-    this.clockUp(this.getPin(Pin.CLOCK).getValue());
+    this.clockUp();
     return this;
   }
 
@@ -600,7 +573,7 @@ class Gate extends EventEmitter {
    * of the gate, and then computes the outputs from non-clocked information.
    */
   tock() {
-    this.clockDown(this.getPin(Pin.CLOCK).getValue());
+    this.clockDown();
     this.eval();
     return this;
   }

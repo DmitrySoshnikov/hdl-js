@@ -165,20 +165,4 @@ describe('script-interpreter', () => {
 
     expect(virtualDirectory['MyGate.out']).toBe(virtualDirectory['MyGate.cmp']);
   });
-
-  it('time column', () => {
-    const script = new ScriptInterpreter({
-      file: EXAMPLES_DIR + '/PC.tst',
-    });
-
-    script.exec();
-
-    const expectedOut = fs
-      .readFileSync(EXAMPLES_DIR + '/PC.cmp', 'utf-8')
-      .replace(/\r\n/g, '\n');
-
-    const actualOut = fs.readFileSync(EXAMPLES_DIR + '/PC.out', 'utf-8');
-
-    expect(actualOut).toBe(expectedOut);
-  });
 });

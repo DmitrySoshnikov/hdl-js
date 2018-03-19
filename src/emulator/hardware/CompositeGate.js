@@ -22,11 +22,13 @@ class CompositeGate extends Gate {
     internalPins = [],
     parts = [],
     ast = null,
+    manualClock = false,
   } = {}) {
     super({
       name,
       inputPins,
       outputPins,
+      manualClock,
     });
 
     this._internalPins = internalPins;
@@ -82,9 +84,7 @@ class CompositeGate extends Gate {
     }
 
     for (const part of this._parts) {
-      if (part.getClass().isClocked()) {
-        part.tick();
-      }
+      part.tick();
     }
   }
 
@@ -98,9 +98,7 @@ class CompositeGate extends Gate {
     }
 
     for (const part of this._parts) {
-      if (part.getClass().isClocked()) {
-        part.tock();
-      }
+      part.tock();
     }
   }
 

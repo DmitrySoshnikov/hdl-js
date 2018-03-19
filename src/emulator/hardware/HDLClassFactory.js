@@ -301,7 +301,11 @@ function instantiateParts(ast, options, partsClasses) {
     const PartGateClass = partsClasses[idx];
 
     // Instance.
-    const partGateInstance = PartGateClass.defaultFromSpec();
+    const partGateInstance = PartGateClass.defaultFromSpec({
+      // Part pins are manually updated for `tick/tock` events
+      // from the main parent gate.
+      manualClock: true,
+    });
 
     // Handle arguments.
     part.arguments.forEach(partArg => {

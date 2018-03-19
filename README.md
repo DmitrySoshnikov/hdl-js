@@ -909,7 +909,7 @@ console.log(b.getRange(4, 7)); // 0b1010;
 
 ### Creating gates from default spec
 
-All gates known their own specification, so we can omit passing explicit pins info, and use a constructor without parameters, or create gates via the `defaultFromSpec` method:
+All gates known their own specification, so we can omit passing explicit pins info, and use `defaultFromSpec` method:
 
 ```js
 const hdl = require('.');
@@ -919,23 +919,13 @@ const {And} = hdl.emulator.BuiltInGates;
 // Creates input `a` and `b` pins, and
 // ouput `out` pin automatically:
 
-const and1 = new And();
+const and = And.defaultFromSpec();
 
-and1
-  .setPinValues({a: 1, b: 1})
-  .eval();
-
-console.log(and1.getPin('out').getValue()); // 1
-
-// The same as:
-
-const and2 = And.defaultFromSpec();
-
-and2
+and
   .setPinValues({a: 1, b: 0})
   .eval();
 
-console.log(and2.getPin('out').getValue()); // 0
+console.log(and.getPin('out').getValue()); // 0
 ```
 
 ### Exec on set of data
@@ -1195,6 +1185,25 @@ Error executing the script:
 ```
 
 In the example above the testing data itself is invalid. Usually though you'll have a correct testing data, and in case of an invalid gate logic, will receive a report on errors in the specific parts.
+
+It is also possible to test the whole directory, passing the directory name instead of an individual `.tst` file. In this case, the directory is scanned for all `.tst` files, which are executed in sequence:
+
+```
+hdl-js --script src/emulator/hardware/scripting/examples/n2t/03/
+```
+
+Result:
+
+```
+[PASS] Bit.tst
+[PASS] PC.tst
+[PASS] RAM16K.tst
+[PASS] RAM4K.tst
+[PASS] RAM512.tst
+[PASS] RAM64.tst
+[PASS] RAM8.tst
+[PASS] Register.tst
+```
 
 #### Script controller commands
 

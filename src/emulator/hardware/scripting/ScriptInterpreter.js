@@ -418,7 +418,7 @@ class ScriptInterpreter {
     const pin = this._gate.getPin(node.value);
 
     // a[1]
-    if (node.index) {
+    if (node.hasOwnProperty('index')) {
       return pin.getValueAt(node.index);
     }
 
@@ -430,7 +430,7 @@ class ScriptInterpreter {
     const pin = this._gate.getPin(node.value);
 
     // a[1]
-    if (node.index) {
+    if (node.hasOwnProperty('index')) {
       return pin.setValueAt(node.index, value.value);
     }
 

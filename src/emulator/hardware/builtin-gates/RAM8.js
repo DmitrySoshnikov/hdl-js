@@ -14,17 +14,83 @@ const {int16Table} = require('../../../util/numbers');
  * Canonical truth table for the `RAM8` gate.
  */
 const TRUTH_TABLE = int16Table([
-  {$clock: -0, in: 0b0000000000000000, load: 0, address: 0, out: 0b0000000000000000},
-  {$clock: +0, in: 0b0000000000010101, load: 1, address: 0, out: 0b0000000000000000},
-  {$clock: -1, in: 0b0000000000000001, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: +1, in: 0b0000000000010101, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: -2, in: 0b0000000000010101, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: +2, in: 0b1101001000010101, load: 1, address: 2, out: 0b0000000000010101},
-  {$clock: -3, in: 0b1101001000010101, load: 0, address: 2, out: 0b1101001000010101},
-  {$clock: +3, in: 0b1111111111111111, load: 1, address: 3, out: 0b1101001000010101},
-  {$clock: -4, in: 0b0000000000000000, load: 1, address: 3, out: 0b1111111111111111},
-  {$clock: +4, in: 0b0000000000000000, load: 1, address: 3, out: 0b1111111111111111},
-  {$clock: -5, in: 0b0000000000000000, load: 0, address: 3, out: 0b0000000000000000},
+  {
+    $clock: -0,
+    in: 0b0000000000000000,
+    load: 0,
+    address: 0,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: +0,
+    in: 0b0000000000010101,
+    load: 1,
+    address: 0,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: -1,
+    in: 0b0000000000000001,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: +1,
+    in: 0b0000000000010101,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: -2,
+    in: 0b0000000000010101,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: +2,
+    in: 0b1101001000010101,
+    load: 1,
+    address: 2,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: -3,
+    in: 0b1101001000010101,
+    load: 0,
+    address: 2,
+    out: 0b1101001000010101,
+  },
+  {
+    $clock: +3,
+    in: 0b1111111111111111,
+    load: 1,
+    address: 3,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: -4,
+    in: 0b0000000000000000,
+    load: 1,
+    address: 3,
+    out: 0b1111111111111111,
+  },
+  {
+    $clock: +4,
+    in: 0b0000000000000000,
+    load: 1,
+    address: 3,
+    out: 0b1111111111111111,
+  },
+  {
+    $clock: -5,
+    in: 0b0000000000000000,
+    load: 0,
+    address: 3,
+    out: 0b0000000000000000,
+  },
 ]);
 
 /**
@@ -77,9 +143,7 @@ RAM8.Spec = {
     {name: 'address', size: 3},
   ],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

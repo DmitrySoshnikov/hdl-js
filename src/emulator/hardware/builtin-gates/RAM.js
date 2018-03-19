@@ -14,13 +14,55 @@ const {int16Table} = require('../../../util/numbers');
  * Canonical truth table for the `RAM` gate.
  */
 const TRUTH_TABLE = int16Table([
-  {$clock: -0, in: 0b0000000000000000, load: 0, address: 0, out: 0b0000000000000000},
-  {$clock: +0, in: 0b0000000000010101, load: 1, address: 0, out: 0b0000000000000000},
-  {$clock: -1, in: 0b0000000000000001, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: +1, in: 0b0000000000010101, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: -2, in: 0b0000000000010101, load: 0, address: 0, out: 0b0000000000010101},
-  {$clock: +2, in: 0b1101001000010101, load: 1, address: 2, out: 0b0000000000010101},
-  {$clock: -3, in: 0b1101001000010101, load: 0, address: 2, out: 0b1101001000010101},
+  {
+    $clock: -0,
+    in: 0b0000000000000000,
+    load: 0,
+    address: 0,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: +0,
+    in: 0b0000000000010101,
+    load: 1,
+    address: 0,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: -1,
+    in: 0b0000000000000001,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: +1,
+    in: 0b0000000000010101,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: -2,
+    in: 0b0000000000010101,
+    load: 0,
+    address: 0,
+    out: 0b0000000000010101,
+  },
+  {
+    $clock: +2,
+    in: 0b1101001000010101,
+    load: 1,
+    address: 2,
+    out: 0b0000000000000000,
+  },
+  {
+    $clock: -3,
+    in: 0b1101001000010101,
+    load: 0,
+    address: 2,
+    out: 0b1101001000010101,
+  },
 ]);
 
 /**
@@ -82,7 +124,7 @@ class RAM extends BuiltInGate {
    * Returns values at address.
    */
   setValueAt(address, value) {
-    return this._storage[this._checkAddress(address)] = value;
+    return (this._storage[this._checkAddress(address)] = value);
   }
 
   /**
@@ -92,10 +134,17 @@ class RAM extends BuiltInGate {
     if (address < 0 || address > this._size - 1) {
       throw new TypeError(
         `Chip "${this.getClass().name}": invalid address ${address}, ` +
-        `while the size is ${this._size}.`
+          `while the size is ${this._size}.`
       );
     }
     return address;
+  }
+
+  /**
+   * Update output for address.
+   */
+  eval() {
+    this._updateOutput();
   }
 
   /**
@@ -118,6 +167,13 @@ class RAM extends BuiltInGate {
    * the value to the output pin.
    */
   clockDown() {
+    this._updateOutput();
+  }
+
+  /**
+   * Updates the output on address change, and on clock down.
+   */
+  _updateOutput() {
     const address = this.getInputPins()[2].getValue();
     this.getOutputPins()[0].setValue(this._storage[address]);
   }
@@ -150,9 +206,7 @@ RAM.Spec = {
     {name: 'address', size: 3},
   ],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

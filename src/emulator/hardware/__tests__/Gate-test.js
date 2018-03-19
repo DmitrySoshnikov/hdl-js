@@ -34,7 +34,6 @@ const gate = new MyGate({
 });
 
 describe('Gate', () => {
-
   it('gate interface', () => {
     expect(gate.getName()).toBe('And');
     expect(gate.getInputPins()).toEqual([a, b]);
@@ -55,7 +54,7 @@ describe('Gate', () => {
       outputPins: ['out'],
     };
 
-    expect((new And()).getName()).toBe('And');
+    expect(And.defaultFromSpec().getName()).toBe('And');
   });
 
   it('sets/gets pin values', () => {
@@ -105,8 +104,10 @@ describe('Gate', () => {
 
     expect(result).not.toEqual(data);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0])
-      .toEqual({row: 0, pins: {out: {expected: 0, actual: 1}}});
+    expect(conflicts[0]).toEqual({
+      row: 0,
+      pins: {out: {expected: 0, actual: 1}},
+    });
 
     // Sets the outputs, no conflicts.
     data = [{a: 1, b: 1}];
@@ -140,32 +141,26 @@ describe('Gate', () => {
 
     expect(result).not.toEqual(data);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0])
-      .toEqual({
-        row: 0,
-        pins: {
-          out: {
-            expected: int16(0b1111111111111110),
-            actual: int16(0b1111111111111111),
-          }
-        }
-      });
+    expect(conflicts[0]).toEqual({
+      row: 0,
+      pins: {
+        out: {
+          expected: int16(0b1111111111111110),
+          actual: int16(0b1111111111111111),
+        },
+      },
+    });
 
     // Sets the outputs, no conflicts.
     data = [{in: '0000000000000000', out: int16(0b1111111111111111)}];
     ({result, conflicts} = not16.execOnData(data));
 
-    expect(result)
-      .toEqual([{in: 0, out: int16(0b1111111111111111)}]);
+    expect(result).toEqual([{in: 0, out: int16(0b1111111111111111)}]);
     expect(conflicts.length).toBe(0);
   });
 
   it('exec on default data', () => {
-    const partialData = [
-      {a: 1},
-      {a: 1, b: 1},
-      {b: 1},
-    ];
+    const partialData = [{a: 1}, {a: 1, b: 1}, {b: 1}];
 
     const {result} = require('../builtin-gates/And')
       .defaultFromSpec()
@@ -185,15 +180,20 @@ describe('Gate', () => {
 
     const Not16 = require('../builtin-gates/Not16');
 
-    expect(Not16.getPinInfo('in'))
-      .toEqual({kind: 'input', name: 'in', size: 16});
+    expect(Not16.getPinInfo('in')).toEqual({
+      kind: 'input',
+      name: 'in',
+      size: 16,
+    });
 
-    expect(Not16.getPinInfo('out'))
-      .toEqual({kind: 'output', name: 'out', size: 16});
+    expect(Not16.getPinInfo('out')).toEqual({
+      kind: 'output',
+      name: 'out',
+      size: 16,
+    });
   });
 
   it('creates pins from spec', () => {
-
     // ----------------------------------------
     // Simple names spec.
 
@@ -207,21 +207,14 @@ describe('Gate', () => {
       new Pin({name: 'b'}),
     ]);
 
-    expect(and1.getOutputPins()).toEqual([
-      new Pin({name: 'out'}),
-    ]);
+    expect(and1.getOutputPins()).toEqual([new Pin({name: 'out'})]);
 
     // ----------------------------------------
     // Object names spec.
 
     const and2 = new And({
-      inputPins: [
-        {name: 'a', value: 1},
-        {name: 'b', value: 0},
-      ],
-      outputPins: [
-        {name: 'out'},
-      ],
+      inputPins: [{name: 'a', value: 1}, {name: 'b', value: 0}],
+      outputPins: [{name: 'out'}],
     });
 
     expect(and2.getInputPins()).toEqual([
@@ -234,9 +227,7 @@ describe('Gate', () => {
 
     and2.eval();
 
-    expect(and1.getOutputPins()).toEqual([
-      new Pin({name: 'out'}),
-    ]);
+    expect(and1.getOutputPins()).toEqual([new Pin({name: 'out'})]);
 
     expect(and2.getPin('out').getValue()).toBe(0);
 
@@ -248,9 +239,7 @@ describe('Gate', () => {
         {name: 'a', value: 1, size: 16},
         {name: 'b', value: 0, size: 16},
       ],
-      outputPins: [
-        {name: 'out', size: 16},
-      ],
+      outputPins: [{name: 'out', size: 16}],
     });
 
     expect(and3.getInputPins()).toEqual([
@@ -263,7 +252,6 @@ describe('Gate', () => {
   });
 
   it('tick-tock', () => {
-
     let state = 0;
     let order = [];
 
@@ -347,21 +335,15 @@ describe('Gate', () => {
       outputPins: ['out'],
     };
 
-    const and1 = And.defaultFromSpec();
+    const and = And.defaultFromSpec();
 
-    expect(and1.getName()).toBe(And.name);
-    expect(and1.getInputPins().length).toEqual(2);
-    expect(and1.getOutputPins().length).toEqual(1);
+    expect(and.getName()).toBe(And.name);
+    expect(and.getInputPins().length).toEqual(2);
+    expect(and.getOutputPins().length).toEqual(1);
 
-    expect(() => and1.getPin('a')).not.toThrow();
-    expect(() => and1.getPin('b')).not.toThrow();
-    expect(() => and1.getPin('out')).not.toThrow();
-
-    const and2 = new And();
-
-    expect(and2.getName()).toBe(And.name);
-    expect(and2.getInputPins().length).toEqual(2);
-    expect(and2.getOutputPins().length).toEqual(1);
+    expect(() => and.getPin('a')).not.toThrow();
+    expect(() => and.getPin('b')).not.toThrow();
+    expect(() => and.getPin('out')).not.toThrow();
 
     // Pin[16]:
 
@@ -374,12 +356,8 @@ describe('Gate', () => {
     Not16.Spec = {
       name: 'Not16',
 
-      inputPins: [
-        {name: 'in', size: 16},
-      ],
-      outputPins: [
-        {name: 'out', size: 16},
-      ],
+      inputPins: [{name: 'in', size: 16}],
+      outputPins: [{name: 'out', size: 16}],
     };
 
     const not16 = Not16.defaultFromSpec();
@@ -426,17 +404,13 @@ describe('Gate', () => {
 
     // External observer:
     gate.on('eval', () => output.push('eval'));
-    gate.on('clockUp', value => output.push(['clockUp', value]));
-    gate.on('clockDown', value => output.push(['clockDown', value]));
+    gate.on('clockUp', () => output.push(['clockUp']));
+    gate.on('clockDown', () => output.push(['clockDown']));
 
-    SystemClock
-      .reset()
-      .cycle();
+    SystemClock.reset().cycle();
 
-    expect(output).toEqual(['eval', ['clockUp', 0], ['clockDown', -1], 'eval']);
+    expect(output).toEqual(['eval', ['clockUp'], ['clockDown'], 'eval']);
     expect(state).toBe(1);
     expect(gate.getPin('out').getValue()).toBe(state);
-
   });
-
 });

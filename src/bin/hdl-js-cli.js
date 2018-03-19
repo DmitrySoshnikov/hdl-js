@@ -299,6 +299,69 @@ function runSlice(data, index, action) {
   }, 1000 / SystemClock.getRate());
 }
 
+function execScript(script, {verbose = false} = {}) {
+  try {
+    new ScriptInterpreter({
+      file: script,
+      workingDirectory: path.dirname(script),
+    }).exec();
+
+    if (verbose) {
+      console.info(colors.green('\n\u2713 Script executed successfully!\n'));
+    } else {
+      console.info(colors.green('[PASS]'), path.basename(script));
+    }
+  } catch (e) {
+    if (!verbose) {
+      console.info(colors.red('[FAIL]'), path.basename(script));
+      return;
+    }
+
+    if (!e.errorData) {
+      console.info(`Script error:`, e);
+      return;
+    }
+
+    const {header, actual, expected, line, compareTo} = e.errorData;
+
+    console.info(colors.red('\nError executing the script:\n'));
+
+    const pad2 = '  ';
+    const pad4 = '    ';
+
+    const firstColumnLength = header.slice(1).indexOf('|');
+    const firstLinePad = '1'.padStart(line.toString().length, ' ');
+    const maxLinePad = ' '.repeat(line.toString().length);
+
+    console.info(
+      pad2,
+      colors.bold('Expected'),
+      'on line',
+      colors.bold(line),
+      'of',
+      colors.bold(compareTo) + ':\n'
+    );
+    console.info(pad4, firstLinePad, colors.green(header));
+    if (line != 2) {
+      console.info(
+        pad4,
+        maxLinePad + ' |' + centerString('...', firstColumnLength)
+      );
+    }
+    console.info(pad4, line, colors.green(expected), '\n');
+
+    console.info(pad2, colors.bold('Received:\n'));
+    console.info(pad4, firstLinePad, colors.red(header));
+    if (line != 2) {
+      console.info(
+        pad4,
+        maxLinePad + ' |' + centerString('...', firstColumnLength)
+      );
+    }
+    console.info(pad4, line, colors.red(actual), '\n');
+  }
+}
+
 function main() {
   const {
     clockRate,
@@ -316,50 +379,17 @@ function main() {
   // Script execution.
 
   if (script) {
-    try {
-      new ScriptInterpreter({
-        file: script,
-        workingDirectory: path.dirname(script),
-      }).exec();
-      console.info(colors.green('\n\u2713 Script executed successfully!\n'));
-    } catch (e) {
-      const {header, actual, expected, line, compareTo} = e.errorData;
-
-      console.info(colors.red('\nError executing the script:\n'));
-
-      const pad2 = '  ';
-      const pad4 = '    ';
-
-      const firstColumnLength = header.slice(1).indexOf('|');
-      const firstLinePad = '1'.padStart(line.toString().length, ' ');
-      const maxLinePad = ' '.repeat(line.toString().length);
-
-      console.info(
-        pad2,
-        colors.bold('Expected'),
-        'on line',
-        colors.bold(line),
-        'of',
-        colors.bold(compareTo) + ':\n'
-      );
-      console.info(pad4, firstLinePad, colors.green(header));
-      if (line != 2) {
-        console.info(
-          pad4,
-          maxLinePad + ' |' + centerString('...', firstColumnLength)
-        );
-      }
-      console.info(pad4, line, colors.green(expected), '\n');
-
-      console.info(pad2, colors.bold('Received:\n'));
-      console.info(pad4, firstLinePad, colors.red(header));
-      if (line != 2) {
-        console.info(
-          pad4,
-          maxLinePad + ' |' + centerString('...', firstColumnLength)
-        );
-      }
-      console.info(pad4, line, colors.red(actual), '\n');
+    if (fs.lstatSync(script).isDirectory()) {
+      // Run the whole directory:
+      fs.readdirSync(script).forEach(file => {
+        if (path.extname(file) !== '.tst') {
+          return;
+        }
+        execScript(script + '/' + file, {verbose: false});
+      });
+    } else {
+      // Single script in the verbose mode:
+      execScript(script, {verbose: true});
     }
   }
 
