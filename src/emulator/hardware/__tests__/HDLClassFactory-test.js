@@ -39,9 +39,9 @@ const MuxClass = HDLClassFactory.fromHDL(MuxHDL);
 
 describe('HDLClassFactory', () => {
   it('fromHDLFile', () => {
-    const and = HDLClassFactory
-      .fromHDLFile(EXAMPLES_DIR + 'And.hdl')
-      .defaultFromSpec();
+    const and = HDLClassFactory.fromHDLFile(
+      EXAMPLES_DIR + 'And.hdl'
+    ).defaultFromSpec();
 
     and.setPinValues({a: 1, b: 1});
     and.eval();
@@ -49,11 +49,9 @@ describe('HDLClassFactory', () => {
   });
 
   it('fromHDL', () => {
-    const and = HDLClassFactory
-      .fromHDL(
-        fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
-      )
-      .defaultFromSpec();
+    const and = HDLClassFactory.fromHDL(
+      fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
+    ).defaultFromSpec();
 
     and.setPinValues({a: 1, b: 1});
     and.eval();
@@ -65,9 +63,7 @@ describe('HDLClassFactory', () => {
       fs.readFileSync(EXAMPLES_DIR + 'And.hdl', 'utf-8')
     );
 
-    const and = HDLClassFactory
-      .fromAST(ast)
-      .defaultFromSpec();
+    const and = HDLClassFactory.fromAST(ast).defaultFromSpec();
 
     and.setPinValues({a: 1, b: 1});
     and.eval();
@@ -117,13 +113,8 @@ describe('HDLClassFactory', () => {
     expect(and1.getPin('out').getValue()).toBe(1);
 
     const and2 = new And({
-      inputPins: [
-        {name: 'a', size: 1},
-        {name: 'b', size: 1},
-      ],
-      outputPins: [
-        {name: 'out', size: 1},
-      ]
+      inputPins: [{name: 'a', size: 1}, {name: 'b', size: 1}],
+      outputPins: [{name: 'out', size: 1}],
     });
 
     and2.setPinValues({a: 0, b: 1});
@@ -141,16 +132,11 @@ describe('HDLClassFactory', () => {
   });
 
   it('And example', () => {
-    const and = HDLClassFactory
-      .fromHDLFile(EXAMPLES_DIR + 'And.hdl')
-      .defaultFromSpec();
+    const and = HDLClassFactory.fromHDLFile(
+      EXAMPLES_DIR + 'And.hdl'
+    ).defaultFromSpec();
 
-    const inputData = [
-      {a: 0, b: 0},
-      {a: 0, b: 1},
-      {a: 1, b: 0},
-      {a: 1, b: 1},
-    ];
+    const inputData = [{a: 0, b: 0}, {a: 0, b: 1}, {a: 1, b: 0}, {a: 1, b: 1}];
 
     const truthTable = [
       {a: 0, b: 0, n: 1, out: 0},
@@ -163,7 +149,6 @@ describe('HDLClassFactory', () => {
     expect(result).toEqual(truthTable);
   });
 
-
   it('Compile class', () => {
     expect(typeof MuxClass).toBe('function');
     expect(Object.getPrototypeOf(MuxClass)).toBe(CompositeGate);
@@ -172,8 +157,9 @@ describe('HDLClassFactory', () => {
   it('Class Spec', () => {
     // Spec.
     const spec = MuxClass.Spec;
-    expect(spec.description)
-      .toBe('Compiled from HDL composite Gate class "Mux".');
+    expect(spec.description).toBe(
+      'Compiled from HDL composite Gate class "Mux".'
+    );
 
     // Spec inputs.
     expect(spec.inputPins).toEqual([
@@ -183,9 +169,7 @@ describe('HDLClassFactory', () => {
     ]);
 
     // Spec outputs.
-    expect(spec.outputPins).toEqual([
-      {name: 'out', size: 1},
-    ]);
+    expect(spec.outputPins).toEqual([{name: 'out', size: 1}]);
 
     // Spec truth table (empty).
     expect(spec.truthTable).toEqual([]);
@@ -229,8 +213,8 @@ describe('HDLClassFactory', () => {
   });
 
   it('Constant values', () => {
-    const myChip = HDLClassFactory
-      .fromHDL(`
+    const myChip = HDLClassFactory.fromHDL(
+      `
         CHIP MyChip {
           IN a;
           OUT out;
@@ -240,19 +224,15 @@ describe('HDLClassFactory', () => {
           Not(in=false, out=not_false);
           Or(a=a, b=not_false, out=out);
         }
-      `)
-      .defaultFromSpec();
+      `
+    ).defaultFromSpec();
 
     const spec = myChip.getClass().Spec;
 
     // `false` constant is not part of internal pins:
-    expect(spec.internalPins).toEqual([
-      {name: 'not_false', size: 1},
-    ]);
+    expect(spec.internalPins).toEqual([{name: 'not_false', size: 1}]);
 
-    myChip
-      .setPinValues({a: 0})
-      .eval();
+    myChip.setPinValues({a: 0}).eval();
 
     expect(myChip.getPinValues()).toEqual({a: 0, not_false: 1, out: 1});
   });
@@ -260,12 +240,7 @@ describe('HDLClassFactory', () => {
   it('Pin connections', () => {
     const mux = MuxClass.defaultFromSpec();
 
-    const [
-      not,
-      and1,
-      and2,
-      or,
-    ] = mux.getParts();
+    const [not, and1, and2, or] = mux.getParts();
 
     // --- Not(in=sel, out=nel); - when `sel` changes, `in` shoudl change too,
     mux.getPin('sel').setValue(1);
@@ -335,7 +310,7 @@ describe('HDLClassFactory', () => {
       {a: 1, b: 0, sel: 0, out: 1, nel: 1, A: 1, B: 0},
       {a: 1, b: 0, sel: 1, out: 0, nel: 0, A: 0, B: 0},
       {a: 1, b: 1, sel: 0, out: 1, nel: 1, A: 1, B: 0},
-      {a: 1, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1}
+      {a: 1, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1},
     ];
 
     // Test full table:
@@ -419,18 +394,13 @@ describe('HDLClassFactory', () => {
     // then taking it from built-ins, while `Not`, and `Or` gates are
     // loaded from built-ins:
 
-    const mux = HDLClassFactory
-      .fromHDLFile(EXAMPLES_DIR + 'Mux.hdl')
-      .defaultFromSpec();
+    const mux = HDLClassFactory.fromHDLFile(
+      EXAMPLES_DIR + 'Mux.hdl'
+    ).defaultFromSpec();
 
     expect(mux).toBeInstanceOf(CompositeGate);
 
-    const [
-      not,
-      and1,
-      and2,
-      or,
-    ] = mux.getParts();
+    const [not, and1, and2, or] = mux.getParts();
 
     expect(not).toBeInstanceOf(BuiltInGate);
     expect(and1).toBeInstanceOf(CompositeGate);
@@ -445,7 +415,7 @@ describe('HDLClassFactory', () => {
       {a: 1, b: 0, sel: 0, out: 1, nel: 1, A: 1, B: 0},
       {a: 1, b: 0, sel: 1, out: 0, nel: 0, A: 0, B: 0},
       {a: 1, b: 1, sel: 0, out: 1, nel: 1, A: 1, B: 0},
-      {a: 1, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1}
+      {a: 1, b: 1, sel: 1, out: 1, nel: 0, A: 0, B: 1},
     ];
 
     // Test full table:
@@ -466,7 +436,8 @@ describe('HDLClassFactory', () => {
   });
 
   it('built-in backend for parts', () => {
-    const Nand = HDLClassFactory.fromHDL(`
+    const Nand = HDLClassFactory.fromHDL(
+      `
       CHIP Nand {
         IN a, b;
         OUT out;
@@ -478,7 +449,9 @@ describe('HDLClassFactory', () => {
 
         BUILTIN And;
       }
-    `, EXAMPLES_DIR);
+    `,
+      EXAMPLES_DIR
+    );
 
     expect(Object.getPrototypeOf(Nand)).toBe(CompositeGate);
 
@@ -496,8 +469,9 @@ describe('HDLClassFactory', () => {
 
     HDLClassFactory.setVirtualDirectory(virtualDirectory);
 
-    expect(HDLClassFactory.fromHDL(virtualDirectory.And))
-      .toBe(HDLClassFactory.fromHDL(virtualDirectory.And));
+    expect(HDLClassFactory.fromHDL(virtualDirectory.And)).toBe(
+      HDLClassFactory.fromHDL(virtualDirectory.And)
+    );
 
     // Reset back:
     HDLClassFactory.setVirtualDirectory(null);
@@ -510,11 +484,13 @@ describe('HDLClassFactory', () => {
 
     HDLClassFactory.setVirtualDirectory(virtualDirectory);
 
-    expect(HDLClassFactory.loadGate('And'))
-      .toBe(HDLClassFactory.loadGate('And'));
+    expect(HDLClassFactory.loadGate('And')).toBe(
+      HDLClassFactory.loadGate('And')
+    );
 
-    expect(Object.getPrototypeOf(HDLClassFactory.loadGate('Nand')))
-      .toBe(BuiltInGate);
+    expect(Object.getPrototypeOf(HDLClassFactory.loadGate('Nand'))).toBe(
+      BuiltInGate
+    );
 
     // Reset back:
     HDLClassFactory.setVirtualDirectory(null);

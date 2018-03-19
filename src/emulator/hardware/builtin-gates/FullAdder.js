@@ -66,5 +66,4 @@ FullAdder.Spec = {
   truthTable: TRUTH_TABLE,
 };
 
-
 module.exports = FullAdder;

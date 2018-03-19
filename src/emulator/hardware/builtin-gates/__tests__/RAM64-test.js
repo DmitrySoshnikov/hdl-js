@@ -12,8 +12,7 @@ const {SystemClock} = require('../../Clock');
 
 describe('RAM64', () => {
   it('RAM64 interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM64))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(RAM64)).not.toThrow();
   });
 
   it('storage', () => {
@@ -42,9 +41,7 @@ describe('RAM64', () => {
     expect(ram64Chip.getValueAt(63)).toBe(255);
 
     expect(() => ram64Chip.getValueAt(67)).toThrow(
-      new TypeError(
-        `Chip "RAM64": invalid address 67, while the size is 64.`
-      )
+      new TypeError(`Chip "RAM64": invalid address 67, while the size is 64.`)
     );
   });
 });

@@ -12,8 +12,7 @@ const {SystemClock} = require('../../Clock');
 
 describe('RAM16K', () => {
   it('RAM16K interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM16K))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(RAM16K)).not.toThrow();
   });
 
   it('storage', () => {

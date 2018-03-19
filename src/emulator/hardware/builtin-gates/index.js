@@ -49,7 +49,6 @@ const BuiltInGates = {};
   'RAM8',
   'Register',
   'Xor',
-]
-  .forEach(gate => BuiltInGates[gate] = require('./' + gate));
+].forEach(gate => (BuiltInGates[gate] = require('./' + gate)));
 
 module.exports = BuiltInGates;

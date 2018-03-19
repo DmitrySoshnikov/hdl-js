@@ -15,7 +15,6 @@ hdlParser.setOptions({captureLocations: false});
  * Extensions to the generated parser.
  */
 Object.assign(hdlParser, {
-
   /**
    * Parses a file with HDL code.
    */

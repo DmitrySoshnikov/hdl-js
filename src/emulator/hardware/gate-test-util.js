@@ -40,7 +40,8 @@ function autoTestGate(GateClass) {
 
   const createPins = pinNames => {
     return pinNames.map(pinName => {
-      let name, size = 1;
+      let name,
+        size = 1;
       if (typeof pinName === 'string') {
         name = pinName;
       } else {

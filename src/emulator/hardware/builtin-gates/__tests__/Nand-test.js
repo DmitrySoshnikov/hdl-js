@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Nand', () => {
   it('Nand interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Nand))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Nand)).not.toThrow();
   });
 });

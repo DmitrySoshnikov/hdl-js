@@ -70,10 +70,7 @@ DMux4Way.Spec = {
     'The other outputs are set to 0.',
   ].join('\n'),
 
-  inputPins: [
-    'in',
-    {name: 'sel', size: 2},
-  ],
+  inputPins: ['in', {name: 'sel', size: 2}],
 
   outputPins: ['a', 'b', 'c', 'd'],
 

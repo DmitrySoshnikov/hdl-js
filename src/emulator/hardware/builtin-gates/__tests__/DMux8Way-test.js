@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('DMux8Way', () => {
   it('DMux8Way interface', () => {
-    expect(() => GateTestUtil.autoTestGate(DMux8Way))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(DMux8Way)).not.toThrow();
   });
 });

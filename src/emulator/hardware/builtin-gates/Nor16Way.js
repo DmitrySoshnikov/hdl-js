@@ -52,13 +52,9 @@ Nor16Way.Spec = {
 
   description: 'Nor of 16 inputs into 1 output.',
 
-  inputPins: [
-    {name: 'in', size: 16},
-  ],
+  inputPins: [{name: 'in', size: 16}],
 
-  outputPins: [
-    'out',
-  ],
+  outputPins: ['out'],
 
   truthTable: TRUTH_TABLE,
 };

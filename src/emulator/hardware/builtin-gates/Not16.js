@@ -54,13 +54,9 @@ Not16.Spec = {
 
   description: 'Implements bitwise 16-bit Not ~ operation.',
 
-  inputPins: [
-    {name: 'in', size: 16},
-  ],
+  inputPins: [{name: 'in', size: 16}],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

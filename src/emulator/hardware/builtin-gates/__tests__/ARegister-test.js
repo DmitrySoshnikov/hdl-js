@@ -10,7 +10,6 @@ const ARegister = require('../DRegister');
 
 describe('ARegister', () => {
   it('ARegister interface', () => {
-    expect(() => GateTestUtil.autoTestGate(ARegister))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(ARegister)).not.toThrow();
   });
 });

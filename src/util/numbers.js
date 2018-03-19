@@ -35,14 +35,14 @@ function int16Table(table) {
  * Converts a number to unsigned 16-bit integer.
  */
 function uint16(v) {
-  return v & 0xFFFF;
+  return v & 0xffff;
 }
 
 /**
  * Test for a neagtive zero.
  */
 function isNegativeZero(value) {
-  return value === 0 && (1 / value === -Infinity);
+  return value === 0 && 1 / value === -Infinity;
 }
 
 /**

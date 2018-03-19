@@ -19,9 +19,7 @@ class DRegister extends Register {}
 DRegister.Spec = {
   name: 'DRegister',
 
-  description:
-
-`16-bit D (Data) register.
+  description: `16-bit D (Data) register.
 
 If load[t]=1 then out[t+1] = in[t] else out does not change.
 
@@ -35,13 +33,8 @@ Clock falling edge propagates the value to the output:
   ${colors.bold('↘')} : out = value
 `,
 
-  inputPins: [
-    {name: 'in', size: 16},
-    {name: 'load', size: 1}
-  ],
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  inputPins: [{name: 'in', size: 16}, {name: 'load', size: 1}],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: Register.Spec.truthTable,
 };

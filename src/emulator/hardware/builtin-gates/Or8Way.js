@@ -52,13 +52,9 @@ Or8Way.Spec = {
 
   description: 'Or | of 8 inputs into 1 output.',
 
-  inputPins: [
-    {name: 'in', size: 8},
-  ],
+  inputPins: [{name: 'in', size: 8}],
 
-  outputPins: [
-    'out',
-  ],
+  outputPins: ['out'],
 
   truthTable: TRUTH_TABLE,
 };

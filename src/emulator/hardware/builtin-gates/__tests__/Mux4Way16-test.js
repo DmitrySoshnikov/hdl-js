@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Mux4Way16', () => {
   it('Mux4Way16 interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Mux4Way16))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Mux4Way16)).not.toThrow();
   });
 });

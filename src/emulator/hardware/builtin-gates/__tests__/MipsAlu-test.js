@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('MipsAlu', () => {
   it('MipsAlu interface', () => {
-    expect(() => GateTestUtil.autoTestGate(MipsAlu))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(MipsAlu)).not.toThrow();
   });
 });

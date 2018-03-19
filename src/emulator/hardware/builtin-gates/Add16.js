@@ -53,14 +53,9 @@ Add16.Spec = {
 
   description: 'A 16-bit integer adder: out = int16(a + b)',
 
-  inputPins: [
-    {name: 'a', size: 16},
-    {name: 'b', size: 16},
-  ],
+  inputPins: [{name: 'a', size: 16}, {name: 'b', size: 16}],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

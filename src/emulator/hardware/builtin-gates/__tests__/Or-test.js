@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Or', () => {
   it('Or interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Or))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Or)).not.toThrow();
   });
 });

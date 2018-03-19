@@ -50,13 +50,9 @@ Inc16.Spec = {
 
   description: 'Adds the constant 1 to the input.',
 
-  inputPins: [
-    {name: 'in', size: 16},
-  ],
+  inputPins: [{name: 'in', size: 16}],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

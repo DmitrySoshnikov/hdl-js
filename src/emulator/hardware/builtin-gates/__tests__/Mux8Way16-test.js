@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Mux8Way16', () => {
   it('Mux8Way16 interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Mux8Way16))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Mux8Way16)).not.toThrow();
   });
 });

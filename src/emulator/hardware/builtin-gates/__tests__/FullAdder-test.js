@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('FullAdder', () => {
   it('FullAdder interface', () => {
-    expect(() => GateTestUtil.autoTestGate(FullAdder))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(FullAdder)).not.toThrow();
   });
 });

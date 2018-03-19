@@ -45,7 +45,7 @@ class Or16 extends BuiltInGate {
 
     // In JS implementation doesn't differ from the simple `Or` gate.
     // Use 16-bit values with 0xFFFF mask.
-    this.getOutputPins()[0].setValue((a | b) & 0xFFFF);
+    this.getOutputPins()[0].setValue((a | b) & 0xffff);
   }
 }
 
@@ -57,14 +57,9 @@ Or16.Spec = {
 
   description: 'Implements bitwise 16-bit Or | operation.',
 
-  inputPins: [
-    {name: 'a', size: 16},
-    {name: 'b', size: 16},
-  ],
+  inputPins: [{name: 'a', size: 16}, {name: 'b', size: 16}],
 
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

@@ -10,10 +10,7 @@ const BuiltInGate = require('../BuiltInGate');
 /**
  * Canonical truth table for the `Not` gate.
  */
-const TRUTH_TABLE = [
-  {in: 0, out: 1},
-  {in: 1, out: 0},
-];
+const TRUTH_TABLE = [{in: 0, out: 1}, {in: 1, out: 0}];
 
 /**
  * A bitwise 1-bit Not gate.

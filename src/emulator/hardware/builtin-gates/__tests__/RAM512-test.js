@@ -12,8 +12,7 @@ const {SystemClock} = require('../../Clock');
 
 describe('RAM512', () => {
   it('RAM512 interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM512))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(RAM512)).not.toThrow();
   });
 
   it('storage', () => {

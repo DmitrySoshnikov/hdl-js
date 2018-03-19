@@ -16,9 +16,7 @@ MyGate.Spec = {
 };
 
 describe('CompositeGate', () => {
-
   it('HalfAdder', () => {
-
     /*
       HalfAdder:
 
@@ -51,8 +49,7 @@ describe('CompositeGate', () => {
 
     xor.eval = function() {
       this.getPin('sum').setValue(
-        this.getPin('a').getValue() ^
-        this.getPin('b').getValue()
+        this.getPin('a').getValue() ^ this.getPin('b').getValue()
       );
     };
 
@@ -65,14 +62,13 @@ describe('CompositeGate', () => {
 
     and.eval = function() {
       this.getPin('carry').setValue(
-        this.getPin('a').getValue() &
-        this.getPin('b').getValue()
+        this.getPin('a').getValue() & this.getPin('b').getValue()
       );
     };
 
     // HalfAdder.
     const halfAdder = new CompositeGate({
-      'name': 'HalfAdder',
+      name: 'HalfAdder',
       inputPins: [a, b],
       outputPins: [sum, carry],
       parts: [xor, and],
@@ -205,13 +201,13 @@ describe('CompositeGate', () => {
         {
           type: 'Name',
           value: 'x',
-          size: 16
+          size: 16,
         },
         {
           type: 'Name',
           value: 'y',
-          size: 16
-        }
+          size: 16,
+        },
       ],
 
       // OUT out[16];
@@ -219,8 +215,8 @@ describe('CompositeGate', () => {
         {
           type: 'Name',
           value: 'out',
-          size: 16
-        }
+          size: 16,
+        },
       ],
 
       parts: [
@@ -233,39 +229,39 @@ describe('CompositeGate', () => {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'a'
+                value: 'a',
               },
               value: {
                 type: 'Name',
                 value: 'x',
-                index: 0
-              }
+                index: 0,
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'b'
+                value: 'b',
               },
               value: {
                 type: 'Name',
                 value: 'y',
-                index: 0
-              }
+                index: 0,
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'out'
+                value: 'out',
               },
               value: {
                 type: 'Name',
                 value: 'out',
-                index: 0
-              }
-            }
-          ]
+                index: 0,
+              },
+            },
+          ],
         },
 
         //And16(a[0..2]=x[1..3], b=y, out[15]=z, out=out, out[0..2]=m)
@@ -280,51 +276,51 @@ describe('CompositeGate', () => {
                 value: 'a',
                 range: {
                   from: 0,
-                  to: 2
-                }
+                  to: 2,
+                },
               },
               value: {
                 type: 'Name',
                 value: 'x',
                 range: {
                   from: 1,
-                  to: 3
-                }
-              }
+                  to: 3,
+                },
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'b'
+                value: 'b',
               },
               value: {
                 type: 'Name',
-                value: 'y'
-              }
+                value: 'y',
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
                 value: 'out',
-                index: 15
+                index: 15,
               },
               value: {
                 type: 'Name',
-                value: 'z'
-              }
+                value: 'z',
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'out'
+                value: 'out',
               },
               value: {
                 type: 'Name',
-                value: 'out'
-              }
+                value: 'out',
+              },
             },
             {
               type: 'Argument',
@@ -333,15 +329,15 @@ describe('CompositeGate', () => {
                 value: 'out',
                 range: {
                   from: 0,
-                  to: 2
-                }
+                  to: 2,
+                },
               },
               value: {
                 type: 'Name',
-                value: 'm'
-              }
-            }
-          ]
+                value: 'm',
+              },
+            },
+          ],
         },
 
         // And(a=z, b=m out=out[14]);
@@ -353,38 +349,38 @@ describe('CompositeGate', () => {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'a'
+                value: 'a',
               },
               value: {
                 type: 'Name',
-                value: 'z'
-              }
+                value: 'z',
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'b'
+                value: 'b',
               },
               value: {
                 type: 'Name',
-                value: 'm'
-              }
+                value: 'm',
+              },
             },
             {
               type: 'Argument',
               name: {
                 type: 'Name',
-                value: 'out'
+                value: 'out',
               },
               value: {
                 type: 'Name',
                 value: 'out',
-                index: 14
-              }
-            }
-          ]
-        }
+                index: 14,
+              },
+            },
+          ],
+        },
       ],
       builtins: [],
       clocked: [],
@@ -393,8 +389,7 @@ describe('CompositeGate', () => {
     // Check generated HDL code:
     const generatedHDLCode = generator.fromCompositeGate(myGate);
 
-    const expectedHDLCode =
-`/**
+    const expectedHDLCode = `/**
  * Automatically generated by hdl-js "MyGate" gate.
  */
 CHIP MyGate {
@@ -409,11 +404,12 @@ CHIP MyGate {
 }`;
 
     expect(generatedHDLCode).toBe(expectedHDLCode);
-
   });
 
   it('generateTruthTable: simple', () => {
-    const and = require('../HDLClassFactory').fromHDL(`
+    const and = require('../HDLClassFactory')
+      .fromHDL(
+        `
       CHIP And {
         IN a, b;
         OUT out;
@@ -423,7 +419,9 @@ CHIP MyGate {
         Nand(a=a, b=b, out=n);
         Nand(a=n, b=n, out=out);
       }
-    `).defaultFromSpec();
+    `
+      )
+      .defaultFromSpec();
 
     expect(and.generateTruthTable()).toEqual([
       {a: 0, b: 0, n: 1, out: 0},
@@ -434,7 +432,9 @@ CHIP MyGate {
   });
 
   it('generateTruthTable: complex', () => {
-    const and = require('../HDLClassFactory').fromHDL(`
+    const and = require('../HDLClassFactory')
+      .fromHDL(
+        `
       CHIP And {
         IN a[2], b[2];
         OUT out[2];
@@ -444,7 +444,9 @@ CHIP MyGate {
         And(a=a[0], b=b[0], out=out[0]);
         And(a=a[1], b=b[1], out=out[1]);
       }
-    `).defaultFromSpec();
+    `
+      )
+      .defaultFromSpec();
 
     const generatedTT = and.generateTruthTable();
     expect(generatedTT.length).toBe(5);
@@ -456,7 +458,9 @@ CHIP MyGate {
   });
 
   it('generateTruthTable: enforceRandom', () => {
-    const and = require('../HDLClassFactory').fromHDL(`
+    const and = require('../HDLClassFactory')
+      .fromHDL(
+        `
       CHIP And {
         IN a, b;
         OUT out;
@@ -466,7 +470,9 @@ CHIP MyGate {
         Nand(a=a, b=b, out=n);
         Nand(a=n, b=n, out=out);
       }
-    `).defaultFromSpec();
+    `
+      )
+      .defaultFromSpec();
 
     const generatedTT = and.generateTruthTable({enforceRandom: true});
     expect(generatedTT.length).toBe(5);
@@ -476,5 +482,4 @@ CHIP MyGate {
     expect(actualTT).toEqual(generatedTT);
     expect(conflicts.length).toBe(0);
   });
-
 });

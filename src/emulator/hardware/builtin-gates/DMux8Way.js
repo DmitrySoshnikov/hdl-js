@@ -78,13 +78,10 @@ DMux8Way.Spec = {
     '1 bit 8-way demultiplexor.',
     '',
     'The 3-bit sel choose to which output to channel the input (0->a .. 7->h).',
-    'The other outputs are set to 0.'
+    'The other outputs are set to 0.',
   ].join('\n'),
 
-  inputPins: [
-    'in',
-    {name: 'sel', size: 3},
-  ],
+  inputPins: ['in', {name: 'sel', size: 3}],
 
   outputPins: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
 

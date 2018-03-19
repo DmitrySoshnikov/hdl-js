@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Or8Way', () => {
   it('Or8Way interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Or8Way))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Or8Way)).not.toThrow();
   });
 });

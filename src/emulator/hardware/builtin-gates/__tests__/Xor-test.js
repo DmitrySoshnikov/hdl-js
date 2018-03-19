@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Xor', () => {
   it('Xor interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Xor))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Xor)).not.toThrow();
   });
 });

@@ -104,8 +104,7 @@ class PC extends BuiltInGate {
 PC.Spec = {
   name: 'PC',
 
-  description:
-`
+  description: `
 A 16-bit counter with load and reset controls.
 
 out[t+1] = 0,          when reset[t] = 1
@@ -133,11 +132,8 @@ Clock falling edge PC propagates the value to the output:
     {name: 'load', size: 1},
     {name: 'inc', size: 1},
     {name: 'reset', size: 1},
-
   ],
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

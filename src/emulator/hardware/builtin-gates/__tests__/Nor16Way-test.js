@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Nor16Way', () => {
   it('Nor16Way interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Nor16Way))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Nor16Way)).not.toThrow();
   });
 });

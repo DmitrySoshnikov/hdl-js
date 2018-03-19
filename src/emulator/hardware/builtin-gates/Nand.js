@@ -47,7 +47,7 @@ Nand.Spec = {
     'Implements bitwise 1-bit Nand (negative-And) gate.',
     '',
     'The "Nand" gate similarly to the "Nor" gate is a basic',
-    'building block for all other gates.'
+    'building block for all other gates.',
   ].join('\n'),
 
   inputPins: ['a', 'b'],

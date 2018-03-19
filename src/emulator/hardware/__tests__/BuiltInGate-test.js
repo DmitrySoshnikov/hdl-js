@@ -80,7 +80,6 @@ CHIP And16 {
     expect(And16.getHDLCode()).toBe(expectedHDLCode);
   });
 
-
   it('generateTruthTable: simple', () => {
     const and = require('../builtin-gates/And').defaultFromSpec();
 
@@ -115,5 +114,4 @@ CHIP And16 {
     expect(actualTT).toEqual(generatedTT);
     expect(conflicts.length).toBe(0);
   });
-
 });

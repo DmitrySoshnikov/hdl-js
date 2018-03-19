@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Or16', () => {
   it('Or16 interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Or16))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Or16)).not.toThrow();
   });
 });

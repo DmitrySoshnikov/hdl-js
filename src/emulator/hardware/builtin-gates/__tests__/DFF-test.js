@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('DFF', () => {
   it('DFF interface', () => {
-    expect(() => GateTestUtil.autoTestGate(DFF))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(DFF)).not.toThrow();
   });
 });

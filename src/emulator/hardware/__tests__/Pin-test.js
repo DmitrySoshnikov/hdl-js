@@ -14,7 +14,6 @@ const a16 = new Pin({
 });
 
 describe('Pin', () => {
-
   it('Pin interface', () => {
     const a = new Pin({name: 'a', value: 1});
 
@@ -261,7 +260,6 @@ describe('Pin', () => {
     a.connectTo(b);
     expect(b.getSourcePin()).toBe(a);
 
-
     a.disconnectFrom(b);
     expect(b.getSourcePin()).toBe(null);
   });
@@ -284,5 +282,4 @@ describe('Pin', () => {
     expect(connectInfo.sourceSpec).toBe(sourceSpec);
     expect(connectInfo.destinationSpec).toBe(destinationSpec);
   });
-
 });

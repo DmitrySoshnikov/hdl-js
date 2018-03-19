@@ -11,23 +11,109 @@ const BuiltInGate = require('../BuiltInGate');
  * Canonical truth table for the MipsAlu
  */
 const TRUTH_TABLE = [
-
   // Add
-  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b10, out: 0, cout: 1, set: 0 },
-  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 1, op: 0b10, out: 1, cout: 1, set: 0 },
-  {a: 0, b: 0, na: 0, nb: 0, less: 0, cin: 1, op: 0b10, out: 1, cout: 0, set: 0 },
+  {
+    a: 1,
+    b: 1,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 0,
+    op: 0b10,
+    out: 0,
+    cout: 1,
+    set: 0,
+  },
+  {
+    a: 1,
+    b: 1,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 1,
+    op: 0b10,
+    out: 1,
+    cout: 1,
+    set: 0,
+  },
+  {
+    a: 0,
+    b: 0,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 1,
+    op: 0b10,
+    out: 1,
+    cout: 0,
+    set: 0,
+  },
 
   // Sub
-  {a: 1, b: 1, na: 0, nb: 1, less: 0, cin: 1, op: 0b10, out: 0, cout: 1, set: 0 },
+  {
+    a: 1,
+    b: 1,
+    na: 0,
+    nb: 1,
+    less: 0,
+    cin: 1,
+    op: 0b10,
+    out: 0,
+    cout: 1,
+    set: 0,
+  },
 
   // And
-  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b00, out: 1, cout: 0, set: 0 },
+  {
+    a: 1,
+    b: 1,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 0,
+    op: 0b00,
+    out: 1,
+    cout: 0,
+    set: 0,
+  },
 
   // Or
-  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 1, cout: 0, set: 0 },
-  {a: 0, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 1, cout: 0, set: 0 },
-  {a: 0, b: 0, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 0, cout: 0, set: 0 },
-
+  {
+    a: 1,
+    b: 1,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 0,
+    op: 0b01,
+    out: 1,
+    cout: 0,
+    set: 0,
+  },
+  {
+    a: 0,
+    b: 1,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 0,
+    op: 0b01,
+    out: 1,
+    cout: 0,
+    set: 0,
+  },
+  {
+    a: 0,
+    b: 0,
+    na: 0,
+    nb: 0,
+    less: 0,
+    cin: 0,
+    op: 0b01,
+    out: 0,
+    cout: 0,
+    set: 0,
+  },
 ];
 
 /**
@@ -49,8 +135,9 @@ class MipsAlu extends BuiltInGate {
    *
    */
   eval() {
-    const [a, b, na, nb, less, cin, op]
-      = this.getInputPins().map(pin => pin.getValue());
+    const [a, b, na, nb, less, cin, op] = this.getInputPins().map(pin =>
+      pin.getValue()
+    );
 
     const A = na ? 1 - a : a;
     const B = nb ? 1 - b : b;
@@ -75,7 +162,6 @@ class MipsAlu extends BuiltInGate {
         break;
       }
     }
-
   }
 }
 
@@ -85,9 +171,7 @@ class MipsAlu extends BuiltInGate {
 MipsAlu.Spec = {
   name: 'MipsAlu',
 
-  description:
-
-`1-bit Mips Alu.
+  description: `1-bit Mips Alu.
 
 Implements 1-bit MIPS ALU chip.
 

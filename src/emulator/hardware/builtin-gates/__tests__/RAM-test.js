@@ -12,8 +12,7 @@ const {SystemClock} = require('../../Clock');
 
 describe('RAM', () => {
   it('RAM interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(RAM)).not.toThrow();
   });
 
   it('storage', () => {
@@ -43,9 +42,7 @@ describe('RAM', () => {
     expect(ram8Chip.getValueAt(2)).toBe(255);
 
     expect(() => ram8Chip.getValueAt(15)).toThrow(
-      new TypeError(
-        `Chip "RAM": invalid address 15, while the size is 8.`
-      )
+      new TypeError(`Chip "RAM": invalid address 15, while the size is 8.`)
     );
   });
 });

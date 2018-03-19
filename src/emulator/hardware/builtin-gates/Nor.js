@@ -47,7 +47,7 @@ Nor.Spec = {
     'Implements bitwise 1-bit Nor (negative-Or) gate.',
     '',
     'The "Nor" gate similarly to the "Nand" gate is a basic',
-    'building block for all other gates.'
+    'building block for all other gates.',
   ].join('\n'),
 
   inputPins: ['a', 'b'],

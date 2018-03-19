@@ -92,13 +92,8 @@ Register.Spec = {
     `  ${colors.bold('↘')} : out = value`,
   ].join('\n'),
 
-  inputPins: [
-    {name: 'in', size: 16},
-    {name: 'load', size: 1}
-  ],
-  outputPins: [
-    {name: 'out', size: 16},
-  ],
+  inputPins: [{name: 'in', size: 16}, {name: 'load', size: 1}],
+  outputPins: [{name: 'out', size: 16}],
 
   truthTable: TRUTH_TABLE,
 };

@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('HalfAdder', () => {
   it('HalfAdder interface', () => {
-    expect(() => GateTestUtil.autoTestGate(HalfAdder))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(HalfAdder)).not.toThrow();
   });
 });

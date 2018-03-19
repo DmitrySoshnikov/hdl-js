@@ -10,7 +10,6 @@ const GateTestUtil = require('../../gate-test-util');
 
 describe('Mux', () => {
   it('Mux interface', () => {
-    expect(() => GateTestUtil.autoTestGate(Mux))
-      .not.toThrow();
+    expect(() => GateTestUtil.autoTestGate(Mux)).not.toThrow();
   });
 });

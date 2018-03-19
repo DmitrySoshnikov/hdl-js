@@ -10,7 +10,8 @@ const path = require('path');
 
 const BuiltInGates = require('../index');
 
-const builtinGatesFromDirectory = fs.readdirSync(__dirname + '/../')
+const builtinGatesFromDirectory = fs
+  .readdirSync(__dirname + '/../')
   .filter(file => /^[A-Z]/.test(file))
   .map(file => path.basename(file, '.js'));
 
