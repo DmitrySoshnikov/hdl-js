@@ -14,6 +14,7 @@ const BuiltInGates = {};
  * A list of exposed built-in gates.
  */
 [
+  'ALU',
   'ARegister',
   'Add16',
   'And',

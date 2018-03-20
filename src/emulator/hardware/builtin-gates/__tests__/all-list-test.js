@@ -13,13 +13,14 @@ const BuiltInGates = require('../index');
 const builtinGatesFromDirectory = fs
   .readdirSync(__dirname + '/../')
   .filter(file => /^[A-Z]/.test(file))
-  .map(file => path.basename(file, '.js'));
+  .map(file => path.basename(file, '.js'))
+  .sort();
 
 describe('list all builtins', () => {
   it('checks list', () => {
     // Make sure to sync the gates in the directory with this list.
     // We do not use `fs` in the actual implementation to support
     // browser environment.
-    expect(builtinGatesFromDirectory).toEqual(Object.keys(BuiltInGates));
+    expect(builtinGatesFromDirectory).toEqual(Object.keys(BuiltInGates).sort());
   });
 });
