@@ -322,43 +322,95 @@ function execScript(script, {verbose = false} = {}) {
       return;
     }
 
-    const {header, actual, expected, line, compareTo} = e.errorData;
+    const {header, errorList, compareTo} = e.errorData;
 
     console.info(colors.red('\nError executing the script:\n'));
 
     const pad2 = '  ';
     const pad4 = '    ';
 
+    // Find Max line number
+    const maxLineLen = errorList[errorList.length - 1].line.toString().length;
+
     const firstColumnLength = header.slice(1).indexOf('|');
-    const firstLinePad = '1'.padStart(line.toString().length, ' ');
-    const maxLinePad = ' '.repeat(line.toString().length);
+    const firstLinePad = '1'.padStart(maxLineLen, ' ');
+    const maxLinePad = ' '.repeat(maxLineLen);
+
+    let prevLine = 1;
+
+    const actualLines = [];
+    const expectedLines = [];
+
+    const lines = [];
+
+    errorList.forEach(({actual, expected, line}) => {
+      lines.push(colors.bold(line));
+
+      const expectedDiffLine = expected
+        .split('')
+        .map((symbol, idx) => {
+          if (actual[idx] !== symbol) {
+            return colors.green(symbol);
+          }
+          return symbol;
+        })
+        .join('');
+
+      if (prevLine !== line - 1) {
+        expectedLines.push(
+          pad4 + maxLinePad + ' |' + centerString('...', firstColumnLength)
+        );
+      }
+      expectedLines.push(
+        pad4 +
+          line.toString().padStart(maxLineLen, ' ') +
+          ' ' +
+          expectedDiffLine
+      );
+
+      const actualDiffLine = actual
+        .split('')
+        .map((symbol, idx) => {
+          if (expected[idx] !== symbol) {
+            return colors.bold(colors.red(symbol));
+          }
+          return symbol;
+        })
+        .join('');
+
+      if (prevLine !== line - 1) {
+        actualLines.push(
+          pad4 + maxLinePad + ' |' + centerString('...', firstColumnLength)
+        );
+      }
+      actualLines.push(
+        pad4 + line.toString().padStart(maxLineLen, ' ') + ' ' + actualDiffLine
+      );
+
+      prevLine = line;
+    });
+
+    if (lines.length > 1) {
+      lines[lines.length - 1] = 'and ' + lines[lines.length - 1];
+    }
+
+    const linesInfo = lines.join(', ');
 
     console.info(
-      pad2,
-      colors.bold('Expected'),
-      'on line',
-      colors.bold(line),
+      pad2 + colors.bold('Expected'),
+      'on line' + (lines.length > 1 ? 's' : ''),
+      linesInfo,
       'of',
-      colors.bold(compareTo) + ':\n'
+      colors.dim(path.dirname(compareTo) + '/') +
+        colors.bold(path.basename(compareTo)) +
+        ':\n'
     );
-    console.info(pad4, firstLinePad, colors.green(header));
-    if (line != 2) {
-      console.info(
-        pad4,
-        maxLinePad + ' |' + centerString('...', firstColumnLength)
-      );
-    }
-    console.info(pad4, line, colors.green(expected), '\n');
+    console.info(pad4 + firstLinePad, colors.green(header));
+    console.info(expectedLines.join('\n'));
 
-    console.info(pad2, colors.bold('Received:\n'));
-    console.info(pad4, firstLinePad, colors.red(header));
-    if (line != 2) {
-      console.info(
-        pad4,
-        maxLinePad + ' |' + centerString('...', firstColumnLength)
-      );
-    }
-    console.info(pad4, line, colors.red(actual), '\n');
+    console.info('\n' + pad2 + colors.bold('Received:\n'));
+    console.info(pad4 + firstLinePad, colors.red(header));
+    console.info(actualLines.join('\n'), '\n');
   }
 }
 

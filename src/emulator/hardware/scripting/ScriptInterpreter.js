@@ -88,6 +88,11 @@ class ScriptInterpreter {
     this._actualLines = [];
 
     /**
+     * Collected error list.
+     */
+    this._errorList = [];
+
+    /**
      * Format of the output columns.
      */
     this._outputListMap = null;
@@ -139,6 +144,18 @@ class ScriptInterpreter {
    */
   nextCommand() {
     this.eval(this._container.commands[this._pc++]);
+
+    const allExecuted =
+      this._container === this._ast && !this._hasMoreCommands();
+
+    if (allExecuted && this._errorList.length > 0) {
+      throw new ScriptError({
+        errorList: this._errorList,
+        compareTo: this._compareTo,
+        header: this._compareToLines[0],
+      });
+    }
+
     return this;
   }
 
@@ -341,16 +358,13 @@ class ScriptInterpreter {
     if (this._compareTo) {
       this._actualLines.push(line);
       const compareIdx = this._actualLines.length - 1;
-      const header = this._compareToLines[0];
       const expected = this._compareToLines[compareIdx];
       const actual = this._actualLines[compareIdx];
       if (expected !== actual) {
-        throw new ScriptError({
-          header,
+        this._errorList.push({
           actual,
           expected,
           line: compareIdx + 1,
-          compareTo: this._compareTo,
         });
       }
     }
