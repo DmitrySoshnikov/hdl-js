@@ -49,6 +49,7 @@ const BuiltInGates = {};
   'RAM64',
   'RAM8',
   'Register',
+  'Screen',
   'Xor',
 ].forEach(gate => (BuiltInGates[gate] = require('./' + gate)));
 

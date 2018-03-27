@@ -41,7 +41,7 @@ describe('RAM8', () => {
     expect(ram8Chip.getValueAt(2)).toBe(255);
 
     expect(() => ram8Chip.getValueAt(15)).toThrow(
-      new TypeError(`Chip "RAM8": invalid address 15, while the size is 8.`)
+      new TypeError(`Chip "RAM8": invalid address 15, the max address is 7.`)
     );
   });
 });

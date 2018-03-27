@@ -38,6 +38,7 @@ class Pin extends EventEmitter {
     }
 
     this._size = size;
+    this._maxAllowed = Math.pow(2, this._size) - 1;
     this.setValue(value);
 
     // There might be more than 11 pins (default in Node).
@@ -72,6 +73,14 @@ class Pin extends EventEmitter {
     if (typeof value === 'string') {
       value = Number.parseInt(value, 2);
     }
+
+    if (value > this._maxAllowed) {
+      throw new TypeError(
+        `Pin "${this.getName()}": value ${value} doesn't match pin's width. ` +
+          `Max allowed is ${this._maxAllowed} (size ${this._size}).`
+      );
+    }
+
     this._value = int16(value);
     this.emit('change', this._value, oldValue);
   }

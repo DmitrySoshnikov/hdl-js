@@ -442,6 +442,7 @@ class Gate extends EventEmitter {
       this._namesToPinsMap[Pin.CLOCK] = new Pin({
         name: Pin.CLOCK,
         value: SystemClock.getValue(),
+        size: 16,
       });
     }
 

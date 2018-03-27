@@ -282,7 +282,7 @@ describe('Gate', () => {
 
     const gate = new MyGate({
       inputPins: ['in'],
-      outputPins: ['out'],
+      outputPins: [{name: 'out', size: 16}],
     });
 
     SystemClock.reset();

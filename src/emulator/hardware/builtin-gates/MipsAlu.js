@@ -10,110 +10,23 @@ const BuiltInGate = require('../BuiltInGate');
 /**
  * Canonical truth table for the MipsAlu
  */
+// prettier-ignore
 const TRUTH_TABLE = [
   // Add
-  {
-    a: 1,
-    b: 1,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 0,
-    op: 0b10,
-    out: 0,
-    cout: 1,
-    set: 0,
-  },
-  {
-    a: 1,
-    b: 1,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 1,
-    op: 0b10,
-    out: 1,
-    cout: 1,
-    set: 0,
-  },
-  {
-    a: 0,
-    b: 0,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 1,
-    op: 0b10,
-    out: 1,
-    cout: 0,
-    set: 0,
-  },
+  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b10, out: 0, cout: 1, set: 0},
+  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 1, op: 0b10, out: 1, cout: 1, set: 0},
+  {a: 0, b: 0, na: 0, nb: 0, less: 0, cin: 1, op: 0b10, out: 1, cout: 0, set: 0},
 
   // Sub
-  {
-    a: 1,
-    b: 1,
-    na: 0,
-    nb: 1,
-    less: 0,
-    cin: 1,
-    op: 0b10,
-    out: 0,
-    cout: 1,
-    set: 0,
-  },
+  {a: 1, b: 1, na: 0, nb: 1, less: 0, cin: 1, op: 0b10, out: 0, cout: 1, set: 0},
 
   // And
-  {
-    a: 1,
-    b: 1,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 0,
-    op: 0b00,
-    out: 1,
-    cout: 0,
-    set: 0,
-  },
+  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b00, out: 1, cout: 0, set: 0},
 
   // Or
-  {
-    a: 1,
-    b: 1,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 0,
-    op: 0b01,
-    out: 1,
-    cout: 0,
-    set: 0,
-  },
-  {
-    a: 0,
-    b: 1,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 0,
-    op: 0b01,
-    out: 1,
-    cout: 0,
-    set: 0,
-  },
-  {
-    a: 0,
-    b: 0,
-    na: 0,
-    nb: 0,
-    less: 0,
-    cin: 0,
-    op: 0b01,
-    out: 0,
-    cout: 0,
-    set: 0,
-  },
+  {a: 1, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 1, cout: 0, set: 0},
+  {a: 0, b: 1, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 1, cout: 0, set: 0},
+  {a: 0, b: 0, na: 0, nb: 0, less: 0, cin: 0, op: 0b01, out: 0, cout: 0, set: 0},
 ];
 
 /**
@@ -187,7 +100,7 @@ For example, to do a subtraction operation "a - b", we need to set cin = 1, and 
 
 Setting inputs "na" and "nb" negates the inputs "a" and "b" before performing the operation.
 `,
-  inputPins: ['a', 'b', 'na', 'nb', 'less', 'cin', 'op'],
+  inputPins: ['a', 'b', 'na', 'nb', 'less', 'cin', {name: 'op', size: 2}],
   outputPins: ['out', 'cout', 'set'],
   truthTable: TRUTH_TABLE,
 };

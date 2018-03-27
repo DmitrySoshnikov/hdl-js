@@ -42,7 +42,7 @@ describe('RAM512', () => {
 
     expect(() => ram512Chip.getValueAt(515)).toThrow(
       new TypeError(
-        `Chip "RAM512": invalid address 515, while the size is 512.`
+        `Chip "RAM512": invalid address 515, the max address is 511.`
       )
     );
   });

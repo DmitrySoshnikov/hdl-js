@@ -41,7 +41,7 @@ describe('RAM64', () => {
     expect(ram64Chip.getValueAt(63)).toBe(255);
 
     expect(() => ram64Chip.getValueAt(67)).toThrow(
-      new TypeError(`Chip "RAM64": invalid address 67, while the size is 64.`)
+      new TypeError(`Chip "RAM64": invalid address 67, the max address is 63.`)
     );
   });
 });

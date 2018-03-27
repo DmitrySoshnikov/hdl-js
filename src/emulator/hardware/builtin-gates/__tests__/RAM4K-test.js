@@ -42,7 +42,7 @@ describe('RAM4K', () => {
 
     expect(() => ram4KChip.getValueAt(4099)).toThrow(
       new TypeError(
-        `Chip "RAM4K": invalid address 4099, while the size is 4096.`
+        `Chip "RAM4K": invalid address 4099, the max address is 4095.`
       )
     );
   });

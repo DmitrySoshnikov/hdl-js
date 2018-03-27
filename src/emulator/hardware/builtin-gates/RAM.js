@@ -134,7 +134,7 @@ class RAM extends BuiltInGate {
     if (address < 0 || address > this._size - 1) {
       throw new TypeError(
         `Chip "${this.getClass().name}": invalid address ${address}, ` +
-          `while the size is ${this._size}.`
+          `the max address is ${this._size - 1}.`
       );
     }
     return address;

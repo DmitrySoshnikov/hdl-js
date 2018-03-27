@@ -282,4 +282,25 @@ describe('Pin', () => {
     expect(connectInfo.sourceSpec).toBe(sourceSpec);
     expect(connectInfo.destinationSpec).toBe(destinationSpec);
   });
+
+  it('max allowed', () => {
+    const a = new Pin({name: 'a', size: 8});
+
+    a.setValue(255);
+    expect(a.getValue()).toBe(255);
+
+    expect(() => {
+      a.setValue(256);
+    }).toThrow(
+      `Pin "a": value 256 doesn't match pin's width. ` +
+        `Max allowed is 255 (size 8).`
+    );
+
+    expect(() => {
+      new Pin({name: 'a', size: 16}).setValue(Math.pow(2, 16));
+    }).toThrow(
+      `Pin "a": value ${Math.pow(2, 16)} doesn't match pin's width. ` +
+        `Max allowed is ${Math.pow(2, 16) - 1} (size 16).`
+    );
+  });
 });

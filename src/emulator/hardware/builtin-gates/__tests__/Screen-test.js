@@ -5,22 +5,22 @@
 
 'use strict';
 
-const RAM16K = require('../RAM16K');
+const Screen = require('../Screen');
 const GateTestUtil = require('../../gate-test-util');
 
 const {SystemClock} = require('../../Clock');
 
-describe('RAM16K', () => {
-  it('RAM16K interface', () => {
-    expect(() => GateTestUtil.autoTestGate(RAM16K)).not.toThrow();
+describe('Screen', () => {
+  it('Screen interface', () => {
+    expect(() => GateTestUtil.autoTestGate(Screen)).not.toThrow();
   });
 
   it('storage', () => {
     SystemClock.reset();
 
-    const ram16KChip = new RAM16K(RAM16K.Spec);
+    const screenChip = Screen.defaultFromSpec();
 
-    ram16KChip
+    screenChip
       .setPinValues({
         in: 0b0000000000010101,
         load: 1,
@@ -28,21 +28,21 @@ describe('RAM16K', () => {
       })
       .clockCycle();
 
-    expect(ram16KChip.getValueAt(0)).toBe(0b0000000000010101);
+    expect(screenChip.getValueAt(0)).toBe(0b0000000000010101);
 
-    ram16KChip
+    screenChip
       .setPinValues({
         in: 255,
         load: 1,
-        address: 16383,
+        address: 8191,
       })
       .clockCycle();
 
-    expect(ram16KChip.getValueAt(16383)).toBe(255);
+    expect(screenChip.getValueAt(8191)).toBe(255);
 
-    expect(() => ram16KChip.getValueAt(16387)).toThrow(
+    expect(() => screenChip.getValueAt(8192)).toThrow(
       new TypeError(
-        `Chip "RAM16K": invalid address 16387, the max address is 16383.`
+        `Chip "Screen": invalid address 8192, the max address is 8191.`
       )
     );
   });
