@@ -7,7 +7,13 @@
 
 const EventEmitter = require('events');
 
-const {int16} = require('../../util/numbers');
+const {
+  getBitAt,
+  getBitRange,
+  int16,
+  setBitAt,
+  setBitRange,
+} = require('../../util/numbers');
 
 /**
  * Maximum word size.
@@ -99,16 +105,8 @@ class Pin extends EventEmitter {
     this._checkIndex(index);
     const oldValue = this._value;
 
-    // Set 1.
-    if (value === 1) {
-      this._value |= 1 << index;
-    } else {
-      // Set 0 ("clear").
-      this._value &= ~(1 << index);
-    }
-
     // Always adjust to int16 on individual bits set
-    this._value = int16(this._value);
+    this._value = int16(setBitAt(this._value, index, value));
 
     this.emit('change', this._value, oldValue, index);
   }
@@ -118,7 +116,7 @@ class Pin extends EventEmitter {
    */
   getValueAt(index) {
     this._checkIndex(index);
-    return (this._value >> index) & 1;
+    return getBitAt(this._value, index);
   }
 
   /**
@@ -127,7 +125,7 @@ class Pin extends EventEmitter {
   getRange(from, to) {
     this._checkIndex(from);
     this._checkIndex(to);
-    return (this._value >> from) & ((1 << (to + 1 - from)) - 1);
+    return getBitRange(this._value, from, to);
   }
 
   /**
@@ -145,8 +143,7 @@ class Pin extends EventEmitter {
     this._checkIndex(to);
 
     const oldValue = this._value;
-    const mask = ((1 << (to + 1 - from)) - 1) << from;
-    this._value = (oldValue & ~mask) | ((range << from) & mask);
+    this._value = setBitRange(this._value, from, to, range);
 
     this.emit('change', this._value, oldValue, from, to);
   }

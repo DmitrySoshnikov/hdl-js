@@ -56,10 +56,50 @@ function toSignedString(value) {
   return (value >= 0 ? '+' : '') + value;
 }
 
+/**
+ * Returns the value of particular bit in a 16-bit number.
+ */
+function getBitAt(number, index) {
+  return (number >> index) & 1;
+}
+
+/**
+ * Sets a particular bit to the value.
+ */
+function setBitAt(number, index, value) {
+  // Set 1.
+  if (value === 1) {
+    number |= 1 << index;
+  } else {
+    // Set 0 ("clear").
+    number &= ~(1 << index);
+  }
+  return number;
+}
+
+/**
+ * Returns a bit range.
+ */
+function getBitRange(number, from, to) {
+  return (number >> from) & ((1 << (to + 1 - from)) - 1);
+}
+
+/**
+ * Sets a bits range.
+ */
+function setBitRange(number, from, to, range) {
+  const mask = ((1 << (to + 1 - from)) - 1) << from;
+  return (number & ~mask) | ((range << from) & mask);
+}
+
 module.exports = {
+  getBitAt,
+  getBitRange,
   int16,
   int16Table,
-  uint16,
   isNegativeZero,
+  setBitAt,
+  setBitRange,
   toSignedString,
+  uint16,
 };
