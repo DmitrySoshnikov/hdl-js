@@ -90,6 +90,9 @@ class RAM extends BuiltInGate {
     super(options);
     this._size = options.size || 8;
     this._storage = new Int16Array(this.getSize());
+
+    // Addresses which are updated (used in `reset`).
+    this._modifiedAddresses = new Set();
   }
 
   /**
@@ -114,6 +117,14 @@ class RAM extends BuiltInGate {
   }
 
   /**
+   * Sets storage.
+   */
+  setStorage(storage) {
+    this._storage = storage;
+    return this;
+  }
+
+  /**
    * Returns values at address.
    */
   getValueAt(address) {
@@ -124,7 +135,20 @@ class RAM extends BuiltInGate {
    * Returns values at address.
    */
   setValueAt(address, value) {
-    return (this._storage[this._checkAddress(address)] = value);
+    this._storage[this._checkAddress(address)] = value;
+    this._modifiedAddresses.add(address);
+    return this;
+  }
+
+  /**
+   * Resets the memory to all zeros.
+   */
+  reset() {
+    this._modifiedAddresses.forEach(address => {
+      this._storage[address] = 0;
+    });
+    this._modifiedAddresses.clear();
+    return this;
   }
 
   /**

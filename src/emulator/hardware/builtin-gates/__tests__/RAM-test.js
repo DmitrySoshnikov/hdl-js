@@ -19,7 +19,7 @@ describe('RAM', () => {
     SystemClock.reset();
 
     // Default is 8 registers.
-    const ram8Chip = new RAM(RAM.Spec);
+    const ram8Chip = RAM.defaultFromSpec();
 
     ram8Chip
       .setPinValues({
@@ -44,5 +44,23 @@ describe('RAM', () => {
     expect(() => ram8Chip.getValueAt(15)).toThrow(
       new TypeError(`Chip "RAM": invalid address 15, the max address is 7.`)
     );
+  });
+
+  it('reset', () => {
+    SystemClock.reset();
+
+    const ram8Chip = RAM.defaultFromSpec();
+
+    ram8Chip
+      .setPinValues({
+        in: 0b0000000000010101,
+        load: 1,
+        address: 0,
+      })
+      .clockCycle();
+
+    ram8Chip.reset();
+
+    expect(ram8Chip.getValueAt(0)).toBe(0);
   });
 });

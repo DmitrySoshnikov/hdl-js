@@ -7,7 +7,7 @@
 
 const RAM = require('./RAM');
 
-const {int16Table} = require('../../../util/numbers');
+const {int16Table, getBitAt, setBitAt} = require('../../../util/numbers');
 
 /**
  * Canonical truth table for the `Screen` gate.
@@ -27,6 +27,11 @@ const TRUTH_TABLE = int16Table([
   {$clock: -5, in: 0b0000000000000000, load: 0, address: 8191, out: 0b0000000000000000},
 ]);
 
+const WORD_SIZE = 16;
+const ROWS = 256;
+const COLUMNS = 512;
+const WORDS_IN_ROW = COLUMNS / WORD_SIZE;
+
 /**
  * A 256 x 512 screen, implemented with 8K registers, each register
  * represents 16 pixels.
@@ -38,33 +43,71 @@ const TRUTH_TABLE = int16Table([
  */
 class Screen extends RAM {
   constructor(options) {
-    super(Object.assign({size: 256 * (512 / 16)}, options));
+    super(Object.assign({size: ROWS * WORDS_IN_ROW}, options));
   }
 
   /**
    * Clears the screen.
    */
   clear() {
-    // TODO
+    this.reset();
+    return this;
   }
 
   /**
-   * Returns a value of a pixel at (row, col) position.
+   * Returns a value of a pixel at (row, column) position.
+   *
+   * word = Screen[32 * row + column / 16]
+   * bit number: column / 16
    */
-  getPixel(row, col) {
-    // TODO
-    row;
-    col;
+  getPixelAt(row, column) {
+    const word = this.getWordForLocation(row, column);
+    return getBitAt(word, column % WORD_SIZE);
   }
 
   /**
-   * Sets a value of a pixel at (row, col) coordinates.
+   * Sets a value of a pixel at (row, column) coordinates.
    */
-  setPixel(row, col, value) {
-    // TODO
-    row;
-    col;
-    value;
+  setPixelAt(row, column, value) {
+    const address = this.getAddressForLocation(row, column);
+    let word = this.getValueAt(address);
+    word = setBitAt(word, column % WORD_SIZE, value);
+    this.setValueAt(address, word);
+    return this;
+  }
+
+  /**
+   * Returns a word corresponding to row, and column.
+   *
+   * Screen[32 * row + column / 16]
+   */
+  getWordForLocation(row, column) {
+    return this._storage[this.getAddressForLocation(row, column)];
+  }
+
+  /**
+   * Returns absolute address corresponding to location.
+   */
+  getAddressForLocation(row, column) {
+    this._checkLocation(row, column);
+    return WORDS_IN_ROW * row + Math.trunc(column / WORD_SIZE);
+  }
+
+  /**
+   * Validates locations.
+   */
+  _checkLocation(row, column) {
+    if (row < 0 || row > ROWS - 1) {
+      throw new TypeError(
+        `Screen: invalid row ${row}, max row is ${ROWS - 1}.`
+      );
+    }
+
+    if (column < 0 || column > COLUMNS - 1) {
+      throw new TypeError(
+        `Screen: invalid column ${column}, max column is ${COLUMNS - 1}.`
+      );
+    }
   }
 }
 
