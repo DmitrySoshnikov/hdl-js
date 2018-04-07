@@ -1466,7 +1466,7 @@ The _Keyboard_ chip is special, and requires callers to implement the actual key
 
 Example using from a browser environment:
 
-```
+```js
 ...
 
 const keyboard = Keyboard.defaultFromSpec();
