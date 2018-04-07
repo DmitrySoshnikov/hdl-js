@@ -1438,12 +1438,12 @@ See detailed clock description in the next section.
 
 The interface chips include the gates, which allow communicating to user input and output. These are:
 
-- [Screen](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Screen.js)
+- [Screen](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Screen.js) (video memory)
 - [Keyboard](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Keyboard.js)
 
 ##### Screen
 
-The _Screen_ chip represents 256 x 512 video memory, implemented with 8K registers. The gate can manipulate individual pixels using `getPixelAt`, and `setPixelAt` methods.
+The `Screen` chip represents 256 x 512 video memory, implemented with 8K registers. The gate can manipulate individual pixels using `getPixelAt`, and `setPixelAt` methods.
 
 ```js
 ...
@@ -1462,7 +1462,7 @@ console.log(screen.getPixelAt(1, 16)); // 1
 
 ##### Keyboard
 
-The _Keyboard_ chip is special, and requires callers to implement the actual keyboard listener, depending on a system where the chip is used. Such caller listeners should call `Keyboard.emit('key', key)` even, and the key code is propagated to the output pin:
+The `Keyboard` chip is special, and requires callers to implement the actual keyboard listener, depending on a system where the chip is used. Such caller listeners should call `Keyboard.emit('key', key)` event, and the key code is propagated to the output pin:
 
 Example using from a browser environment:
 
@@ -1480,7 +1480,7 @@ document.body.addEventListener('keypress', event => {
 });
 ```
 
-The `Keyboard` also provides default (blocking) `listen` method, which spawns Node's stdin keyboard input listening:
+The `Keyboard` also provides default (blocking) `listen` method, which spawns Node's `stdin` keyboard listening:
 
 ```js
 ...
@@ -1495,7 +1495,7 @@ keyboard.getPin('out').on('change', value => {
 keyboard.listen();
 ```
 
-We can introspect keyboard events using `--describe` option of the Keyboard gate:
+We can introspect keyboard events using `--describe` option of the `Keyboard` gate:
 
 ```
 hdl-js --gate Keyboard --describe
