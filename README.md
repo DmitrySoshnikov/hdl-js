@@ -1402,7 +1402,7 @@ The _arithmetic-logic unit_ is an abstraction which encapsulates inside several 
 - [FullAdder](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/FullAdder.js) (3 bits adder)
 - [Add16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Add16.js)
 - [Inc16](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Inc16.js)
-- ALU
+- [ALU](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/ALU.js)
 
 The ALU chip itself evaluates both, arithmetic (such as addition), and logic (such as `And`, `Or`, etc) operations.
 
@@ -1430,6 +1430,102 @@ Memory chips are synchronized by the [clock](https://en.wikipedia.org/wiki/Clock
 The _internal state_ of a clocked chip can _only_ change on the _rising edge_. While the _output_ is _committed_ (usually to reflect the internal state) on the _falling edge_ of the clock. This _delay_ of the output is exactly reflected in the DFF, that is _Delay_ Flip-Flop, name.
 
 See detailed clock description in the next section.
+
+#### Interface chips
+
+The interface chips include the gates, which allow communicating to user input and output. These are:
+
+- [Screen](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Screen.js)
+- [Keyboard](https://github.com/DmitrySoshnikov/hdl-js/blob/master/src/emulator/hardware/builtin-gates/Keyboard.js)
+
+##### Screen
+
+The _Screen_ chip represents 256 x 512 video memory, implemented with 8K registers. The gate can manipulate individual pixels using `getPixelAt`, and `setPixelAt` methods.
+
+```js
+...
+
+const screen = Screen
+  .defaultFromSpec()
+  .clear();
+
+console.log(screen.getPixelAt(1, 16)); // 0
+
+screen.setPixelAt(/* row */ 1,  /* column */ 16, 1);
+
+console.log(screen.getPixelAt(1, 16)); // 1
+
+```
+
+##### Keyboard
+
+The _Keyboard_ chip is special, and requires callers to implement the actual keyboard listener, depending on a system where the chip is used. Such caller listeners should call `Keyboard.emit('key', key)` even, and the key code is propagated to the output pin:
+
+Example using from a browser environment:
+
+```
+...
+
+const keyboard = Keyboard.defaultFromSpec();
+
+keyboard.getPin('out').on('change', value => {
+  console.log('Char code: ' + value);
+});
+
+document.body.addEventListener('keypress', event => {
+  Keyboard.emit('key', event.key);
+});
+```
+
+The `Keyboard` also provides default (blocking) `listen` method, which spawns Node's stdin keyboard input listening:
+
+```js
+...
+
+const keyboard = Keyboard.defaultFromSpec();
+
+keyboard.getPin('out').on('change', value => {
+  console.log('Char code: ' + value);
+});
+
+// Listen to stdin.
+keyboard.listen();
+```
+
+We can introspect keyboard events using `--describe` option of the Keyboard gate:
+
+```
+hdl-js --gate Keyboard --describe
+```
+
+Result:
+
+```
+BuiltIn "Keyboard" gate:
+
+Description:
+
+  A keyboard, implemented as a 16 bit register that stores
+  the currently pressed key code.
+
+Inputs:
+
+    Keyboard input
+
+Outputs:
+
+  - out[16]
+
+Truth table: press any key...
+
+┌──────┬─────┐
+│ char │ out │
+├──────┼─────┤
+│  A   │ 65  │
+└──────┴─────┘
+
+Ctrl-c to exit...
+```
 
 ### Clock
 

@@ -28,6 +28,7 @@ const BuiltInGates = {};
   'FullAdder',
   'HalfAdder',
   'Inc16',
+  'Keyboard',
   'MipsAlu',
   'Mux',
   'Mux16',

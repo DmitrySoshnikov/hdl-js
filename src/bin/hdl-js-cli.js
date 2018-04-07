@@ -9,6 +9,7 @@ const colors = require('colors');
 const fs = require('fs');
 const hdl = require('../../index');
 const path = require('path');
+const TablePrinter = require('../table-printer');
 const vm = require('vm');
 
 const {
@@ -186,6 +187,7 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
 
   const GateClass = loadGate(gate);
   const isBuiltIn = Object.getPrototypeOf(GateClass) === BuiltInGate;
+  const isKeyboard = isBuiltIn && GateClass.name === 'Keyboard';
   const spec = GateClass.Spec;
 
   console.info('');
@@ -213,7 +215,14 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
 
   // Input pins:
 
-  const inputPins = spec.inputPins.map(input => toFullName(input)).join('\n');
+  let inputPins =
+    spec.inputPins.length > 0
+      ? spec.inputPins.map(input => toFullName(input)).join('\n')
+      : '    None';
+
+  if (isKeyboard) {
+    inputPins = '    Keyboard input';
+  }
 
   console.info('\n' + colors.bold('Inputs:\n\n') + inputPins);
 
@@ -235,6 +244,36 @@ function describeGate(gate, formatRadix, formatStringLengh, columns) {
 
   console.info('\n' + colors.bold('Outputs:\n\n') + outputPins);
   console.info('');
+
+  // Special truth table for Keyboard.
+  if (isKeyboard) {
+    const keyboard = GateClass.defaultFromSpec().listen();
+
+    console.info(colors.bold('Truth table:') + ' press any key...\n');
+
+    const printKeyboardTable = (ch, code) => {
+      const printer = new TablePrinter({
+        head: ['char', 'out'],
+      });
+
+      printer.push([
+        {content: ch.trim() || ' ', hAlign: 'center'},
+        {content: code, hAlign: 'center'},
+      ]);
+
+      console.info(printer.toString() + '\n');
+      console.info('Ctrl-c to exit...\n');
+    };
+
+    printKeyboardTable('?', '?');
+
+    keyboard.getPin('out').on('change', value => {
+      clearPreviousLines(8);
+      printKeyboardTable(String.fromCharCode(value), value);
+    });
+
+    return;
+  }
 
   let {truthTable} = spec;
   let isCustomTable = truthTable.length === 0;
@@ -294,9 +333,16 @@ function runSlice(data, index, action) {
 
   setTimeout(() => {
     // Clear 6 previous lines, which take a previous table row.
-    process.stdout.write('\r\x1B[K\r\x1B[1A'.repeat(6));
+    clearPreviousLines(6);
     runSlice(data, index + 1, action);
   }, 1000 / SystemClock.getRate());
+}
+
+/**
+ * Clears previous lines in the terminal.
+ */
+function clearPreviousLines(count) {
+  process.stdout.write('\r\x1B[K\r\x1B[1A'.repeat(count));
 }
 
 function execScript(script, {verbose = false} = {}) {
