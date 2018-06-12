@@ -3,20 +3,21 @@
  * Copyright (c) 2017-present Dmitry Soshnikov <dmitry.soshnikov@gmail.com>
  */
 
-const Table = require('cli-table2');
+const Table = require('cli-table3');
 
 /**
- * Wrapper class over `cli-table2` with default options preset.
+ * Wrapper class over `cli-table3` with default options preset.
  */
-class TablePrinter extends Table {
+class TablePrinter {
   constructor(options) {
-    options = Object.assign({}, options, {
-      style: {
-        head: ['blue'],
-        border: ['gray'],
-      },
-    });
-    super(options);
+    return new Table(
+      Object.assign({}, options, {
+        style: {
+          head: ['blue'],
+          border: ['gray'],
+        },
+      })
+    );
   }
 }
 

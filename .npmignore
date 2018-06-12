@@ -1,5 +1,11 @@
+/examples/
+/scripts/
 /src/
 .gitignore
+.eslintignore
+.prettierignore
+.prettierrc
+.watchmanconfig
 .eslintrc
 .babelrc
 .travis.yml
