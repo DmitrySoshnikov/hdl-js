@@ -27,7 +27,7 @@
 \b(?:CLOCKED|clocked)\b     return 'CLOCKED'
 
 \d+                         return 'NUMBER'
-[a-zA-Z_$]\w*               return 'ID'
+[a-zA-Z_$][\w-]*            return 'ID'
 
 /lex
 
