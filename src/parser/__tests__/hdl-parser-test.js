@@ -10,7 +10,7 @@ describe('hdl-parser', () => {
     const exampleHDL = `
       CHIP Custom {
         IN a, b[4];
-        OUT out[8], out2;
+        OUT out[8], out2, hello-world;
 
         PARTS:
 
@@ -42,6 +42,10 @@ describe('hdl-parser', () => {
         {
           type: 'Name',
           value: 'out2',
+        },
+        {
+          type: 'Name',
+          value: 'hello-world',
         },
       ],
       parts: [
